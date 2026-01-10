@@ -1,6 +1,6 @@
 import { eq, and, desc } from 'drizzle-orm'
-import { db } from '~~/server/database/drizzle'
-import { project } from '~~/server/database/schema'
+import { db } from '../database/drizzle'
+import { project } from '../database/schema'
 
 /**
  * Service de gestion des projets

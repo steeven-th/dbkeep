@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { createProject } from '~~/server/services/projectService'
-import { requireAuth } from '~~/server/utils/appMode'
+import { createProject } from '../../services/projectService'
+import { requireAuth } from '../../utils/appMode'
 
 // Schéma de validation pour la création d'un projet
 const createProjectSchema = z.object({

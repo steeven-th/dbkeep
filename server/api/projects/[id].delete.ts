@@ -1,5 +1,5 @@
-import { deleteProject } from '~~/server/services/projectService'
-import { requireAuth } from '~~/server/utils/appMode'
+import { deleteProject } from '../../services/projectService'
+import { requireAuth } from '../../utils/appMode'
 
 /**
  * DELETE /api/projects/:id

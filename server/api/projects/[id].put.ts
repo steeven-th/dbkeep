@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { updateProject } from '~~/server/services/projectService'
-import { requireAuth } from '~~/server/utils/appMode'
+import { updateProject } from '../../services/projectService'
+import { requireAuth } from '../../utils/appMode'
 
 // Schéma de validation pour la mise à jour d'un projet
 const updateProjectSchema = z.object({

@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
@@ -41,7 +43,7 @@ export default defineNuxtConfig({
     enabled: true
   },
 
-  css: ['~/assets/css/main.css'],
+  css: [fileURLToPath(new URL('./app/assets/css/main.css', import.meta.url))],
 
   // Nuxt UI génère automatiquement les palettes nécessaires basées sur app.config.ts
 

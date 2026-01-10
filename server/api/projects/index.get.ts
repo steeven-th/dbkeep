@@ -1,5 +1,5 @@
-import { listProjects } from '~~/server/services/projectService'
-import { requireAuth } from '~~/server/utils/appMode'
+import { listProjects } from '../../services/projectService'
+import { requireAuth } from '../../utils/appMode'
 
 /**
  * GET /api/projects
