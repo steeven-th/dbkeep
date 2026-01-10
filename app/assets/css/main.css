@@ -1,0 +1,203 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* Vue Flow styles */
+@import "@vue-flow/core/dist/style.css";
+@import "@vue-flow/core/dist/theme-default.css";
+@import "@vue-flow/controls/dist/style.css";
+@import "@vue-flow/node-resizer/dist/style.css";
+
+/* =====================================================
+   DESIGN SYSTEM - DBKeep
+   Palette: Amber (primary), Zinc (secondary), Gray (neutral)
+   Semantic colors configured in app.config.ts
+   ===================================================== */
+
+/* =====================================================
+   COLOR PALETTE - Valeurs de base réutilisables
+   ===================================================== */
+:root {
+  /* Base colors */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Gray scale (pour light mode) */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* Slate scale (pour dark mode backgrounds) */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+}
+
+/* =====================================================
+   SEMANTIC TOKENS - Light Mode
+   ===================================================== */
+:root {
+  /* Text */
+  --ui-text-dimmed: var(--ui-color-neutral-400);
+  --ui-text-muted: var(--ui-color-neutral-500);
+  --ui-text-toned: var(--ui-color-neutral-600);
+  --ui-text: var(--ui-color-neutral-700);
+  --ui-text-highlighted: var(--ui-color-neutral-900);
+  --ui-text-inverted: var(--color-white);
+
+  /* Background */
+  --ui-bg: var(--color-white);
+  --ui-bg-muted: var(--ui-color-neutral-50);
+  --ui-bg-elevated: var(--ui-color-neutral-100);
+  --ui-bg-accented: var(--ui-color-neutral-200);
+  --ui-bg-inverted: var(--ui-color-neutral-900);
+
+  /* Border */
+  --ui-border: var(--ui-color-neutral-200);
+  --ui-border-muted: var(--ui-color-neutral-200);
+  --ui-border-accented: var(--ui-color-neutral-300);
+  --ui-border-inverted: var(--ui-color-neutral-900);
+
+  /* Radius */
+  --ui-radius: 0.25rem;
+
+  /* Vue Flow specific */
+  --vue-flow-grid-color: var(--color-gray-600);
+  --vue-flow-icon-color: var(--color-gray-700);
+}
+
+/* =====================================================
+   SEMANTIC TOKENS - Dark Mode
+   ===================================================== */
+.dark {
+  /* Text */
+  --ui-text-dimmed: var(--ui-color-neutral-400);
+  --ui-text-muted: var(--ui-color-neutral-300);
+  --ui-text-toned: var(--ui-color-neutral-200);
+  --ui-text: var(--color-white);
+  --ui-text-highlighted: var(--color-white);
+  --ui-text-inverted: var(--color-white);
+
+  /* Background - Using Slate for dark mode */
+  --ui-bg: var(--color-slate-900);
+  --ui-bg-muted: var(--color-slate-800);
+  --ui-bg-elevated: var(--color-slate-700);
+  --ui-bg-accented: var(--color-slate-600);
+  --ui-bg-inverted: var(--color-slate-500);
+
+  /* Border */
+  --ui-border: var(--ui-color-neutral-800);
+  --ui-border-muted: var(--ui-color-neutral-800);
+  --ui-border-accented: var(--ui-color-neutral-700);
+  --ui-border-inverted: var(--ui-color-neutral-800);
+
+  /* Vue Flow specific */
+  --vue-flow-grid-color: var(--color-slate-400);
+  --vue-flow-icon-color: var(--color-white);
+}
+
+/* =====================================================
+   VUE FLOW - Styles globaux
+   ===================================================== */
+
+/* Effet de lueur sur les tables sélectionnées */
+.vue-flow__node.selected {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--ui-color-primary-500) 50%, transparent) !important;
+  border-color: var(--ui-color-primary-500) !important;
+}
+
+.dark .vue-flow__node.selected {
+  box-shadow: 0 0 25px color-mix(in srgb, var(--ui-color-primary-400) 60%, transparent) !important;
+}
+
+/* Les lignes de relations */
+.vue-flow__edge-path {
+  stroke: var(--ui-color-primary-500);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--ui-color-primary-500) 50%, transparent));
+}
+
+.dark .vue-flow__edge-path {
+  stroke: var(--ui-color-primary-400);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--ui-color-primary-400) 60%, transparent));
+}
+
+/* Fond du canvas */
+.vue-flow__background {
+  background-color: var(--ui-bg-muted);
+}
+
+.dark .vue-flow__background {
+  background-color: var(--color-slate-900);
+}
+
+/* Zone de sélection (lasso) */
+.vue-flow__selection {
+  background: color-mix(in srgb, var(--ui-color-primary-500) 10%, transparent);
+  border: 1px dashed var(--ui-color-primary-500);
+}
+
+/* Contrôles Vue Flow */
+.vue-flow__controls {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border-radius: var(--ui-radius);
+  border: 1px solid var(--ui-border);
+  overflow: hidden;
+}
+
+.vue-flow__controls-button {
+  background: var(--ui-bg);
+  border: none;
+  color: var(--ui-text);
+}
+
+.vue-flow__controls-button:hover {
+  background: var(--ui-bg-elevated);
+}
+
+/* Icônes des contrôles */
+.vue-flow__controls-button svg {
+  fill: var(--vue-flow-icon-color);
+}
+
+.vue-flow__controls-button:hover svg {
+  fill: var(--vue-flow-icon-color);
+}
+
+/* Lignes de connexion en cours de création */
+.vue-flow__connection-line {
+  stroke: var(--ui-color-primary-500);
+  stroke-width: 2px;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--ui-color-primary-500) 50%, transparent));
+}
+
+.dark .vue-flow__connection-line {
+  stroke: var(--ui-color-primary-400);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--ui-color-primary-400) 60%, transparent));
+}
+
+/* Edges sélectionnés */
+.vue-flow__edge.selected .vue-flow__edge-path {
+  stroke: var(--ui-color-primary-500);
+  stroke-width: 3px;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--ui-color-primary-500) 70%, transparent));
+}
+
+.dark .vue-flow__edge.selected .vue-flow__edge-path {
+  stroke: var(--ui-color-primary-400);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--ui-color-primary-400) 70%, transparent));
+}
