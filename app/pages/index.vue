@@ -4,6 +4,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const { isGuestModeEnabled, isRegisterEnabled } = useAppMode()
+
+// Détermine la destination du bouton principal d'action
+const primaryActionRoute = computed(() => isGuestModeEnabled.value ? '/app' : '/login')
+const primaryActionLabel = computed(() => isGuestModeEnabled.value ? t('landing.open_app') : t('auth.login_link'))
 </script>
 
 <template>
@@ -31,10 +36,19 @@ const { t } = useI18n()
             color="neutral"
             variant="ghost"
           />
-          <UButton to="/login" color="neutral" variant="ghost">
-            {{ t('auth.login_link') }}
+          <!-- Bouton Connexion / Accéder à l'app -->
+          <UButton
+            :to="primaryActionRoute"
+            color="neutral"
+            variant="ghost"
+          >
+            {{ primaryActionLabel }}
           </UButton>
-          <UButton to="/register">
+          <!-- Bouton Inscription (masqué si enableRegister=false OU si guestMode=true) -->
+          <UButton
+            v-if="isRegisterEnabled && !isGuestModeEnabled"
+            to="/register"
+          >
             {{ t('auth.register_link') }}
           </UButton>
         </div>
@@ -51,8 +65,13 @@ const { t } = useI18n()
           {{ t('landing.hero_description') }}
         </p>
         <div class="flex items-center justify-center gap-4">
-          <UButton to="/app" size="xl" icon="i-lucide-play">
-            {{ t('landing.get_started') }}
+          <!-- Bouton principal : Accéder à l'app (guest) ou Commencer (auth) -->
+          <UButton
+            :to="isGuestModeEnabled ? '/app' : '/register'"
+            size="xl"
+            :icon="isGuestModeEnabled ? 'i-lucide-arrow-right' : 'i-lucide-play'"
+          >
+            {{ isGuestModeEnabled ? t('landing.open_app') : t('landing.get_started') }}
           </UButton>
           <UButton
             to="https://github.com"
@@ -105,8 +124,8 @@ const { t } = useI18n()
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-24 px-4">
+    <!-- CTA Section (masquée en mode guest) -->
+    <section v-if="!isGuestModeEnabled" class="py-24 px-4">
       <div class="container mx-auto text-center max-w-2xl">
         <h2 class="text-3xl font-bold mb-4">
           {{ t('landing.cta_title') }}
@@ -114,8 +133,24 @@ const { t } = useI18n()
         <p class="text-muted mb-8">
           {{ t('landing.cta_description') }}
         </p>
-        <UButton to="/register" size="xl" icon="i-lucide-arrow-right" trailing>
+        <!-- Bouton CTA : visible uniquement si inscription activée -->
+        <UButton
+          v-if="isRegisterEnabled"
+          to="/register"
+          size="xl"
+          icon="i-lucide-arrow-right"
+          trailing
+        >
           {{ t('landing.cta_button') }}
+        </UButton>
+        <!-- Bouton alternatif si inscription désactivée mais pas en guest mode -->
+        <UButton
+          v-else
+          to="/login"
+          size="xl"
+          icon="i-lucide-log-in"
+        >
+          {{ t('auth.login_link') }}
         </UButton>
       </div>
     </section>
