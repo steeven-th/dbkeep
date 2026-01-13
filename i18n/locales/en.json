@@ -49,6 +49,7 @@
   "project": {
     "name": "Project name",
     "name_placeholder": "My database project",
+    "new_project_description": "Configure your new database project.",
     "engine": "Database engine",
     "create": "Create project",
     "created_at": "Created at",
@@ -57,18 +58,27 @@
     "welcome_message": "Start by creating a new project to design your database.",
     "no_project": "No project open",
     "my_projects": "My projects",
+    "search_placeholder": "Search a project...",
+    "all_engines": "All engines",
+    "no_results": "No projects found",
+    "no_results_description": "No projects match your search criteria.",
+    "clear_filters": "Clear filters",
     "open": "Open",
+    "rename": "Rename",
+    "rename_description": "Enter a new name for this project.",
     "delete": "Delete",
     "confirm_delete": "Are you sure you want to delete this project?",
     "confirm_delete_description": "This action is irreversible. All project data will be lost.",
     "empty_list": "No projects",
     "empty_list_description": "Create your first project to start designing your databases.",
     "created_success": "Project created successfully",
+    "renamed_success": "Project renamed successfully",
     "deleted_success": "Project deleted successfully",
     "saved_success": "Project saved",
     "error_load_list": "Error loading projects",
     "error_load": "Error loading project",
     "error_create": "Error creating project",
+    "error_rename": "Error renaming project",
     "error_save": "Error saving project",
     "error_delete": "Error deleting project",
     "last_modified": "Last modified",
@@ -226,7 +236,29 @@
   "errors": {
     "required_field": "This field is required",
     "invalid_name": "The name contains invalid characters",
-    "duplicate_name": "This name already exists"
+    "duplicate_name": "This name already exists",
+
+    "UNKNOWN_ERROR": "An unexpected error occurred",
+    "VALIDATION_ERROR": "Validation error",
+    "UNAUTHORIZED": "You must be logged in to perform this action",
+    "FORBIDDEN": "You don't have permission to perform this action",
+    "NOT_FOUND": "Resource not found",
+    "INVALID_INPUT": "Invalid data",
+
+    "AUTH_INVALID_CREDENTIALS": "Invalid email or password",
+    "AUTH_EMAIL_ALREADY_EXISTS": "This email address is already in use",
+    "AUTH_INVALID_TOKEN": "Invalid or expired token",
+    "AUTH_SESSION_EXPIRED": "Your session has expired, please log in again",
+
+    "USER_NOT_FOUND": "User not found",
+
+    "EMAIL_INVALID": "Invalid email address",
+    "EMAIL_REQUIRED": "Email address is required",
+    "NAME_REQUIRED": "Name is required",
+    "FIELD_REQUIRED": "This field is required",
+
+    "PROJECT_NOT_FOUND": "Project not found",
+    "PROJECT_PERMISSION_DENIED": "You don't have access to this project"
   },
   "confirm": {
     "delete_tables": "Are you sure you want to delete {count} tables?",

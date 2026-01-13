@@ -1,66 +1,66 @@
 # Configuration
 
-Guide de configuration des variables d'environnement.
+Environment variables configuration guide.
 
-## Fichier .env
+## .env File
 
-DBKeep utilise un fichier `.env` pour la configuration. Un fichier d'exemple `.env.example` est fourni.
+DBKeep uses an `.env` file for configuration. An example file `.env.example` is provided.
 
 ```bash
 cp .env.example .env
 ```
 
-## Variables d'environnement
+## Environment Variables
 
 ### DATABASE_URL
 
-URL de connexion à PostgreSQL.
+PostgreSQL connection URL.
 
-**Format** :
+**Format**:
 ```
 postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
-**Exemples** :
+**Examples**:
 
 ```env
-# Avec mot de passe
-DATABASE_URL=postgresql://postgres:monmotdepasse@localhost:5432/dbkeep
+# With password
+DATABASE_URL=postgresql://postgres:mypassword@localhost:5432/dbkeep
 
-# Sans mot de passe (config locale macOS par défaut)
-DATABASE_URL=postgresql://steeventhomas@localhost:5432/dbkeep
+# Without password (default macOS local config)
+DATABASE_URL=postgresql://username@localhost:5432/dbkeep
 
-# Avec SSL (production)
+# With SSL (production)
 DATABASE_URL=postgresql://user:pass@host.com:5432/dbkeep?sslmode=require
 ```
 
 ### BETTER_AUTH_SECRET
 
-Clé secrète pour signer les sessions et tokens. **Doit faire au moins 32 caractères**.
+Secret key for signing sessions and tokens. **Must be at least 32 characters**.
 
-**Générer une clé sécurisée** :
+**Generate a secure key**:
 
 ```bash
-# Avec OpenSSL
+# With OpenSSL
 openssl rand -base64 32
 
-# Avec Node.js
+# With Node.js
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
-**Exemple** :
+**Example**:
 ```env
 BETTER_AUTH_SECRET=+dh34Ge0TJcUPxtk7Nza9eOZ7+lPlX6itV/ATEw3jzs=
 ```
 
-> **Important** : Ne jamais commiter cette clé dans le code source !
+> **Important**: Never commit this key to source code!
 
 ### BETTER_AUTH_URL
 
-URL de base de l'application. Utilisée pour les redirections et les callbacks.
+Application base URL. Used for redirects and callbacks.
 
 ```env
-# Développement
+# Development
 BETTER_AUTH_URL=http://localhost:3000
 
 # Production
@@ -69,90 +69,90 @@ BETTER_AUTH_URL=https://dbkeep.example.com
 
 ---
 
-## Modes de fonctionnement
+## Operation Modes
 
-DBKeep supporte différents modes de déploiement via des variables d'environnement.
+DBKeep supports different deployment modes via environment variables.
 
 ### NUXT_PUBLIC_GUEST_MODE
 
-Active le **Mode Invité** permettant d'utiliser l'application sans authentification.
+Enables **Guest Mode** allowing the application to be used without authentication.
 
-| Valeur | Comportement |
-|--------|--------------|
-| `false` (défaut) | Authentification requise |
-| `true` | Accès libre, projets attribués à un utilisateur "guest" |
+| Value | Behavior |
+|-------|----------|
+| `false` (default) | Authentication required |
+| `true` | Open access, projects assigned to a "guest" user |
 
-**Cas d'usage** :
-- Auto-hébergement personnel
-- Instances de démonstration
-- Usage local sans compte
+**Use cases**:
+- Personal self-hosting
+- Demo instances
+- Local use without account
 
 ```env
 NUXT_PUBLIC_GUEST_MODE=true
 ```
 
-**Impact** :
-- Le middleware auth laisse passer toutes les requêtes vers `/app`
-- Les projets sont sauvegardés avec l'ID utilisateur `guest-user`
-- Les options "Profil" et "Paramètres" sont masquées dans le menu
+**Impact**:
+- Auth middleware allows all requests to `/app`
+- Projects are saved with user ID `guest-user`
+- "Profile" and "Settings" options are hidden in the menu
 
 ### NUXT_PUBLIC_ENABLE_REGISTER
 
-Contrôle l'inscription de nouveaux utilisateurs.
+Controls new user registration.
 
-| Valeur | Comportement |
-|--------|--------------|
-| `true` (défaut) | Inscription ouverte |
-| `false` | Inscription désactivée |
+| Value | Behavior |
+|-------|----------|
+| `true` (default) | Open registration |
+| `false` | Registration disabled |
 
-**Cas d'usage** :
-- SaaS privé (seul l'admin crée les comptes)
-- Instance personnelle verrouillée
-- Phase beta fermée
+**Use cases**:
+- Private deployment (only admin creates accounts)
+- Locked personal instance
+- Closed beta phase
 
 ```env
 NUXT_PUBLIC_ENABLE_REGISTER=false
 ```
 
-**Impact** :
-- Le lien "S'inscrire" est masqué sur `/login`
-- La page `/register` affiche un message d'erreur
-- L'API `/api/auth/sign-up` retourne une erreur 403
+**Impact**:
+- "Sign up" link is hidden on `/login`
+- The `/register` page displays an error message
+- The `/api/auth/sign-up` API returns a 403 error
 
 ---
 
-## Scénarios de déploiement
+## Deployment Scenarios
 
-### SaaS Public (défaut)
+### Multi-user (default)
 
-Configuration standard avec authentification et inscription ouverte.
+Standard configuration with authentication and open registration.
 
 ```env
 DATABASE_URL=postgresql://user:pass@db.host.com:5432/dbkeep
-BETTER_AUTH_SECRET=<clé-sécurisée>
+BETTER_AUTH_SECRET=<secure-key>
 BETTER_AUTH_URL=https://dbkeep.example.com
 
-# Valeurs par défaut (peuvent être omises)
+# Default values (can be omitted)
 NUXT_PUBLIC_GUEST_MODE=false
 NUXT_PUBLIC_ENABLE_REGISTER=true
 ```
 
-### SaaS Privé
+### Private Deployment
 
-Authentification requise, inscription désactivée (admin crée les comptes).
+Authentication required, registration disabled (admin creates accounts).
 
 ```env
 DATABASE_URL=postgresql://user:pass@db.host.com:5432/dbkeep
-BETTER_AUTH_SECRET=<clé-sécurisée>
+BETTER_AUTH_SECRET=<secure-key>
 BETTER_AUTH_URL=https://private.dbkeep.example.com
 
 NUXT_PUBLIC_GUEST_MODE=false
 NUXT_PUBLIC_ENABLE_REGISTER=false
 ```
 
-### Auto-hébergement Personnel
+### Personal Self-hosting
 
-Mode invité pour usage personnel sans gestion de compte.
+Guest mode for personal use without account management.
 
 ```env
 DATABASE_URL=postgresql://localhost/dbkeep
@@ -163,9 +163,9 @@ NUXT_PUBLIC_GUEST_MODE=true
 NUXT_PUBLIC_ENABLE_REGISTER=false
 ```
 
-### Développement Local
+### Local Development
 
-Configuration pour le développement avec toutes les fonctionnalités.
+Configuration for development with all features enabled.
 
 ```env
 DATABASE_URL=postgresql://localhost/dbkeep
@@ -178,11 +178,11 @@ NUXT_PUBLIC_ENABLE_REGISTER=true
 
 ---
 
-## Exemple complet
+## Complete Example
 
 ```env
 # ===========================================
-# Database PostgreSQL
+# PostgreSQL Database
 # ===========================================
 DATABASE_URL=postgresql://postgres:password@localhost:5432/dbkeep
 
@@ -193,26 +193,26 @@ BETTER_AUTH_SECRET=+dh34Ge0TJcUPxtk7Nza9eOZ7+lPlX6itV/ATEw3jzs=
 BETTER_AUTH_URL=http://localhost:3000
 
 # ===========================================
-# Mode de fonctionnement
+# Operation Mode
 # ===========================================
-# Mode Invité (accès sans authentification)
+# Guest Mode (access without authentication)
 NUXT_PUBLIC_GUEST_MODE=false
 
-# Inscription des utilisateurs
+# User registration
 NUXT_PUBLIC_ENABLE_REGISTER=true
 ```
 
 ## Validation
 
-Après configuration, vérifiez que tout fonctionne :
+After configuration, verify everything works:
 
 ```bash
-# Tester la connexion à la base
+# Test database connection
 pnpm db:push
 
-# Lancer l'application
+# Launch the application
 pnpm dev
 
-# Ouvrir Drizzle Studio pour vérifier les tables
+# Open Drizzle Studio to verify tables
 pnpm db:studio
 ```

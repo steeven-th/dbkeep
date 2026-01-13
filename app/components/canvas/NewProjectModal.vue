@@ -94,7 +94,7 @@ watch(isOpen, (newValue) => {
   <UModal
     v-model:open="isOpen"
     :title="t('sidebar.new_project')"
-    :close="true"
+    :description="t('project.new_project_description')"
   >
     <template #body>
       <div class="space-y-6">

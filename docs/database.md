@@ -1,23 +1,23 @@
-# Base de données
+# Database
 
-DBKeep utilise **PostgreSQL** avec **Drizzle ORM** pour la gestion des données.
+DBKeep uses **PostgreSQL** with **Drizzle ORM** for data management.
 
 ## Stack
 
-| Technologie | Usage |
-|-------------|-------|
-| [PostgreSQL](https://www.postgresql.org) | Base de données relationnelle |
-| [Drizzle ORM](https://orm.drizzle.team) | ORM TypeScript type-safe |
-| [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) | CLI pour migrations |
-| [Drizzle Studio](https://orm.drizzle.team/drizzle-studio/overview) | Interface de visualisation |
+| Technology | Usage |
+|------------|-------|
+| [PostgreSQL](https://www.postgresql.org) | Relational database |
+| [Drizzle ORM](https://orm.drizzle.team) | Type-safe TypeScript ORM |
+| [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) | CLI for migrations |
+| [Drizzle Studio](https://orm.drizzle.team/drizzle-studio/overview) | Visualization interface |
 
-## Schéma
+## Schema
 
-Le schéma de la base de données est défini dans `server/database/schema.ts`.
+The database schema is defined in `server/database/schema.ts`.
 
-### Tables principales
+### Main Tables
 
-#### User (Utilisateurs)
+#### User (Users)
 
 ```typescript
 export const user = pgTable('user', {
@@ -44,7 +44,7 @@ export const session = pgTable('session', {
 })
 ```
 
-#### Account (Comptes OAuth)
+#### Account (OAuth Accounts)
 
 ```typescript
 export const account = pgTable('account', {
@@ -54,49 +54,49 @@ export const account = pgTable('account', {
   userId: text('user_id').notNull().references(() => user.id),
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
-  // ... autres champs OAuth
+  // ... other OAuth fields
 })
 ```
 
-#### Project (Projets de schéma)
+#### Project (Schema Projects)
 
 ```typescript
 export const project = pgTable('project', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   engine: text('engine').notNull().default('postgresql'),
-  data: jsonb('data'),  // Stockage du schéma (tables, relations, etc.)
+  data: jsonb('data'),  // Schema storage (tables, relations, etc.)
   userId: text('user_id').notNull().references(() => user.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })
 ```
 
-## Commandes Drizzle
+## Drizzle Commands
 
 ### db:push
 
-Synchronise le schéma TypeScript avec la base de données. **Recommandé pour le développement**.
+Synchronizes the TypeScript schema with the database. **Recommended for development**.
 
 ```bash
 pnpm db:push
 ```
 
-> **Note** : Cette commande peut supprimer des données si vous supprimez des colonnes.
+> **Note**: This command may delete data if you remove columns.
 
 ### db:generate
 
-Génère des fichiers de migration SQL basés sur les changements du schéma.
+Generates SQL migration files based on schema changes.
 
 ```bash
 pnpm db:generate
 ```
 
-Les migrations sont créées dans `drizzle/` (ou le dossier configuré).
+Migrations are created in `drizzle/` (or the configured folder).
 
 ### db:migrate
 
-Applique les migrations en attente.
+Applies pending migrations.
 
 ```bash
 pnpm db:migrate
@@ -104,7 +104,7 @@ pnpm db:migrate
 
 ### db:studio
 
-Lance Drizzle Studio, une interface web pour visualiser et manipuler la base de données.
+Launches Drizzle Studio, a web interface to visualize and manipulate the database.
 
 ```bash
 pnpm db:studio
@@ -112,26 +112,26 @@ pnpm db:studio
 
 ## Drizzle Studio
 
-Drizzle Studio est l'équivalent de **Prisma Studio** pour Drizzle ORM.
+Drizzle Studio is the equivalent of **Prisma Studio** for Drizzle ORM.
 
-### Lancement
+### Launch
 
 ```bash
 pnpm db:studio
 ```
 
-Ouvre automatiquement [https://local.drizzle.studio](https://local.drizzle.studio)
+Automatically opens [https://local.drizzle.studio](https://local.drizzle.studio)
 
-### Fonctionnalités
+### Features
 
-- **Visualisation des tables** : Voir la structure de toutes les tables
-- **Navigation des données** : Parcourir les enregistrements avec pagination
-- **Édition inline** : Modifier les données directement
-- **Ajout/Suppression** : Créer ou supprimer des enregistrements
-- **Filtres** : Filtrer les données par colonne
-- **SQL brut** : Exécuter des requêtes SQL personnalisées
+- **Table visualization**: View the structure of all tables
+- **Data navigation**: Browse records with pagination
+- **Inline editing**: Modify data directly
+- **Add/Delete**: Create or delete records
+- **Filters**: Filter data by column
+- **Raw SQL**: Execute custom SQL queries
 
-### Capture d'écran
+### Screenshot
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -154,9 +154,9 @@ Ouvre automatiquement [https://local.drizzle.studio](https://local.drizzle.studi
 └─────────────────────────────────────────────────────────┘
 ```
 
-## Connexion à la base
+## Database Connection
 
-La connexion est configurée dans `server/database/drizzle.ts` :
+The connection is configured in `server/database/drizzle.ts`:
 
 ```typescript
 import { drizzle } from 'drizzle-orm/node-postgres'
@@ -169,17 +169,17 @@ const pool = new Pool({
 export const db = drizzle(pool)
 ```
 
-## Bonnes pratiques
+## Best Practices
 
-### Développement
+### Development
 
-1. Utiliser `db:push` pour itérer rapidement sur le schéma
-2. Utiliser Drizzle Studio pour vérifier les données
-3. Ne pas commiter de données sensibles
+1. Use `db:push` to iterate quickly on the schema
+2. Use Drizzle Studio to verify data
+3. Don't commit sensitive data
 
 ### Production
 
-1. Toujours utiliser des migrations (`db:generate` + `db:migrate`)
-2. Tester les migrations sur un environnement de staging
-3. Faire des backups avant les migrations
-4. Utiliser des connexions SSL (`?sslmode=require`)
+1. Always use migrations (`db:generate` + `db:migrate`)
+2. Test migrations on a staging environment
+3. Backup before migrations
+4. Use SSL connections (`?sslmode=require`)

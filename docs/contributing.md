@@ -1,111 +1,111 @@
-# Guide de contribution
+# Contributing Guide
 
-Merci de votre intérêt pour contribuer à DBKeep !
+Thank you for your interest in contributing to DBKeep!
 
-## Comment contribuer
+## How to Contribute
 
-### Signaler un bug
+### Report a Bug
 
-1. Vérifiez que le bug n'a pas déjà été signalé dans les [Issues](https://github.com/votre-username/dbkeep/issues)
-2. Créez une nouvelle issue avec :
-   - Description claire du problème
-   - Étapes pour reproduire
-   - Comportement attendu vs obtenu
-   - Screenshots si pertinent
-   - Environnement (OS, navigateur, version Node.js)
+1. Check that the bug hasn't already been reported in [Issues](https://github.com/your-username/dbkeep/issues)
+2. Create a new issue with:
+   - Clear description of the problem
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Screenshots if relevant
+   - Environment (OS, browser, Node.js version)
 
-### Proposer une fonctionnalité
+### Propose a Feature
 
-1. Ouvrez une issue avec le tag `feature`
-2. Décrivez la fonctionnalité et son cas d'usage
-3. Attendez la validation avant de commencer le développement
+1. Open an issue with the `feature` tag
+2. Describe the feature and its use case
+3. Wait for validation before starting development
 
-### Soumettre du code
+### Submit Code
 
-1. **Fork** le repository
-2. **Cloner** votre fork
+1. **Fork** the repository
+2. **Clone** your fork
    ```bash
-   git clone https://github.com/VOTRE_USERNAME/dbkeep.git
+   git clone https://github.com/YOUR_USERNAME/dbkeep.git
    cd dbkeep
    ```
-3. **Créer une branche**
+3. **Create a branch**
    ```bash
-   git checkout -b feature/ma-fonctionnalite
-   # ou
-   git checkout -b fix/mon-bugfix
+   git checkout -b feature/my-feature
+   # or
+   git checkout -b fix/my-bugfix
    ```
-4. **Développer** en suivant les conventions
-5. **Tester** vos changements
+4. **Develop** following conventions
+5. **Test** your changes
    ```bash
    pnpm lint
    pnpm typecheck
    pnpm test
    ```
-6. **Commiter** avec un message clair
+6. **Commit** with a clear message
    ```bash
-   git commit -m "feat: ajouter la fonctionnalité X"
+   git commit -m "feat: add feature X"
    ```
-7. **Pusher** votre branche
+7. **Push** your branch
    ```bash
-   git push origin feature/ma-fonctionnalite
+   git push origin feature/my-feature
    ```
-8. **Créer une Pull Request** vers `main`
+8. **Create a Pull Request** to `main`
 
-## Conventions de code
+## Code Conventions
 
-### Style général
+### General Style
 
-- **Langue du code** : Anglais (noms de variables, fonctions)
-- **Commentaires** : Français accepté pour la documentation complexe
-- **Indentation** : 2 espaces
-- **Quotes** : Single quotes (`'`)
-- **Point-virgule** : Non (style Nuxt/Vue)
+- **Code language**: English (variable names, functions)
+- **Comments**: English for code comments
+- **Indentation**: 2 spaces
+- **Quotes**: Single quotes (`'`)
+- **Semicolons**: No (Nuxt/Vue style)
 
 ### Commits
 
-Format des messages de commit :
+Commit message format:
 
 ```
-type(scope): description courte
+type(scope): short description
 
-Corps optionnel avec plus de détails.
+Optional body with more details.
 ```
 
-Types :
-- `feat` : Nouvelle fonctionnalité
-- `fix` : Correction de bug
-- `docs` : Documentation
-- `style` : Formatage (pas de changement de code)
-- `refactor` : Refactoring
-- `test` : Ajout/modification de tests
-- `chore` : Maintenance, dépendances
+Types:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Formatting (no code change)
+- `refactor`: Refactoring
+- `test`: Adding/modifying tests
+- `chore`: Maintenance, dependencies
 
-Exemples :
+Examples:
 ```
-feat(canvas): ajouter le zoom avec la molette
-fix(auth): corriger la redirection après connexion
-docs: mettre à jour le README
+feat(canvas): add mouse wheel zoom
+fix(auth): fix redirect after login
+docs: update README
 ```
 
 ### TypeScript
 
-- Toujours typer les paramètres et retours de fonction
-- Éviter `any`, préférer `unknown` si nécessaire
-- Utiliser des interfaces pour les objets complexes
+- Always type function parameters and returns
+- Avoid `any`, prefer `unknown` if needed
+- Use interfaces for complex objects
 
 ```typescript
-// Bien
+// Good
 const addTable = (table: TableData): void => { ... }
 
-// Éviter
+// Avoid
 const addTable = (table: any) => { ... }
 ```
 
 ### Vue/Nuxt
 
-- Utiliser `<script setup lang="ts">`
-- Composables avec préfixe `use`
-- Props typées avec `defineProps<T>()`
+- Use `<script setup lang="ts">`
+- Composables with `use` prefix
+- Typed props with `defineProps<T>()`
 
 ```vue
 <script setup lang="ts">
@@ -122,57 +122,57 @@ const props = withDefaults(defineProps<Props>(), {
 
 ### i18n
 
-**Aucun texte en dur**. Toujours utiliser `$t()` ou `t()`.
+**No hardcoded text**. Always use `$t()` or `t()`.
 
 ```vue
-<!-- Bien -->
+<!-- Good -->
 <UButton>{{ $t('common.save') }}</UButton>
 
-<!-- Éviter -->
-<UButton>Enregistrer</UButton>
+<!-- Avoid -->
+<UButton>Save</UButton>
 ```
 
-Ajouter les traductions dans les deux fichiers :
+Add translations in both files:
 - `i18n/locales/fr.json`
 - `i18n/locales/en.json`
 
-## Structure des fichiers
+## File Structure
 
-Respecter l'organisation existante :
+Follow the existing organization:
 
 ```
 app/
-├── components/canvas/     # Composants Vue Flow
-├── composables/           # Hooks réutilisables
+├── components/canvas/     # Vue Flow components
+├── composables/           # Reusable hooks
 ├── pages/                 # Routes
-├── types/                 # Types TypeScript
-└── utils/                 # Utilitaires
+├── types/                 # TypeScript types
+└── utils/                 # Utilities
 ```
 
 ## Tests
 
-### Tests unitaires
+### Unit Tests
 
-Utiliser Vitest pour les tests unitaires.
+Use Vitest for unit tests.
 
 ```typescript
 import { describe, it, expect } from 'vitest'
 
-describe('maFonction', () => {
-  it('devrait retourner true', () => {
-    expect(maFonction()).toBe(true)
+describe('myFunction', () => {
+  it('should return true', () => {
+    expect(myFunction()).toBe(true)
   })
 })
 ```
 
-### Tests E2E
+### E2E Tests
 
-Utiliser Playwright pour les tests end-to-end.
+Use Playwright for end-to-end tests.
 
 ```typescript
 import { test, expect } from '@playwright/test'
 
-test('connexion utilisateur', async ({ page }) => {
+test('user login', async ({ page }) => {
   await page.goto('/login')
   await page.fill('[name="email"]', 'test@test.com')
   await page.fill('[name="password"]', 'password')
@@ -181,18 +181,18 @@ test('connexion utilisateur', async ({ page }) => {
 })
 ```
 
-## Checklist avant PR
+## Checklist Before PR
 
-- [ ] Le code compile sans erreur (`pnpm typecheck`)
-- [ ] Le linter passe (`pnpm lint`)
-- [ ] Les tests passent (`pnpm test`)
-- [ ] Les traductions sont ajoutées (FR et EN)
-- [ ] La documentation est mise à jour si nécessaire
-- [ ] Le commit suit les conventions
+- [ ] Code compiles without errors (`pnpm typecheck`)
+- [ ] Linter passes (`pnpm lint`)
+- [ ] Tests pass (`pnpm test`)
+- [ ] Translations added (FR and EN)
+- [ ] Documentation updated if necessary
+- [ ] Commit follows conventions
 
-## Besoin d'aide ?
+## Need Help?
 
-- Ouvrez une issue avec le tag `question`
-- Consultez la documentation dans `/docs`
+- Open an issue with the `question` tag
+- Check the documentation in `/docs`
 
-Merci de contribuer à DBKeep !
+Thank you for contributing to DBKeep!

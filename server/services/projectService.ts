@@ -3,12 +3,12 @@ import { db } from '../database/drizzle'
 import { project } from '../database/schema'
 
 /**
- * Service de gestion des projets
- * Centralise toutes les opérations Drizzle pour les projets
- * Découplé de l'authentification pour supporter le mode invité
+ * Project management service
+ * Centralizes all Drizzle operations for projects
+ * Decoupled from authentication to support guest mode
  */
 
-// ID de l'utilisateur invité (mode guest)
+// Guest user ID (guest mode)
 export const GUEST_USER_ID = 'guest-user'
 
 export interface CreateProjectInput {
@@ -16,6 +16,10 @@ export interface CreateProjectInput {
   engine: 'PostgreSQL' | 'MySQL' | 'SQLite'
   data?: unknown
   userId: string
+  // Optional for backward compatibility - defaults to userId
+  ownerId?: string
+  // Optional for backward compatibility - defaults to 'user'
+  ownerType?: 'user' | 'team'
 }
 
 export interface UpdateProjectInput {
@@ -30,6 +34,8 @@ export interface ProjectOutput {
   engine: string
   data: unknown | null
   userId: string
+  ownerId: string
+  ownerType: string
   createdAt: Date
   updatedAt: Date
 }
@@ -38,32 +44,59 @@ export interface ProjectListItem {
   id: string
   name: string
   engine: string
+  ownerId: string
+  ownerType: string
   createdAt: Date
   updatedAt: Date
 }
 
+export interface ListProjectsOptions {
+  userId: string
+  // If specified, filter by workspace (otherwise uses userId)
+  workspaceId?: string
+  workspaceType?: 'user' | 'team'
+}
+
 /**
- * Récupère la liste des projets d'un utilisateur
+ * Returns the list of projects for a user or workspace
  */
-export async function listProjects(userId: string): Promise<ProjectListItem[]> {
+export async function listProjects(options: string | ListProjectsOptions): Promise<ProjectListItem[]> {
+  // Backward compatibility: if just a string, it's the userId
+  const opts: ListProjectsOptions = typeof options === 'string'
+    ? { userId: options }
+    : options
+
+  const { workspaceId, workspaceType } = opts
+
+  // If workspace specified, filter by ownerId/ownerType
+  // Otherwise, filter by userId (default standalone behavior)
+  const whereClause = workspaceId && workspaceType
+    ? and(
+        eq(project.ownerId, workspaceId),
+        eq(project.ownerType, workspaceType)
+      )
+    : eq(project.userId, opts.userId)
+
   const projects = await db
     .select({
       id: project.id,
       name: project.name,
       engine: project.engine,
+      ownerId: project.ownerId,
+      ownerType: project.ownerType,
       createdAt: project.createdAt,
       updatedAt: project.updatedAt
     })
     .from(project)
-    .where(eq(project.userId, userId))
+    .where(whereClause)
     .orderBy(desc(project.updatedAt))
 
   return projects
 }
 
 /**
- * Récupère un projet par son ID
- * Vérifie que le projet appartient à l'utilisateur
+ * Returns a project by its ID
+ * Verifies that the project belongs to the user
  */
 export async function getProject(projectId: string, userId: string): Promise<ProjectOutput | null> {
   const [foundProject] = await db
@@ -87,7 +120,7 @@ export async function getProject(projectId: string, userId: string): Promise<Pro
 }
 
 /**
- * Crée un nouveau projet
+ * Creates a new project
  */
 export async function createProject(input: CreateProjectInput): Promise<ProjectOutput> {
   const [newProject] = await db
@@ -96,7 +129,10 @@ export async function createProject(input: CreateProjectInput): Promise<ProjectO
       name: input.name,
       engine: input.engine,
       data: input.data ? JSON.stringify(input.data) : null,
-      userId: input.userId
+      userId: input.userId,
+      // By default, the owner is the user who creates the project
+      ownerId: input.ownerId || input.userId,
+      ownerType: input.ownerType || 'user'
     })
     .returning()
 
@@ -107,15 +143,15 @@ export async function createProject(input: CreateProjectInput): Promise<ProjectO
 }
 
 /**
- * Met à jour un projet existant
- * Vérifie que le projet appartient à l'utilisateur
+ * Updates an existing project
+ * Verifies that the project belongs to the user
  */
 export async function updateProject(
   projectId: string,
   userId: string,
   input: UpdateProjectInput
 ): Promise<ProjectOutput | null> {
-  // Vérifier que le projet existe et appartient à l'utilisateur
+  // Verify that the project exists and belongs to the user
   const [existingProject] = await db
     .select({ id: project.id })
     .from(project)
@@ -130,7 +166,7 @@ export async function updateProject(
     return null
   }
 
-  // Préparer les données à mettre à jour
+  // Prepare data to update
   const updateData: Record<string, unknown> = {
     updatedAt: new Date()
   }
@@ -145,7 +181,7 @@ export async function updateProject(
     updateData.data = JSON.stringify(input.data)
   }
 
-  // Mettre à jour le projet
+  // Update the project
   const [updatedProject] = await db
     .update(project)
     .set(updateData)
@@ -159,8 +195,8 @@ export async function updateProject(
 }
 
 /**
- * Supprime un projet
- * Vérifie que le projet appartient à l'utilisateur
+ * Deletes a project
+ * Verifies that the project belongs to the user
  */
 export async function deleteProject(projectId: string, userId: string): Promise<boolean> {
   const [deletedProject] = await db

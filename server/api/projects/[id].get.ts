@@ -3,29 +3,29 @@ import { requireAuth } from '../../utils/appMode'
 
 /**
  * GET /api/projects/:id
- * Récupère un projet spécifique de l'utilisateur connecté (ou invité)
+ * Returns a specific project for the authenticated user (or guest)
  */
 export default defineEventHandler(async (event) => {
-  // Obtenir l'ID utilisateur (authentifié ou invité)
+  // Get user ID (authenticated or guest)
   const userId = await requireAuth(event)
 
-  // Récupérer l'ID du projet
+  // Get project ID
   const projectId = getRouterParam(event, 'id')
 
   if (!projectId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID du projet manquant'
+      statusMessage: 'Missing project ID'
     })
   }
 
-  // Récupérer le projet via le service
+  // Fetch project via service
   const project = await getProject(projectId, userId)
 
   if (!project) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Projet non trouvé'
+      statusMessage: 'Project not found'
     })
   }
 

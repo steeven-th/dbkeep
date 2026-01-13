@@ -1,65 +1,65 @@
-# Documentation DBKeep
+# DBKeep Documentation
 
-Bienvenue dans la documentation de DBKeep, un outil open-source pour concevoir des bases de données visuellement.
+Welcome to the DBKeep documentation, an open-source tool for designing databases visually.
 
-## Modes de déploiement
+## Deployment Modes
 
-DBKeep supporte différents modes de déploiement :
+DBKeep supports different deployment modes:
 
-| Mode | Description | Utilisation |
-|------|-------------|-------------|
-| **SaaS Public** | Authentification + inscription ouverte | Production multi-utilisateurs |
-| **SaaS Privé** | Authentification, inscription fermée | Équipe privée |
-| **Mode Invité** | Sans authentification | Auto-hébergement personnel |
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| **Multi-user** | Authentication + open registration | Multi-user production |
+| **Private** | Authentication, registration disabled | Private team |
+| **Guest Mode** | No authentication | Personal self-hosting |
 
-Voir [Configuration](./configuration.md) pour les détails.
+See [Configuration](./configuration.md) for details.
 
-## Sommaire
+## Table of Contents
 
-### Guides de démarrage
-- [Installation](./installation.md) - Guide d'installation complet
-- [Configuration](./configuration.md) - Variables d'environnement et modes
+### Getting Started
+- [Installation](./installation.md) - Complete installation guide
+- [Configuration](./configuration.md) - Environment variables and modes
 
-### Base de données
-- [Drizzle ORM](./database.md) - Schéma, migrations et Drizzle Studio
+### Database
+- [Drizzle ORM](./database.md) - Schema, migrations and Drizzle Studio
 
-### Authentification
-- [Better Auth](./authentication.md) - Système d'authentification et mode invité
+### Authentication
+- [Better Auth](./authentication.md) - Authentication system and guest mode
 
-### Développement
-- [Structure du projet](./structure.md) - Organisation des fichiers et architecture
-- [Commandes](./commands.md) - Toutes les commandes disponibles
+### Development
+- [Project Structure](./structure.md) - File organization and architecture
+- [Commands](./commands.md) - All available commands
 
-### Contribution
-- [Guide de contribution](./contributing.md) - Comment contribuer au projet
+### Contributing
+- [Contributing Guide](./contributing.md) - How to contribute to the project
 
 ## Quick Start
 
 ```bash
-# Cloner le repo
-git clone https://github.com/votre-username/dbkeep.git
+# Clone the repo
+git clone https://github.com/your-username/dbkeep.git
 cd dbkeep
 
-# Installer les dépendances
+# Install dependencies
 pnpm install
 
-# Configurer
+# Configure
 cp .env.example .env
-# Éditer .env avec vos valeurs
+# Edit .env with your values
 
-# Créer les tables
+# Create tables
 pnpm db:push
 
-# Lancer
+# Run
 pnpm dev
 ```
 
-## Mode Invité (usage personnel)
+## Guest Mode (personal use)
 
-Pour utiliser DBKeep sans gestion de compte :
+To use DBKeep without account management:
 
 ```env
 NUXT_PUBLIC_GUEST_MODE=true
 ```
 
-Voir [Installation](./installation.md) pour plus de détails.
+See [Installation](./installation.md) for more details.

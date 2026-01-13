@@ -49,6 +49,7 @@
   "project": {
     "name": "Nom du projet",
     "name_placeholder": "Mon projet de base de données",
+    "new_project_description": "Configurez votre nouveau projet de base de données.",
     "engine": "Moteur de base de données",
     "create": "Créer le projet",
     "created_at": "Créé le",
@@ -57,18 +58,27 @@
     "welcome_message": "Commencez par créer un nouveau projet pour modéliser votre base de données.",
     "no_project": "Aucun projet ouvert",
     "my_projects": "Mes projets",
+    "search_placeholder": "Rechercher un projet...",
+    "all_engines": "Tous les moteurs",
+    "no_results": "Aucun projet trouvé",
+    "no_results_description": "Aucun projet ne correspond à vos critères de recherche.",
+    "clear_filters": "Effacer les filtres",
     "open": "Ouvrir",
+    "rename": "Renommer",
+    "rename_description": "Entrez un nouveau nom pour ce projet.",
     "delete": "Supprimer",
     "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce projet ?",
     "confirm_delete_description": "Cette action est irréversible. Toutes les données du projet seront perdues.",
     "empty_list": "Aucun projet",
     "empty_list_description": "Créez votre premier projet pour commencer à modéliser vos bases de données.",
     "created_success": "Projet créé avec succès",
+    "renamed_success": "Projet renommé avec succès",
     "deleted_success": "Projet supprimé avec succès",
     "saved_success": "Projet sauvegardé",
     "error_load_list": "Erreur lors du chargement des projets",
     "error_load": "Erreur lors du chargement du projet",
     "error_create": "Erreur lors de la création du projet",
+    "error_rename": "Erreur lors du renommage du projet",
     "error_save": "Erreur lors de la sauvegarde du projet",
     "error_delete": "Erreur lors de la suppression du projet",
     "last_modified": "Dernière modification",
@@ -226,7 +236,29 @@
   "errors": {
     "required_field": "Ce champ est requis",
     "invalid_name": "Le nom contient des caractères invalides",
-    "duplicate_name": "Ce nom existe déjà"
+    "duplicate_name": "Ce nom existe déjà",
+
+    "UNKNOWN_ERROR": "Une erreur inattendue s'est produite",
+    "VALIDATION_ERROR": "Erreur de validation",
+    "UNAUTHORIZED": "Vous devez être connecté pour effectuer cette action",
+    "FORBIDDEN": "Vous n'avez pas les droits pour effectuer cette action",
+    "NOT_FOUND": "Ressource non trouvée",
+    "INVALID_INPUT": "Données invalides",
+
+    "AUTH_INVALID_CREDENTIALS": "Email ou mot de passe incorrect",
+    "AUTH_EMAIL_ALREADY_EXISTS": "Cette adresse email est déjà utilisée",
+    "AUTH_INVALID_TOKEN": "Token invalide ou expiré",
+    "AUTH_SESSION_EXPIRED": "Votre session a expiré, veuillez vous reconnecter",
+
+    "USER_NOT_FOUND": "Utilisateur non trouvé",
+
+    "EMAIL_INVALID": "Adresse email invalide",
+    "EMAIL_REQUIRED": "L'adresse email est requise",
+    "NAME_REQUIRED": "Le nom est requis",
+    "FIELD_REQUIRED": "Ce champ est requis",
+
+    "PROJECT_NOT_FOUND": "Projet non trouvé",
+    "PROJECT_PERMISSION_DENIED": "Vous n'avez pas accès à ce projet"
   },
   "confirm": {
     "delete_tables": "Êtes-vous sûr de vouloir supprimer {count} tables ?",

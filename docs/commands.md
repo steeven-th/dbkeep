@@ -1,91 +1,91 @@
-# Commandes
+# Commands
 
-Toutes les commandes disponibles pour développer et maintenir DBKeep.
+All available commands for developing and maintaining DBKeep.
 
-## Développement
+## Development
 
-| Commande | Description |
-|----------|-------------|
-| `pnpm dev` | Lancer le serveur de développement |
-| `pnpm build` | Build de production |
-| `pnpm preview` | Prévisualiser le build de production |
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start the development server |
+| `pnpm build` | Production build |
+| `pnpm preview` | Preview the production build |
 
 ### pnpm dev
 
-Lance le serveur Nuxt en mode développement avec hot-reload.
+Starts the Nuxt server in development mode with hot-reload.
 
 ```bash
 pnpm dev
 
-# Sortie
+# Output
 Nuxt 4.x.x with Nitro 2.x.x
 Local:    http://localhost:3000/
 Network:  http://192.168.x.x:3000/
 ```
 
-Options utiles :
+Useful options:
 ```bash
-# Port personnalisé
+# Custom port
 pnpm dev -- --port 3001
 
-# Ouvrir dans le navigateur
+# Open in browser
 pnpm dev -- --open
 ```
 
 ### pnpm build
 
-Compile l'application pour la production.
+Compiles the application for production.
 
 ```bash
 pnpm build
 ```
 
-Le build est généré dans `.output/`.
+The build is generated in `.output/`.
 
 ### pnpm preview
 
-Prévisualise le build de production localement.
+Previews the production build locally.
 
 ```bash
 pnpm build && pnpm preview
 ```
 
-## Base de données
+## Database
 
-| Commande | Description |
-|----------|-------------|
-| `pnpm db:push` | Synchroniser le schéma avec la BDD |
-| `pnpm db:generate` | Générer les fichiers de migration |
-| `pnpm db:migrate` | Appliquer les migrations |
-| `pnpm db:studio` | Ouvrir Drizzle Studio |
+| Command | Description |
+|---------|-------------|
+| `pnpm db:push` | Sync schema with database |
+| `pnpm db:generate` | Generate migration files |
+| `pnpm db:migrate` | Apply migrations |
+| `pnpm db:studio` | Open Drizzle Studio |
 
 ### pnpm db:push
 
-Synchronise le schéma TypeScript avec la base de données. **Idéal pour le développement**.
+Synchronizes the TypeScript schema with the database. **Ideal for development**.
 
 ```bash
 pnpm db:push
 
-# Sortie
+# Output
 [✓] Changes applied
 ```
 
-> **Attention** : Cette commande peut supprimer des données si vous supprimez des colonnes ou tables.
+> **Warning**: This command may delete data if you remove columns or tables.
 
 ### pnpm db:generate
 
-Génère des fichiers de migration SQL basés sur les changements.
+Generates SQL migration files based on changes.
 
 ```bash
 pnpm db:generate
 
-# Sortie
+# Output
 [✓] Your SQL migration file ➜ drizzle/0001_migration.sql
 ```
 
 ### pnpm db:migrate
 
-Applique les migrations en attente sur la base de données.
+Applies pending migrations to the database.
 
 ```bash
 pnpm db:migrate
@@ -93,36 +93,36 @@ pnpm db:migrate
 
 ### pnpm db:studio
 
-Lance Drizzle Studio pour visualiser et manipuler la base de données.
+Launches Drizzle Studio to visualize and manipulate the database.
 
 ```bash
 pnpm db:studio
 
-# Sortie
+# Output
 Drizzle Studio is running on https://local.drizzle.studio
 ```
 
-## Qualité du code
+## Code Quality
 
-| Commande | Description |
-|----------|-------------|
-| `pnpm lint` | Vérifier le code avec ESLint |
-| `pnpm typecheck` | Vérification des types TypeScript |
+| Command | Description |
+|---------|-------------|
+| `pnpm lint` | Check code with ESLint |
+| `pnpm typecheck` | TypeScript type checking |
 
 ### pnpm lint
 
-Analyse le code pour trouver des problèmes de style et des erreurs potentielles.
+Analyzes code for style issues and potential errors.
 
 ```bash
 pnpm lint
 
-# Corriger automatiquement
+# Auto-fix
 pnpm lint --fix
 ```
 
 ### pnpm typecheck
 
-Vérifie les types TypeScript dans tout le projet.
+Verifies TypeScript types throughout the project.
 
 ```bash
 pnpm typecheck
@@ -130,29 +130,29 @@ pnpm typecheck
 
 ## Tests
 
-| Commande | Description |
-|----------|-------------|
-| `pnpm test` | Lancer tous les tests |
-| `pnpm test:watch` | Tests en mode watch |
-| `pnpm test:unit` | Tests unitaires uniquement |
-| `pnpm test:nuxt` | Tests Nuxt uniquement |
-| `pnpm test:e2e` | Tests E2E Playwright |
-| `pnpm test:e2e:ui` | Tests E2E avec interface |
+| Command | Description |
+|---------|-------------|
+| `pnpm test` | Run all tests |
+| `pnpm test:watch` | Tests in watch mode |
+| `pnpm test:unit` | Unit tests only |
+| `pnpm test:nuxt` | Nuxt tests only |
+| `pnpm test:e2e` | E2E Playwright tests |
+| `pnpm test:e2e:ui` | E2E tests with UI |
 
 ### pnpm test
 
-Lance tous les tests (unitaires et Nuxt).
+Runs all tests (unit and Nuxt).
 
 ```bash
 pnpm test
 
-# Avec couverture de code
+# With code coverage
 pnpm test -- --coverage
 ```
 
 ### pnpm test:watch
 
-Lance les tests en mode watch (relance automatique).
+Runs tests in watch mode (automatic re-run).
 
 ```bash
 pnpm test:watch
@@ -160,18 +160,18 @@ pnpm test:watch
 
 ### pnpm test:e2e
 
-Lance les tests end-to-end avec Playwright.
+Runs end-to-end tests with Playwright.
 
 ```bash
 pnpm test:e2e
 
-# Un seul fichier
+# Single file
 pnpm test:e2e tests/auth.spec.ts
 ```
 
 ### pnpm test:e2e:ui
 
-Lance Playwright avec son interface graphique.
+Launches Playwright with its graphical interface.
 
 ```bash
 pnpm test:e2e:ui
@@ -179,44 +179,44 @@ pnpm test:e2e:ui
 
 ## Installation
 
-| Commande | Description |
-|----------|-------------|
-| `pnpm install` | Installer les dépendances |
-| `pnpm postinstall` | Préparer Nuxt (auto) |
+| Command | Description |
+|---------|-------------|
+| `pnpm install` | Install dependencies |
+| `pnpm postinstall` | Prepare Nuxt (auto) |
 
 ### pnpm install
 
-Installe toutes les dépendances du projet.
+Installs all project dependencies.
 
 ```bash
 pnpm install
 
-# Ignorer les devDependencies (production)
+# Ignore devDependencies (production)
 pnpm install --prod
 ```
 
-## Résumé rapide
+## Quick Reference
 
 ```bash
-# Setup initial
+# Initial setup
 pnpm install
 cp .env.example .env
-# Éditer .env
+# Edit .env
 pnpm db:push
 pnpm dev
 
-# Workflow quotidien
-pnpm dev           # Développer
-pnpm lint          # Vérifier le code
-pnpm test          # Tester
-pnpm db:studio     # Voir la BDD
+# Daily workflow
+pnpm dev           # Develop
+pnpm lint          # Check code
+pnpm test          # Test
+pnpm db:studio     # View database
 
-# Avant commit
+# Before commit
 pnpm lint --fix
 pnpm typecheck
 pnpm test
 
-# Déploiement
+# Deployment
 pnpm build
-pnpm preview       # Vérifier localement
+pnpm preview       # Verify locally
 ```

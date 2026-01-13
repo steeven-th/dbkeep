@@ -1,39 +1,49 @@
 import { z } from 'zod'
 import { createProject } from '../../services/projectService'
 import { requireAuth } from '../../utils/appMode'
+import { getWorkspaceContext, resolveOwner } from '../../utils/workspace'
 
-// Schéma de validation pour la création d'un projet
+// Validation schema for project creation
 const createProjectSchema = z.object({
-  name: z.string().min(1, 'Le nom est requis'),
+  name: z.string().min(1, 'Name is required'),
   engine: z.enum(['PostgreSQL', 'MySQL', 'SQLite']).default('PostgreSQL'),
   data: z.any().optional()
 })
 
 /**
  * POST /api/projects
- * Crée un nouveau projet pour l'utilisateur connecté (ou invité)
+ * Creates a new project for the authenticated user (or guest)
+ * Supports optional workspace context for multi-tenant deployments
  */
 export default defineEventHandler(async (event) => {
-  // Obtenir l'ID utilisateur (authentifié ou invité)
+  // Get user ID (authenticated or guest)
   const userId = await requireAuth(event)
 
-  // Valider le body
+  // Get optional workspace context for multi-tenancy
+  const workspace = getWorkspaceContext(event)
+
+  // Validate request body
   const body = await readBody(event)
   const parsed = createProjectSchema.safeParse(body)
 
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Données invalides',
+      statusMessage: 'Invalid data',
       data: parsed.error.flatten()
     })
   }
 
-  // Créer le projet via le service
+  // Resolve ownership (workspace or user)
+  const { ownerId, ownerType } = resolveOwner(userId, workspace)
+
+  // Create project via service
   return await createProject({
     name: parsed.data.name,
     engine: parsed.data.engine,
     data: parsed.data.data,
-    userId
+    userId,
+    ownerId,
+    ownerType
   })
 })

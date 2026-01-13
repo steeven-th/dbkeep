@@ -1,151 +1,152 @@
-# Structure du projet
+# Project Structure
 
-Organisation des fichiers et dossiers de DBKeep.
+File and folder organization for DBKeep.
 
-## Vue d'ensemble
+## Overview
 
-DBKeep suit la structure Nuxt 4 avec le dossier `app/` pour le code source frontend et une architecture **Open Core** permettant différents modes de déploiement.
+DBKeep follows the Nuxt 4 structure with the `app/` folder for frontend source code and an **extensible architecture** supporting different deployment modes.
 
 ```
 dbkeep/
-├── app/                      # Code source frontend (Nuxt 4)
+├── app/                      # Frontend source code (Nuxt 4)
 ├── docs/                     # Documentation
-├── i18n/                     # Internationalisation
-├── public/                   # Assets statiques
-├── server/                   # Backend Nitro
-├── test/                     # Configuration des tests
-├── tests/                    # Tests E2E
-├── .env.example              # Exemple de configuration
-├── drizzle.config.ts         # Configuration Drizzle Kit
-├── nuxt.config.ts            # Configuration Nuxt
-├── package.json              # Dépendances
-└── vitest.config.ts          # Configuration Vitest
+├── i18n/                     # Internationalization
+├── public/                   # Static assets
+├── server/                   # Nitro Backend
+├── test/                     # Test configuration
+├── tests/                    # E2E tests
+├── .env.example              # Configuration example
+├── drizzle.config.ts         # Drizzle Kit configuration
+├── nuxt.config.ts            # Nuxt configuration
+├── package.json              # Dependencies
+└── vitest.config.ts          # Vitest configuration
 ```
 
-## Dossier app/
+## app/ Folder
 
-Code source frontend Vue.js/Nuxt.
+Vue.js/Nuxt frontend source code.
 
 ```
 app/
 ├── assets/                   # CSS, images, fonts
 │   └── css/
-│       └── main.css          # Styles globaux + Design System
-├── components/               # Composants Vue
-│   ├── canvas/               # Composants Vue Flow
-│   │   ├── DatabaseCanvas.vue    # Canvas principal
-│   │   ├── CanvasToolbar.vue     # Barre d'outils
-│   │   ├── TableEditor.vue       # Slideover édition table
-│   │   ├── GroupEditor.vue       # Slideover édition groupe
-│   │   ├── NoteEditor.vue        # Slideover édition note
-│   │   ├── RelationEditor.vue    # Modal édition relation
-│   │   ├── SqlChangesOverlay.vue # Overlay modifications SQL
-│   │   ├── NewProjectModal.vue   # Modal nouveau projet
+│       └── main.css          # Global styles + Design System
+├── components/               # Vue components
+│   ├── canvas/               # Vue Flow components
+│   │   ├── DatabaseCanvas.vue    # Main canvas
+│   │   ├── CanvasToolbar.vue     # Toolbar
+│   │   ├── TableEditor.vue       # Table edit slideover
+│   │   ├── GroupEditor.vue       # Group edit slideover
+│   │   ├── NoteEditor.vue        # Note edit slideover
+│   │   ├── RelationEditor.vue    # Relation edit modal
+│   │   ├── SqlChangesOverlay.vue # SQL changes overlay
+│   │   ├── NewProjectModal.vue   # New project modal
 │   │   ├── nodes/
-│   │   │   ├── DbTable.vue       # Node table
-│   │   │   ├── DbGroup.vue       # Node groupe
-│   │   │   └── DbNote.vue        # Node note
+│   │   │   ├── DbTable.vue       # Table node
+│   │   │   ├── DbGroup.vue       # Group node
+│   │   │   └── DbNote.vue        # Note node
 │   │   └── edges/
-│   │       └── RelationEdge.vue  # Edge relation
+│   │       └── RelationEdge.vue  # Relation edge
 │   ├── sidebar/
-│   │   └── SqlPreview.vue        # Prévisualisation SQL
-│   ├── DeleteConfirmModal.vue    # Modal confirmation suppression
-│   ├── ProfileEditModal.vue      # Modal édition profil
-│   └── ...                   # Autres composants
-├── composables/              # Composables Vue (hooks réutilisables)
-│   ├── useAppMode.ts         # Gestion mode invité + inscription
-│   ├── useAuth.ts            # Authentification
-│   ├── useProjectStore.ts    # Store projet (tables, colonnes)
-│   ├── useCanvasStore.ts     # Store Vue Flow (nodes, edges)
-│   ├── useProjects.ts        # CRUD projets (API)
-│   ├── useSqlGenerator.ts    # Génération SQL
-│   ├── useSqlParser.ts       # Parsing SQL
-│   └── useDeleteConfirm.ts   # Confirmation de suppression
-├── layouts/                  # Layouts Nuxt
-│   ├── default.vue           # Layout avec navbar (app)
-│   └── landing.vue           # Layout sans navbar (public)
-├── middleware/               # Middleware de route
-│   └── auth.ts               # Protection routes (supporte guest mode)
-├── pages/                    # Pages/routes automatiques
+│   │   └── SqlPreview.vue        # SQL preview
+│   ├── DeleteConfirmModal.vue    # Delete confirmation modal
+│   ├── ProfileEditModal.vue      # Profile edit modal
+│   └── ...                   # Other components
+├── composables/              # Vue composables (reusable hooks)
+│   ├── useAppMode.ts         # Guest mode + registration management
+│   ├── useAuth.ts            # Authentication
+│   ├── useProjectStore.ts    # Project store (tables, columns)
+│   ├── useCanvasStore.ts     # Vue Flow store (nodes, edges)
+│   ├── useProjects.ts        # Projects CRUD (API)
+│   ├── useSqlGenerator.ts    # SQL generation
+│   ├── useSqlParser.ts       # SQL parsing
+│   └── useDeleteConfirm.ts   # Delete confirmation
+├── layouts/                  # Nuxt layouts
+│   ├── default.vue           # Layout with navbar (app)
+│   └── landing.vue           # Layout without navbar (public)
+├── middleware/               # Route middleware
+│   └── auth.ts               # Route protection (supports guest mode)
+├── pages/                    # Automatic pages/routes
 │   ├── index.vue             # Landing page (/)
-│   ├── login.vue             # Connexion (/login)
-│   ├── register.vue          # Inscription (/register)
+│   ├── login.vue             # Login (/login)
+│   ├── register.vue          # Registration (/register)
 │   └── app/
-│       ├── index.vue         # Dashboard projets (/app)
-│       ├── settings.vue      # Paramètres (/app/settings)
+│       ├── index.vue         # Projects dashboard (/app)
+│       ├── settings.vue      # Settings (/app/settings)
 │       └── project/
-│           └── [id].vue      # Éditeur projet (/app/project/:id)
-├── types/                    # Types TypeScript
-│   └── database.ts           # Types pour tables, colonnes, relations
+│           └── [id].vue      # Project editor (/app/project/:id)
+├── types/                    # TypeScript types
+│   └── database.ts           # Types for tables, columns, relations
 ├── plugins/
-│   └── monaco.client.ts      # Plugin Monaco Editor
-└── utils/                    # Utilitaires
-    └── auth-client.ts        # Client Better Auth
+│   └── monaco.client.ts      # Monaco Editor plugin
+└── utils/                    # Utilities
+    └── auth-client.ts        # Better Auth client
 ```
 
-## Dossier server/
+## server/ Folder
 
-Backend Nitro (API, base de données, services).
+Nitro backend (API, database, services).
 
 ```
 server/
-├── api/                      # Routes API
+├── api/                      # API routes
 │   ├── auth/
-│   │   └── [...all].ts       # Handler Better Auth (catch-all)
+│   │   └── [...all].ts       # Better Auth handler (catch-all)
 │   └── projects/
-│       ├── index.get.ts      # GET /api/projects (liste)
-│       ├── index.post.ts     # POST /api/projects (création)
+│       ├── index.get.ts      # GET /api/projects (list)
+│       ├── index.post.ts     # POST /api/projects (create)
 │       ├── [id].get.ts       # GET /api/projects/:id
 │       ├── [id].put.ts       # PUT /api/projects/:id
 │       └── [id].delete.ts    # DELETE /api/projects/:id
-├── database/                 # Base de données
-│   ├── drizzle.ts            # Connexion PostgreSQL
-│   └── schema.ts             # Schéma Drizzle (tables)
-├── services/                 # Services métier
-│   └── projectService.ts     # Opérations projets (Drizzle)
-├── plugins/                  # Plugins Nitro
-│   └── guestUser.ts          # Création user guest au démarrage
-└── utils/                    # Utilitaires serveur
-    ├── auth.ts               # Configuration Better Auth
-    ├── appMode.ts            # Helpers mode invité
-    └── guestUser.ts          # Gestion utilisateur guest
+├── database/                 # Database
+│   ├── drizzle.ts            # PostgreSQL connection
+│   └── schema.ts             # Drizzle schema (tables)
+├── services/                 # Business services
+│   └── projectService.ts     # Project operations (Drizzle)
+├── plugins/                  # Nitro plugins
+│   └── guestUser.ts          # Guest user creation at startup
+└── utils/                    # Server utilities
+    ├── auth.ts               # Better Auth configuration
+    ├── appMode.ts            # Guest mode helpers
+    ├── workspace.ts          # Multi-tenancy extension point
+    └── guestUser.ts          # Guest user management
 ```
 
-## Dossier i18n/
+## i18n/ Folder
 
-Fichiers de traduction pour l'internationalisation.
+Translation files for internationalization.
 
 ```
 i18n/
 └── locales/
-    ├── fr.json               # Traductions françaises
-    └── en.json               # Traductions anglaises
+    ├── fr.json               # French translations
+    └── en.json               # English translations
 ```
 
-### Structure des traductions
+### Translation Structure
 
 ```json
 {
   "app_name": "DBKeep",
   "common": {
-    "save": "Enregistrer",
-    "cancel": "Annuler"
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "auth": {
-    "login_title": "Connexion",
-    "login_button": "Se connecter"
+    "login_title": "Login",
+    "login_button": "Sign in"
   },
   "guest": {
-    "mode_label": "Mode Invité"
+    "mode_label": "Guest Mode"
   }
 }
 ```
 
-## Fichiers de configuration
+## Configuration Files
 
 ### nuxt.config.ts
 
-Configuration principale de Nuxt avec les variables d'environnement runtime.
+Main Nuxt configuration with runtime environment variables.
 
 ```typescript
 export default defineNuxtConfig({
@@ -164,7 +165,7 @@ export default defineNuxtConfig({
 
 ### drizzle.config.ts
 
-Configuration de Drizzle Kit pour les migrations.
+Drizzle Kit configuration for migrations.
 
 ```typescript
 export default defineConfig({
@@ -179,55 +180,56 @@ export default defineConfig({
 
 ### vitest.config.ts
 
-Configuration des tests unitaires.
+Unit test configuration.
 
 ### playwright.config.ts
 
-Configuration des tests E2E.
+E2E test configuration.
 
-## Conventions de nommage
+## Naming Conventions
 
-### Fichiers
+### Files
 
-| Type | Convention | Exemple |
+| Type | Convention | Example |
 |------|------------|---------|
-| Composants | PascalCase | `TableEditor.vue` |
-| Composables | camelCase avec `use` | `useProjectStore.ts` |
-| Services | camelCase avec `Service` | `projectService.ts` |
+| Components | PascalCase | `TableEditor.vue` |
+| Composables | camelCase with `use` | `useProjectStore.ts` |
+| Services | camelCase with `Service` | `projectService.ts` |
 | Pages | kebab-case | `login.vue` |
 | Types | PascalCase | `database.ts` |
 | Utils | camelCase | `auth-client.ts` |
 
 ### Code
 
-| Type | Convention | Exemple |
+| Type | Convention | Example |
 |------|------------|---------|
-| Composants | PascalCase | `<TableEditor />` |
-| Fonctions | camelCase | `addTable()` |
-| Constantes | SCREAMING_SNAKE | `GUEST_USER_ID` |
+| Components | PascalCase | `<TableEditor />` |
+| Functions | camelCase | `addTable()` |
+| Constants | SCREAMING_SNAKE | `GUEST_USER_ID` |
 | Types/Interfaces | PascalCase | `TableData` |
 | Enums | PascalCase | `ColumnType` |
 
-## Architecture Open Core
+## Extensible Architecture
 
-DBKeep suit une architecture découplée permettant différents modes :
+DBKeep follows a decoupled architecture supporting different modes:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        Frontend                              │
 ├─────────────────────────────────────────────────────────────┤
-│  useAppMode         → Configuration mode invité/register    │
-│  useCanvasStore     → État canvas (agnostique auth)         │
-│  middleware/auth    → Protection routes (guest bypass)      │
+│  useAppMode         → Guest mode/register configuration     │
+│  useCanvasStore     → Canvas state (auth-agnostic)          │
+│  middleware/auth    → Route protection (guest bypass)       │
 └─────────────────────────────────────────────────────────────┘
                               │
 ┌─────────────────────────────────────────────────────────────┐
 │                        Backend                               │
 ├─────────────────────────────────────────────────────────────┤
-│  services/          → Logique métier centralisée            │
-│  utils/appMode      → Helpers mode invité                   │
-│  plugins/guestUser  → Création user guest au démarrage      │
+│  services/          → Centralized business logic            │
+│  utils/appMode      → Guest mode helpers                    │
+│  utils/workspace    → Multi-tenancy extension point         │
+│  plugins/guestUser  → Guest user creation at startup        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Voir [Configuration](./configuration.md) pour les variables d'environnement.
+See [Configuration](./configuration.md) for environment variables.

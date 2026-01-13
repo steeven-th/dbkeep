@@ -5,10 +5,41 @@ definePageMeta({
 
 const router = useRouter()
 const { t } = useI18n()
+const toast = useToast()
 const { projects, isLoadingList, hasLoadedOnce, fetchProjects, deleteProject, closeProject } = useProjects()
 
 // État du modal de nouveau projet
 const showNewProjectModal = ref(false)
+
+// État de la recherche et des filtres
+const searchQuery = ref('')
+const selectedEngine = ref<string | null>(null)
+
+// Options de filtre par moteur
+const engineOptions = computed(() => [
+  { label: t('project.all_engines'), value: null },
+  { label: 'PostgreSQL', value: 'PostgreSQL' },
+  { label: 'MySQL', value: 'MySQL' },
+  { label: 'SQLite', value: 'SQLite' }
+])
+
+// Projets filtrés
+const filteredProjects = computed(() => {
+  let result = projects.value
+
+  // Filtre par recherche textuelle
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    result = result.filter(p => p.name.toLowerCase().includes(query))
+  }
+
+  // Filtre par moteur
+  if (selectedEngine.value) {
+    result = result.filter(p => p.engine === selectedEngine.value)
+  }
+
+  return result
+})
 
 // État du modal de confirmation de suppression
 const projectToDelete = ref<string | null>(null)
@@ -16,6 +47,20 @@ const showDeleteModal = computed({
   get: () => !!projectToDelete.value,
   set: (value) => {
     if (!value) projectToDelete.value = null
+  }
+})
+
+// État du modal de renommage
+const projectToRename = ref<{ id: string; name: string } | null>(null)
+const newProjectName = ref('')
+const isRenaming = ref(false)
+const showRenameModal = computed({
+  get: () => !!projectToRename.value,
+  set: (value) => {
+    if (!value) {
+      projectToRename.value = null
+      newProjectName.value = ''
+    }
   }
 })
 
@@ -53,6 +98,48 @@ const handleDeleteProject = async () => {
   if (projectToDelete.value) {
     await deleteProject(projectToDelete.value)
     projectToDelete.value = null
+  }
+}
+
+/**
+ * Ouvre le modal de renommage
+ */
+const openRenameModal = (projectId: string, currentName: string) => {
+  projectToRename.value = { id: projectId, name: currentName }
+  newProjectName.value = currentName
+}
+
+/**
+ * Renomme le projet
+ */
+const handleRenameProject = async () => {
+  if (!projectToRename.value || !newProjectName.value.trim()) return
+
+  isRenaming.value = true
+  try {
+    await $fetch(`/api/projects/${projectToRename.value.id}`, {
+      method: 'PUT',
+      body: { name: newProjectName.value.trim() }
+    })
+
+    toast.add({
+      title: t('project.renamed_success'),
+      color: 'success'
+    })
+
+    // Rafraîchir la liste
+    await fetchProjects()
+
+    // Fermer le modal
+    showRenameModal.value = false
+  } catch (error: any) {
+    toast.add({
+      title: t('project.error_rename'),
+      description: error.message,
+      color: 'error'
+    })
+  } finally {
+    isRenaming.value = false
   }
 }
 
@@ -131,6 +218,25 @@ const getEngineIcon = (engine: string) => {
           />
         </div>
 
+        <!-- Barre de recherche et filtres -->
+        <div
+          v-if="hasLoadedOnce && projects.length > 0"
+          class="flex flex-col sm:flex-row gap-3"
+        >
+          <UInput
+            v-model="searchQuery"
+            :placeholder="t('project.search_placeholder')"
+            icon="i-lucide-search"
+            class="flex-1"
+          />
+          <USelect
+            v-model="selectedEngine"
+            :items="engineOptions"
+            value-key="value"
+            class="w-full sm:w-48"
+          />
+        </div>
+
         <!-- Loading state avec skeletons de cartes -->
         <div
           v-if="isLoadingList"
@@ -171,13 +277,37 @@ const getEngineIcon = (engine: string) => {
           </p>
         </div>
 
+        <!-- Aucun résultat de recherche -->
+        <div
+          v-else-if="hasLoadedOnce && projects.length > 0 && filteredProjects.length === 0"
+          class="text-center py-12 bg-default rounded-lg border border-default"
+        >
+          <UIcon
+            name="i-lucide-search-x"
+            class="w-12 h-12 text-muted mx-auto mb-4"
+          />
+          <p class="text-muted">
+            {{ t('project.no_results') }}
+          </p>
+          <p class="text-sm text-muted mt-1">
+            {{ t('project.no_results_description') }}
+          </p>
+          <UButton
+            variant="soft"
+            class="mt-4"
+            @click="searchQuery = ''; selectedEngine = null"
+          >
+            {{ t('project.clear_filters') }}
+          </UButton>
+        </div>
+
         <!-- Grille de projets -->
         <div
           v-else
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           <div
-            v-for="project in projects"
+            v-for="project in filteredProjects"
             :key="project.id"
             class="bg-default rounded-lg border border-default p-4 hover:border-primary transition-colors group"
           >
@@ -197,6 +327,11 @@ const getEngineIcon = (engine: string) => {
                     label: t('project.open'),
                     icon: 'i-lucide-folder-open',
                     onSelect: () => openProject(project.id)
+                  },
+                  {
+                    label: t('project.rename'),
+                    icon: 'i-lucide-pencil',
+                    onSelect: () => openRenameModal(project.id, project.name)
                   }],
                   [{
                     label: t('project.delete'),
@@ -270,6 +405,42 @@ const getEngineIcon = (engine: string) => {
             @click="handleDeleteProject"
           >
             {{ t('project.delete') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Modal de renommage -->
+    <UModal
+      v-model:open="showRenameModal"
+      :title="t('project.rename')"
+      :description="t('project.rename_description')"
+    >
+      <template #body>
+        <UFormField :label="t('project.name')">
+          <UInput
+            v-model="newProjectName"
+            :placeholder="t('project.name_placeholder')"
+            autofocus
+            class="w-full"
+            @keyup.enter="handleRenameProject"
+          />
+        </UFormField>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <UButton
+            variant="ghost"
+            @click="showRenameModal = false"
+          >
+            {{ t('common.cancel') }}
+          </UButton>
+          <UButton
+            :loading="isRenaming"
+            :disabled="!newProjectName.trim() || newProjectName === projectToRename?.name"
+            @click="handleRenameProject"
+          >
+            {{ t('common.save') }}
           </UButton>
         </div>
       </template>

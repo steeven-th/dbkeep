@@ -1,14 +1,23 @@
 import { listProjects } from '../../services/projectService'
 import { requireAuth } from '../../utils/appMode'
+import { getWorkspaceContext } from '../../utils/workspace'
 
 /**
  * GET /api/projects
- * Récupère la liste des projets de l'utilisateur connecté (ou invité)
+ * Returns the list of projects for the authenticated user (or guest)
+ * Supports optional workspace filtering for multi-tenant deployments
  */
 export default defineEventHandler(async (event) => {
-  // Obtenir l'ID utilisateur (authentifié ou invité)
+  // Get user ID (authenticated or guest)
   const userId = await requireAuth(event)
 
-  // Récupérer les projets via le service
-  return await listProjects(userId)
+  // Get optional workspace context for multi-tenancy
+  const workspace = getWorkspaceContext(event)
+
+  // Fetch projects via service
+  return await listProjects({
+    userId,
+    workspaceId: workspace.id,
+    workspaceType: workspace.type
+  })
 })

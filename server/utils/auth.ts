@@ -4,17 +4,17 @@ import { db } from '../database/drizzle'
 import * as schema from '../database/schema'
 
 /**
- * Configuration Better Auth
- * Utilise Drizzle ORM avec PostgreSQL
+ * Better Auth configuration
+ * Uses Drizzle ORM with PostgreSQL
  */
 export const auth = betterAuth({
-  // Base URL de l'application
+  // Application base URL
   baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
 
-  // Secret pour les tokens (à définir en production)
+  // Token secret (must be set in production)
   secret: process.env.BETTER_AUTH_SECRET,
 
-  // Adapter Drizzle pour la persistance
+  // Drizzle adapter for persistence
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema: {
@@ -25,27 +25,27 @@ export const auth = betterAuth({
     }
   }),
 
-  // Configuration de l'authentification par email/password
+  // Email/password authentication configuration
   emailAndPassword: {
     enabled: true,
-    // Longueur minimale du mot de passe
+    // Minimum password length
     minPasswordLength: 8
   },
 
-  // Configuration des sessions
+  // Session configuration
   session: {
-    // Durée de vie de la session (7 jours)
+    // Session lifetime (7 days)
     expiresIn: 60 * 60 * 24 * 7,
-    // Renouvellement automatique
+    // Automatic renewal
     updateAge: 60 * 60 * 24
   },
 
-  // Configuration des cookies
+  // Cookie configuration
   advanced: {
     cookiePrefix: 'dbkeep',
     useSecureCookies: process.env.NODE_ENV === 'production'
   }
 })
 
-// Type pour la session
+// Session type
 export type AuthSession = typeof auth.$Infer.Session

@@ -1,18 +1,18 @@
 # Installation
 
-Guide d'installation complet de DBKeep.
+Complete installation guide for DBKeep.
 
-## Prérequis
+## Prerequisites
 
-Avant de commencer, assurez-vous d'avoir installé :
+Before starting, make sure you have installed:
 
-| Outil | Version minimale | Vérification |
-|-------|-----------------|--------------|
+| Tool | Minimum Version | Check |
+|------|-----------------|-------|
 | Node.js | >= 18.x | `node --version` |
 | pnpm | >= 10.x | `pnpm --version` |
 | PostgreSQL | >= 14.x | `psql --version` |
 
-### Installer pnpm (si nécessaire)
+### Install pnpm (if needed)
 
 ```bash
 # Via npm
@@ -21,15 +21,15 @@ npm install -g pnpm
 # Via Homebrew (macOS)
 brew install pnpm
 
-# Via Corepack (recommandé)
+# Via Corepack (recommended)
 corepack enable
 corepack prepare pnpm@latest --activate
 ```
 
-### Installer PostgreSQL (si nécessaire)
+### Install PostgreSQL (if needed)
 
 ```bash
-# macOS avec Homebrew
+# macOS with Homebrew
 brew install postgresql@16
 brew services start postgresql@16
 
@@ -39,106 +39,106 @@ sudo apt install postgresql postgresql-contrib
 sudo systemctl start postgresql
 
 # Windows
-# Télécharger depuis https://www.postgresql.org/download/windows/
+# Download from https://www.postgresql.org/download/windows/
 ```
 
-## Installation du projet
+## Project Installation
 
-### 1. Cloner le repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/votre-username/dbkeep.git
+git clone https://github.com/your-username/dbkeep.git
 cd dbkeep
 ```
 
-### 2. Installer les dépendances
+### 2. Install dependencies
 
 ```bash
 pnpm install
 ```
 
-### 3. Créer la base de données
+### 3. Create the database
 
 ```bash
-# Créer la base de données
+# Create the database
 createdb dbkeep
 
-# Vérifier que la base existe
+# Verify the database exists
 psql -l | grep dbkeep
 ```
 
-### 4. Configurer l'environnement
+### 4. Configure the environment
 
 ```bash
-# Copier le fichier d'exemple
+# Copy the example file
 cp .env.example .env
 ```
 
-Éditer `.env` - voir [Configuration](./configuration.md) pour les détails.
+Edit `.env` - see [Configuration](./configuration.md) for details.
 
-### 5. Initialiser la base de données
+### 5. Initialize the database
 
 ```bash
-# Créer les tables
+# Create tables
 pnpm db:push
 ```
 
-### 6. Lancer l'application
+### 6. Launch the application
 
 ```bash
 pnpm dev
 ```
 
-L'application est maintenant accessible sur [http://localhost:3000](http://localhost:3000)
+The application is now accessible at [http://localhost:3000](http://localhost:3000)
 
-## Vérification de l'installation
+## Verify Installation
 
-1. Ouvrir [http://localhost:3000](http://localhost:3000) - Landing page
-2. Cliquer sur "S'inscrire" - Page de création de compte
-3. Créer un compte test
-4. Vous devriez être redirigé vers `/app`
+1. Open [http://localhost:3000](http://localhost:3000) - Landing page
+2. Click "Sign up" - Account creation page
+3. Create a test account
+4. You should be redirected to `/app`
 
-## Mode Invité (optionnel)
+## Guest Mode (optional)
 
-Pour un usage personnel sans gestion de compte, activez le mode invité :
+For personal use without account management, enable guest mode:
 
 ```bash
-# Dans .env
+# In .env
 NUXT_PUBLIC_GUEST_MODE=true
 ```
 
-En mode invité :
-- Pas besoin de créer un compte
-- Accès direct à `/app`
-- Les projets sont sauvegardés localement
+In guest mode:
+- No need to create an account
+- Direct access to `/app`
+- Projects are saved locally
 
-Voir [Configuration](./configuration.md) pour plus de détails sur les modes de déploiement.
+See [Configuration](./configuration.md) for more details on deployment modes.
 
-## Problèmes courants
+## Common Issues
 
-### Erreur "database does not exist"
+### Error "database does not exist"
 
 ```
 database "username" does not exist
 ```
 
-**Solution** : La variable `DATABASE_URL` n'est pas configurée correctement. Vérifiez votre fichier `.env`.
+**Solution**: The `DATABASE_URL` variable is not configured correctly. Check your `.env` file.
 
-### Erreur "Invalid base URL"
+### Error "Invalid base URL"
 
 ```
 Invalid base URL: /api/auth
 ```
 
-**Solution** : L'URL de base doit être absolue. Vérifiez que `BETTER_AUTH_URL` est définie dans `.env`.
+**Solution**: The base URL must be absolute. Verify that `BETTER_AUTH_URL` is defined in `.env`.
 
-### Erreur de connexion PostgreSQL
+### PostgreSQL connection error
 
 ```
 connection refused
 ```
 
-**Solution** : PostgreSQL n'est pas démarré.
+**Solution**: PostgreSQL is not running.
 
 ```bash
 # macOS

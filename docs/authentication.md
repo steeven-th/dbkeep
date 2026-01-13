@@ -1,28 +1,28 @@
-# Authentification
+# Authentication
 
-DBKeep utilise [Better Auth](https://www.better-auth.com) pour gérer l'authentification des utilisateurs.
+DBKeep uses [Better Auth](https://www.better-auth.com) to manage user authentication.
 
-## Modes de fonctionnement
+## Operation Modes
 
-DBKeep supporte plusieurs modes de déploiement :
+DBKeep supports multiple deployment modes:
 
 | Mode | Description | Variables |
 |------|-------------|-----------|
-| **SaaS Public** | Auth requise, inscription ouverte | (défaut) |
-| **SaaS Privé** | Auth requise, inscription fermée | `NUXT_PUBLIC_ENABLE_REGISTER=false` |
-| **Mode Invité** | Pas d'auth, usage personnel | `NUXT_PUBLIC_GUEST_MODE=true` |
+| **Multi-user** | Auth required, open registration | (default) |
+| **Private** | Auth required, registration disabled | `NUXT_PUBLIC_ENABLE_REGISTER=false` |
+| **Guest Mode** | No auth, personal use | `NUXT_PUBLIC_GUEST_MODE=true` |
 
-Voir [Configuration](./configuration.md) pour plus de détails.
+See [Configuration](./configuration.md) for more details.
 
-## Vue d'ensemble
+## Overview
 
-Better Auth est une solution d'authentification moderne pour les applications TypeScript/JavaScript, offrant :
+Better Auth is a modern authentication solution for TypeScript/JavaScript applications, offering:
 
-- Authentification email/mot de passe
-- Sessions sécurisées en base de données
-- Support OAuth (extensible)
-- API type-safe
-- Intégration Drizzle native
+- Email/password authentication
+- Database-backed secure sessions
+- OAuth support (extensible)
+- Type-safe API
+- Native Drizzle integration
 
 ## Architecture
 
@@ -30,34 +30,34 @@ Better Auth est une solution d'authentification moderne pour les applications Ty
 ┌─────────────────────────────────────────────────────────────┐
 │                        Frontend (Nuxt)                       │
 ├─────────────────────────────────────────────────────────────┤
-│  app/utils/auth-client.ts    → Client Better Auth           │
-│  app/composables/useAuth.ts  → Composable Vue               │
-│  app/middleware/auth.ts      → Protection des routes        │
-│  app/pages/login.vue         → Page de connexion            │
-│  app/pages/register.vue      → Page d'inscription           │
+│  app/utils/auth-client.ts    → Better Auth Client           │
+│  app/composables/useAuth.ts  → Vue Composable               │
+│  app/middleware/auth.ts      → Route Protection             │
+│  app/pages/login.vue         → Login Page                   │
+│  app/pages/register.vue      → Registration Page            │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                        Backend (Nitro)                       │
 ├─────────────────────────────────────────────────────────────┤
-│  server/utils/auth.ts        → Configuration Better Auth    │
-│  server/api/auth/[...all].ts → Handler API                  │
-│  server/database/schema.ts   → Tables auth (Drizzle)        │
+│  server/utils/auth.ts        → Better Auth Configuration    │
+│  server/api/auth/[...all].ts → API Handler                  │
+│  server/database/schema.ts   → Auth Tables (Drizzle)        │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                        PostgreSQL                            │
 ├─────────────────────────────────────────────────────────────┤
-│  user         → Utilisateurs                                │
-│  session      → Sessions actives                            │
-│  account      → Comptes OAuth                               │
-│  verification → Tokens de vérification email                │
+│  user         → Users                                       │
+│  session      → Active Sessions                             │
+│  account      → OAuth Accounts                              │
+│  verification → Email Verification Tokens                   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Configuration serveur
+## Server Configuration
 
 ### server/utils/auth.ts
 
@@ -92,7 +92,7 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-## Configuration client
+## Client Configuration
 
 ### app/utils/auth-client.ts
 
@@ -150,7 +150,7 @@ export const useAuth = () => {
 }
 ```
 
-## Protection des routes
+## Route Protection
 
 ### app/middleware/auth.ts
 
@@ -171,29 +171,29 @@ export default defineNuxtRouteMiddleware(async (to) => {
 })
 ```
 
-## Routes disponibles
+## Available Routes
 
-| Route | Description | Accès |
-|-------|-------------|-------|
+| Route | Description | Access |
+|-------|-------------|--------|
 | `/` | Landing page | Public |
-| `/login` | Connexion | Public |
-| `/register` | Inscription | Public |
-| `/app` | Application | Authentifié |
+| `/login` | Login | Public |
+| `/register` | Registration | Public |
+| `/app` | Application | Authenticated |
 
 ## API Endpoints
 
-Better Auth expose automatiquement ces endpoints :
+Better Auth automatically exposes these endpoints:
 
-| Endpoint | Méthode | Description |
-|----------|---------|-------------|
-| `/api/auth/sign-up/email` | POST | Inscription |
-| `/api/auth/sign-in/email` | POST | Connexion |
-| `/api/auth/sign-out` | POST | Déconnexion |
-| `/api/auth/get-session` | GET | Session actuelle |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/sign-up/email` | POST | Registration |
+| `/api/auth/sign-in/email` | POST | Login |
+| `/api/auth/sign-out` | POST | Logout |
+| `/api/auth/get-session` | GET | Current Session |
 
-## Utilisation dans les composants
+## Usage in Components
 
-### Vérifier l'authentification
+### Check Authentication
 
 ```vue
 <script setup lang="ts">
@@ -201,17 +201,17 @@ const { isAuthenticated, user, isLoading } = useAuth()
 </script>
 
 <template>
-  <div v-if="isLoading">Chargement...</div>
+  <div v-if="isLoading">Loading...</div>
   <div v-else-if="isAuthenticated">
-    Bonjour {{ user?.name }}
+    Hello {{ user?.name }}
   </div>
   <div v-else>
-    Non connecté
+    Not logged in
   </div>
 </template>
 ```
 
-### Formulaire de connexion
+### Login Form
 
 ```vue
 <script setup lang="ts">
@@ -231,7 +231,7 @@ const onSubmit = async () => {
 </script>
 ```
 
-### Déconnexion
+### Logout
 
 ```vue
 <script setup lang="ts">
@@ -240,36 +240,36 @@ const { logout, user } = useAuth()
 
 <template>
   <UButton @click="logout">
-    Se déconnecter
+    Sign out
   </UButton>
 </template>
 ```
 
-## Sécurité
+## Security
 
-### Mot de passe
+### Password
 
-- Minimum 8 caractères (configurable)
-- Hashé avec bcrypt par Better Auth
-- Jamais stocké en clair
+- Minimum 8 characters (configurable)
+- Hashed with bcrypt by Better Auth
+- Never stored in plain text
 
 ### Sessions
 
-- Stockées en base de données
-- Token unique par session
-- Expiration automatique
-- Révocation possible
+- Stored in database
+- Unique token per session
+- Automatic expiration
+- Revocable
 
-### Bonnes pratiques
+### Best Practices
 
-1. Toujours utiliser HTTPS en production
-2. Garder `BETTER_AUTH_SECRET` secret
-3. Configurer une expiration de session raisonnable
-4. Surveiller les tentatives de connexion échouées
+1. Always use HTTPS in production
+2. Keep `BETTER_AUTH_SECRET` secret
+3. Configure reasonable session expiration
+4. Monitor failed login attempts
 
-## Mode Invité
+## Guest Mode
 
-Le mode invité permet d'utiliser DBKeep sans authentification, idéal pour l'auto-hébergement personnel.
+Guest mode allows using DBKeep without authentication, ideal for personal self-hosting.
 
 ### Activation
 
@@ -277,27 +277,27 @@ Le mode invité permet d'utiliser DBKeep sans authentification, idéal pour l'au
 NUXT_PUBLIC_GUEST_MODE=true
 ```
 
-### Fonctionnement
+### How It Works
 
-- Le middleware `auth.ts` laisse passer toutes les requêtes vers `/app`
-- Un utilisateur "guest" est créé automatiquement au démarrage (`server/plugins/guestUser.ts`)
-- Les projets sont attribués à l'ID `guest-user`
-- Les options "Profil" et "Paramètres" sont masquées
+- The `auth.ts` middleware allows all requests to `/app`
+- A "guest" user is automatically created at startup (`server/plugins/guestUser.ts`)
+- Projects are assigned to the `guest-user` ID
+- "Profile" and "Settings" options are hidden
 
-### Composable useAppMode
+### useAppMode Composable
 
 ```typescript
 const { isGuestModeEnabled, guestUser, isAuthRequired } = useAppMode()
 
-// Vérifier si en mode invité
+// Check if in guest mode
 if (isGuestModeEnabled.value) {
-  console.log('Mode invité activé')
+  console.log('Guest mode enabled')
 }
 ```
 
-## Désactivation de l'inscription
+## Disabling Registration
 
-Pour un SaaS privé où seul l'admin crée les comptes :
+For private deployments where only admins create accounts:
 
 ```env
 NUXT_PUBLIC_ENABLE_REGISTER=false
@@ -305,17 +305,17 @@ NUXT_PUBLIC_ENABLE_REGISTER=false
 
 ### Impact
 
-- Le lien "S'inscrire" est masqué sur `/login`
-- La page `/register` affiche un message d'erreur
-- L'API `/api/auth/sign-up` retourne une erreur 403
+- "Sign up" link is hidden on `/login`
+- The `/register` page shows an error message
+- The `/api/auth/sign-up` API returns a 403 error
 
-### Vérification côté client
+### Client-side Check
 
 ```typescript
 const { isRegisterEnabled } = useAppMode()
 
-// Afficher le lien d'inscription seulement si activé
+// Show registration link only if enabled
 <NuxtLink v-if="isRegisterEnabled" to="/register">
-  S'inscrire
+  Sign up
 </NuxtLink>
 ```

@@ -4,13 +4,13 @@ import * as schema from './schema'
 
 const { Pool } = pg
 
-// Configuration du pool de connexions PostgreSQL
+// PostgreSQL connection pool configuration
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 })
 
-// Instance Drizzle avec le schéma
+// Drizzle instance with schema
 export const db = drizzle(pool, { schema })
 
-// Export du pool pour Better Auth
+// Export pool for Better Auth
 export { pool }

@@ -5,10 +5,14 @@ definePageMeta({
 
 const { t } = useI18n()
 const { isGuestModeEnabled, isRegisterEnabled } = useAppMode()
+const { isAuthenticated } = useAuth()
+
+// Détermine si l'utilisateur peut accéder directement à l'app
+const canAccessApp = computed(() => isGuestModeEnabled.value || isAuthenticated.value)
 
 // Détermine la destination du bouton principal d'action
-const primaryActionRoute = computed(() => isGuestModeEnabled.value ? '/app' : '/login')
-const primaryActionLabel = computed(() => isGuestModeEnabled.value ? t('landing.open_app') : t('auth.login_link'))
+const primaryActionRoute = computed(() => canAccessApp.value ? '/app' : '/login')
+const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_app') : t('auth.login_link'))
 </script>
 
 <template>
@@ -44,9 +48,9 @@ const primaryActionLabel = computed(() => isGuestModeEnabled.value ? t('landing.
           >
             {{ primaryActionLabel }}
           </UButton>
-          <!-- Bouton Inscription (masqué si enableRegister=false OU si guestMode=true) -->
+          <!-- Bouton Inscription (masqué si connecté, si enableRegister=false OU si guestMode=true) -->
           <UButton
-            v-if="isRegisterEnabled && !isGuestModeEnabled"
+            v-if="isRegisterEnabled && !isGuestModeEnabled && !isAuthenticated"
             to="/register"
           >
             {{ t('auth.register_link') }}
@@ -65,13 +69,13 @@ const primaryActionLabel = computed(() => isGuestModeEnabled.value ? t('landing.
           {{ t('landing.hero_description') }}
         </p>
         <div class="flex items-center justify-center gap-4">
-          <!-- Bouton principal : Accéder à l'app (guest) ou Commencer (auth) -->
+          <!-- Bouton principal : Accéder à l'app (guest ou connecté) ou Commencer (non connecté) -->
           <UButton
-            :to="isGuestModeEnabled ? '/app' : '/register'"
+            :to="canAccessApp ? '/app' : '/register'"
             size="xl"
-            :icon="isGuestModeEnabled ? 'i-lucide-arrow-right' : 'i-lucide-play'"
+            :icon="canAccessApp ? 'i-lucide-arrow-right' : 'i-lucide-play'"
           >
-            {{ isGuestModeEnabled ? t('landing.open_app') : t('landing.get_started') }}
+            {{ canAccessApp ? t('landing.open_app') : t('landing.get_started') }}
           </UButton>
           <UButton
             to="https://github.com"
@@ -124,8 +128,8 @@ const primaryActionLabel = computed(() => isGuestModeEnabled.value ? t('landing.
       </div>
     </section>
 
-    <!-- CTA Section (masquée en mode guest) -->
-    <section v-if="!isGuestModeEnabled" class="py-24 px-4">
+    <!-- CTA Section (masquée en mode guest ou si connecté) -->
+    <section v-if="!canAccessApp" class="py-24 px-4">
       <div class="container mx-auto text-center max-w-2xl">
         <h2 class="text-3xl font-bold mb-4">
           {{ t('landing.cta_title') }}

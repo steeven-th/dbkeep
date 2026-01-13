@@ -2,11 +2,11 @@ import { ensureGuestUserExists } from '../utils/guestUser'
 import { isGuestModeEnabled } from '../utils/appMode'
 
 /**
- * Plugin serveur qui s'exécute au démarrage
- * Crée l'utilisateur guest si le mode invité est activé
+ * Server plugin that runs at startup
+ * Creates the guest user if guest mode is enabled
  */
 export default defineNitroPlugin(async () => {
-  // Ne rien faire si le mode guest n'est pas activé
+  // Do nothing if guest mode is not enabled
   if (!isGuestModeEnabled()) {
     return
   }

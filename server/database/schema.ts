@@ -1,8 +1,8 @@
 import { pgTable, text, timestamp, boolean, uuid } from 'drizzle-orm/pg-core'
 
 /**
- * Table User - Utilisateurs de l'application
- * Compatible avec Better Auth
+ * User table - Application users
+ * Compatible with Better Auth
  */
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -15,8 +15,8 @@ export const user = pgTable('user', {
 })
 
 /**
- * Table Session - Sessions utilisateur
- * Compatible avec Better Auth
+ * Session table - User sessions
+ * Compatible with Better Auth
  */
 export const session = pgTable('session', {
   id: text('id').primaryKey(),
@@ -32,8 +32,8 @@ export const session = pgTable('session', {
 })
 
 /**
- * Table Account - Comptes OAuth liés
- * Compatible avec Better Auth
+ * Account table - Linked OAuth accounts
+ * Compatible with Better Auth
  */
 export const account = pgTable('account', {
   id: text('id').primaryKey(),
@@ -54,8 +54,8 @@ export const account = pgTable('account', {
 })
 
 /**
- * Table Verification - Tokens de vérification (email, reset password)
- * Compatible avec Better Auth
+ * Verification table - Verification tokens (email, password reset)
+ * Compatible with Better Auth
  */
 export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
@@ -67,22 +67,26 @@ export const verification = pgTable('verification', {
 })
 
 /**
- * Table Project - Projets de schéma de base de données
- * Liée à l'utilisateur
+ * Project table - Database schema projects
+ * Linked to user and workspace (user or team)
  */
 export const project = pgTable('project', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   engine: text('engine').notNull().default('postgresql'),
-  data: text('data'), // JSON stringifié du schéma
+  data: text('data'), // Stringified JSON schema
   userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
+  // Project owner (user_id or team_id)
+  ownerId: text('owner_id').notNull(),
+  // Owner type ('user' or 'team')
+  ownerType: text('owner_type').notNull().default('user'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })
 
-// Types exportés pour TypeScript
+// Exported types for TypeScript
 export type User = typeof user.$inferSelect
 export type NewUser = typeof user.$inferInsert
 export type Session = typeof session.$inferSelect

@@ -12,7 +12,7 @@ export const useAuth = () => {
 
   // État partagé pour la session (useState pour partager entre composants)
   const sessionData = useState<any>('auth-session', () => null)
-  const isLoading = useState<boolean>('auth-loading', () => true)
+  const isLoading = useState<boolean>('auth-loading', () => false)
   const error = useState<Error | null>('auth-error', () => null)
 
   // Synchroniser la session de Better Auth avec notre état

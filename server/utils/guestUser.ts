@@ -4,11 +4,11 @@ import { user } from '../database/schema'
 import { GUEST_USER_ID } from '../services/projectService'
 
 /**
- * Assure que l'utilisateur guest existe dans la BDD
- * Appelé au démarrage si le mode guest est activé
+ * Ensures the guest user exists in the database
+ * Called at startup if guest mode is enabled
  */
 export async function ensureGuestUserExists(): Promise<void> {
-  // Vérifier si l'utilisateur guest existe déjà
+  // Check if guest user already exists
   const [existingGuest] = await db
     .select({ id: user.id })
     .from(user)
@@ -16,10 +16,10 @@ export async function ensureGuestUserExists(): Promise<void> {
     .limit(1)
 
   if (existingGuest) {
-    return // L'utilisateur existe déjà
+    return // User already exists
   }
 
-  // Créer l'utilisateur guest
+  // Create guest user
   await db.insert(user).values({
     id: GUEST_USER_ID,
     name: 'Guest User',
