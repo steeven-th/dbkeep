@@ -25,7 +25,7 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
           class="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <img
-            src="/logo.svg"
+            src="/dbkeep-light.svg"
             alt="DBKeep"
             class="size-8"
           >
