@@ -21,6 +21,7 @@ export const useProjects = () => {
   const canvasStore = useCanvasStore()
   const toast = useToast()
   const { t } = useI18n()
+  const { parseError } = useAppError()
 
   // Liste des projets de l'utilisateur
   const projects = useState<ProjectListItem[]>('projects-list', () => [])
@@ -43,10 +44,10 @@ export const useProjects = () => {
       const data = await $fetch<ProjectListItem[]>('/api/projects')
       projects.value = data
       return data
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.add({
         title: t('project.error_load_list'),
-        description: error.message,
+        description: parseError(error).message,
         color: 'error'
       })
       return []
@@ -102,13 +103,13 @@ export const useProjects = () => {
       })
 
       return savedProject
-    } catch (error: any) {
+    } catch (error: unknown) {
       // En cas d'erreur, fermer le projet local
       projectStore.closeProject()
 
       toast.add({
         title: t('project.error_create'),
-        description: error.message,
+        description: parseError(error).message,
         color: 'error'
       })
       return null
@@ -149,10 +150,10 @@ export const useProjects = () => {
       await canvasStore.syncFromProject(project)
 
       return project
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.add({
         title: t('project.error_load'),
-        description: error.message,
+        description: parseError(error).message,
         color: 'error'
       })
       return null
@@ -228,10 +229,10 @@ export const useProjects = () => {
       lastSaveTime.value = Date.now()
 
       return true
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.add({
         title: t('project.error_save'),
-        description: error.message,
+        description: parseError(error).message,
         color: 'error'
       })
       return false
@@ -264,10 +265,10 @@ export const useProjects = () => {
       })
 
       return true
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.add({
         title: t('project.error_delete'),
-        description: error.message,
+        description: parseError(error).message,
         color: 'error'
       })
       return false
