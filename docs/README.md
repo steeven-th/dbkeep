@@ -25,6 +25,7 @@ See [Configuration](./configuration.md) for details.
 
 ### Authentication
 - [Better Auth](./authentication.md) - Authentication system and guest mode
+- [Email Configuration](./email-configuration.md) - SMTP setup for password reset and email verification
 
 ### Development
 - [Project Structure](./structure.md) - File organization and architecture

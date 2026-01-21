@@ -4,88 +4,101 @@
 [![Nuxt UI](https://img.shields.io/badge/Nuxt%20UI-4.x-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**DBKeep** est un outil open-source gratuit pour concevoir et modéliser vos schémas de base de données avec une interface visuelle intuitive. Alternative à DrawDB et dbdiagram.io.
+**DBKeep** is a free open-source tool for designing and modeling your database schemas with an intuitive visual interface. An alternative to DrawDB and dbdiagram.io.
 
-## Fonctionnalités
+## Features
 
-- **Éditeur visuel** : Créez des tables, colonnes et relations avec une interface drag-and-drop
-- **Export SQL** : Exportez vos schémas pour PostgreSQL, MySQL ou SQLite
-- **Groupes de tables** : Organisez vos tables en groupes visuels
-- **Multi-langues** : Interface disponible en français et anglais
-- **Authentification** : Système de comptes utilisateurs
-- **Open Source** : Gratuit pour toujours
+- **Visual editor**: Create tables, columns and relations with a drag-and-drop interface
+- **SQL export**: Export your schemas for PostgreSQL, MySQL or SQLite
+- **Table groups**: Organize your tables into visual groups
+- **Multi-language**: Interface available in English and French
+- **Authentication**: User account system with optional guest mode
+- **Open Source**: Free forever
 
-## Stack Technique
+## Tech Stack
 
 - [Nuxt 4](https://nuxt.com) + [Nuxt UI v4](https://ui.nuxt.com)
-- [Vue Flow](https://vueflow.dev) pour le canvas de diagrammes
+- [Vue Flow](https://vueflow.dev) for the diagram canvas
 - [Drizzle ORM](https://orm.drizzle.team) + PostgreSQL
-- [Better Auth](https://www.better-auth.com) pour l'authentification
-- [@nuxtjs/i18n](https://i18n.nuxtjs.org) pour l'internationalisation
+- [Better Auth](https://www.better-auth.com) for authentication
+- [@nuxtjs/i18n](https://i18n.nuxtjs.org) for internationalization
 
-## Démarrage rapide
+## Quick Start
 
 ```bash
-# 1. Cloner et installer
-git clone https://github.com/votre-username/dbkeep.git
+# 1. Clone and install
+git clone https://github.com/your-username/dbkeep.git
 cd dbkeep
 pnpm install
 
-# 2. Configurer l'environnement
+# 2. Configure environment
 cp .env.example .env
-# Éditer .env avec vos paramètres PostgreSQL
+# Edit .env with your PostgreSQL settings
 
-# 3. Créer la base de données
+# 3. Create the database
 createdb dbkeep
 pnpm db:push
 
-# 4. Lancer
+# 4. Run
 pnpm dev
 ```
 
-L'application est accessible sur [http://localhost:3000](http://localhost:3000)
+The application is available at [http://localhost:3000](http://localhost:3000)
 
 ## Documentation
 
-📚 **[Documentation complète](./docs/README.md)**
+**[Full documentation](./docs/README.md)**
 
-- [Installation](./docs/installation.md) - Guide d'installation détaillé
-- [Configuration](./docs/configuration.md) - Variables d'environnement
-- [Base de données](./docs/database.md) - Drizzle ORM et Drizzle Studio
-- [Authentification](./docs/authentication.md) - Better Auth
-- [Structure du projet](./docs/structure.md) - Organisation des fichiers
-- [Commandes](./docs/commands.md) - Toutes les commandes disponibles
-- [Contribution](./docs/contributing.md) - Guide de contribution
+- [Installation](./docs/installation.md) - Detailed installation guide
+- [Configuration](./docs/configuration.md) - Environment variables
+- [Database](./docs/database.md) - Drizzle ORM and Drizzle Studio
+- [Authentication](./docs/authentication.md) - Better Auth
+- [Email Configuration](./docs/email-configuration.md) - SMTP setup for password reset
+- [Project Structure](./docs/structure.md) - File organization
+- [Commands](./docs/commands.md) - All available commands
+- [Contributing](./docs/contributing.md) - Contribution guide
 
-## Commandes principales
+## Main Commands
 
-| Commande | Description |
-|----------|-------------|
-| `pnpm dev` | Serveur de développement |
-| `pnpm build` | Build de production |
-| `pnpm db:push` | Synchroniser le schéma BDD |
-| `pnpm db:studio` | Interface Drizzle Studio |
-| `pnpm test` | Lancer les tests |
-| `pnpm lint` | Vérifier le code |
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Development server |
+| `pnpm build` | Production build |
+| `pnpm db:push` | Sync database schema |
+| `pnpm db:studio` | Drizzle Studio interface |
+| `pnpm test` | Run tests |
+| `pnpm lint` | Lint code |
 
 ## Drizzle Studio
 
-Visualisez et manipulez votre base de données avec Drizzle Studio (équivalent de Prisma Studio) :
+Visualize and manage your database with Drizzle Studio (similar to Prisma Studio):
 
 ```bash
 pnpm db:studio
 ```
 
-Ouvre [https://local.drizzle.studio](https://local.drizzle.studio)
+Opens [https://local.drizzle.studio](https://local.drizzle.studio)
 
-## Contribution
+## Deployment Modes
 
-Les contributions sont les bienvenues ! Consultez le [guide de contribution](./docs/contributing.md).
+DBKeep supports different deployment modes:
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| **Multi-user** | Authentication + open registration | Multi-user production |
+| **Private** | Authentication, registration disabled | Private team |
+| **Guest Mode** | No authentication required | Personal self-hosting |
+
+See [Configuration](./docs/configuration.md) for details.
+
+## Contributing
+
+Contributions are welcome! Check the [contributing guide](./docs/contributing.md).
 
 ## License
 
-[MIT](LICENSE) - Libre d'utilisation, modification et distribution.
+[MIT](LICENSE) - Free to use, modify and distribute.
 
 ---
 
-Fait avec ❤️ par la communauté open-source
+Made with love by the open-source community

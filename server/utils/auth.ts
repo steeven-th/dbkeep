@@ -2,6 +2,7 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { db } from '../database/drizzle'
 import * as schema from '../database/schema'
+import { sendPasswordResetEmail, sendEmailVerification, isEmailConfigured } from '../services/emailService'
 
 /**
  * Better Auth configuration
@@ -29,7 +30,39 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     // Minimum password length
-    minPasswordLength: 8
+    minPasswordLength: 8,
+
+    // Password reset email
+    sendResetPassword: async ({ user, url }) => {
+      if (!isEmailConfigured()) {
+        console.warn('[Auth] Email non configuré - lien de reset:', url)
+        return
+      }
+
+      await sendPasswordResetEmail({
+        to: user.email,
+        resetUrl: url,
+        expiresInMinutes: 60
+      })
+    }
+  },
+
+  // Email verification (optional, disabled by default)
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      if (!isEmailConfigured()) {
+        console.warn('[Auth] Email non configuré - lien de vérification:', url)
+        return
+      }
+
+      await sendEmailVerification({
+        to: user.email,
+        verifyUrl: url,
+        userName: user.name
+      })
+    },
+    // Désactivé par défaut, peut être activé via env
+    sendOnSignUp: process.env.REQUIRE_EMAIL_VERIFICATION === 'true'
   },
 
   // Session configuration
