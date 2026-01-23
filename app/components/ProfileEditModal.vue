@@ -139,18 +139,11 @@ const tabs = computed(() => [
 <template>
   <UModal
     :open="open"
+    :title="t('profile.title')"
+    :description="t('profile.edit_profile')"
+    :icon="{ name: 'i-lucide-user-cog' }"
     @update:open="$emit('update:open', $event)"
   >
-    <template #header>
-      <div class="flex items-center gap-2">
-        <UIcon
-          name="i-lucide-user-cog"
-          class="size-5"
-        />
-        <span class="font-semibold">{{ t('profile.title') }}</span>
-      </div>
-    </template>
-
     <template #body>
       <UTabs
         v-model="activeTab"

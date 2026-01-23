@@ -26,6 +26,53 @@ const localSql = ref(props.modelValue)
 const isManuallyModified = ref(false)
 const currentErrors = ref<SqlParseError[]>([])
 
+// Export modal state
+const showExportModal = ref(false)
+
+// Export format options
+const exportFormats = computed(() => [
+  {
+    id: 'sql',
+    icon: 'i-lucide-file-code',
+    label: t('export.format_sql'),
+    description: t('export.format_sql_description'),
+    extension: '.sql',
+    available: false
+  },
+  {
+    id: 'json',
+    icon: 'i-lucide-file-json',
+    label: t('export.format_json'),
+    description: t('export.format_json_description'),
+    extension: '.json',
+    available: false
+  },
+  {
+    id: 'pdf',
+    icon: 'i-lucide-file-text',
+    label: t('export.format_pdf'),
+    description: t('export.format_pdf_description'),
+    extension: '.pdf',
+    available: false
+  },
+  {
+    id: 'image',
+    icon: 'i-lucide-image',
+    label: t('export.format_image'),
+    description: t('export.format_image_description'),
+    extension: '.png',
+    available: false
+  }
+])
+
+/**
+ * Handles export for the selected format
+ */
+const handleExport = (formatId: string) => {
+  // TODO: Implement export logic for each format
+  console.log('Export format:', formatId)
+}
+
 // Reference to Monaco editor and model
 const editorRef = shallowRef<editor.IStandaloneCodeEditor>()
 const monacoRef = shallowRef<typeof import('monaco-editor')>()
@@ -272,15 +319,26 @@ const copyToClipboard = async () => {
           {{ currentErrors.length }} {{ currentErrors.length > 1 ? 'erreurs' : 'erreur' }}
         </UBadge>
       </div>
-      <UTooltip :text="t('sql.copy')">
-        <UButton
-          icon="i-lucide-copy"
-          size="xs"
-          variant="ghost"
-          color="neutral"
-          @click="copyToClipboard"
-        />
-      </UTooltip>
+      <div class="flex items-center gap-1">
+        <UTooltip :text="t('sql.copy')">
+          <UButton
+            icon="i-lucide-copy"
+            size="xs"
+            variant="ghost"
+            color="neutral"
+            @click="copyToClipboard"
+          />
+        </UTooltip>
+        <UTooltip text="Export">
+          <UButton
+            icon="i-lucide-download"
+            size="xs"
+            variant="ghost"
+            color="neutral"
+            @click="showExportModal = true"
+          />
+        </UTooltip>
+      </div>
     </div>
 
     <!-- Monaco Editor -->
@@ -302,6 +360,59 @@ const copyToClipboard = async () => {
         </template>
       </ClientOnly>
     </div>
+
+    <!-- Export Modal -->
+    <UModal
+      v-model:open="showExportModal"
+      :title="t('export.title')"
+      :description="t('export.description')"
+    >
+      <template #body>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            v-for="format in exportFormats"
+            :key="format.id"
+            class="relative flex flex-col items-start p-4 rounded-lg border border-default bg-default hover:bg-elevated hover:border-primary/50 transition-all text-left group"
+            :class="{ 'opacity-60 cursor-not-allowed': !format.available }"
+            :disabled="!format.available"
+            @click="format.available && handleExport(format.id)"
+          >
+            <!-- Coming soon badge -->
+            <UBadge
+              v-if="!format.available"
+              color="neutral"
+              variant="soft"
+              size="xs"
+              class="absolute top-2 right-2"
+            >
+              {{ t('export.coming_soon') }}
+            </UBadge>
+
+            <div class="flex items-center gap-3 mb-2">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
+                <UIcon :name="format.icon" class="w-5 h-5 text-muted group-hover:text-primary transition-colors" />
+              </div>
+              <div>
+                <span class="font-medium text-default">{{ format.label }}</span>
+                <span class="text-xs text-muted ml-1">{{ format.extension }}</span>
+              </div>
+            </div>
+            <p class="text-xs text-muted">{{ format.description }}</p>
+          </button>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            @click="showExportModal = false"
+          >
+            {{ t('common.close') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 

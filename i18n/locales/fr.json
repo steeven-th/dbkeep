@@ -337,6 +337,20 @@
     "fix_errors_to_apply": "Corrigez les erreurs dans votre SQL avant d'appliquer les changements.",
     "readonly_message": "Vous êtes en mode lecture seule. Vous ne pouvez pas modifier ce contenu."
   },
+  "export": {
+    "title": "Exporter le schéma",
+    "description": "Choisissez le format d'export pour votre schéma de base de données.",
+    "format_sql": "Fichier SQL",
+    "format_sql_description": "Script SQL exécutable avec toutes les instructions CREATE TABLE",
+    "format_json": "Fichier JSON",
+    "format_json_description": "Format structuré avec toutes les métadonnées du projet",
+    "format_pdf": "Document PDF",
+    "format_pdf_description": "Documentation imprimable avec aperçu visuel du schéma",
+    "format_image": "Image PNG",
+    "format_image_description": "Capture du canvas au format image haute résolution",
+    "export_button": "Exporter",
+    "coming_soon": "Bientôt disponible"
+  },
   "guest": {
     "mode_label": "Mode Invité",
     "mode_description": "Vous utilisez DBKeep en mode invité. Vos projets sont sauvegardés localement.",

@@ -337,6 +337,20 @@
     "fix_errors_to_apply": "Fix the errors in your SQL before applying changes.",
     "readonly_message": "You are in read-only mode. You cannot edit this content."
   },
+  "export": {
+    "title": "Export schema",
+    "description": "Choose the export format for your database schema.",
+    "format_sql": "SQL File",
+    "format_sql_description": "Executable SQL script with all CREATE TABLE statements",
+    "format_json": "JSON File",
+    "format_json_description": "Structured format with all project metadata",
+    "format_pdf": "PDF Document",
+    "format_pdf_description": "Printable documentation with visual schema preview",
+    "format_image": "PNG Image",
+    "format_image_description": "Canvas capture in high resolution image format",
+    "export_button": "Export",
+    "coming_soon": "Coming soon"
+  },
   "guest": {
     "mode_label": "Guest Mode",
     "mode_description": "You are using DBKeep in guest mode. Your projects are saved locally.",
