@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { markRaw } from 'vue'
+import { markRaw, inject, type Ref } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { VueFlow, useVueFlow, SelectionMode, type Connection, type GraphNode } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
@@ -16,6 +16,9 @@ const canvasStore = useCanvasStore()
 const deleteConfirm = useDeleteConfirm()
 const { saveProject, isSaving, lastSaveTime } = useProjects()
 const toast = useToast()
+
+// Mode lecture seule injecté par le parent (page projet)
+const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
 // Clé pour forcer le re-render de Vue Flow
 const vueFlowKey = ref(0)
@@ -112,6 +115,9 @@ const pendingConnection = ref<Connection | null>(null)
  * Gestion d'une nouvelle connexion entre deux colonnes
  */
 onConnect((connection: Connection) => {
+  // Bloquer en mode lecture seule
+  if (canvasReadOnly.value) return
+
   // Extraire les IDs de table et colonne depuis les handles
   // On retire le suffixe -source ou -target (peu importe le type de handle utilisé)
   const sourceColumnId = connection.sourceHandle?.replace(/-(source|target)$/, '')
@@ -257,6 +263,9 @@ onNodeDragStop((event) => {
  * Appelé quand l'utilisateur appuie sur Delete ou Backspace
  */
 const handleDeleteSelected = () => {
+  // Bloquer en mode lecture seule
+  if (canvasReadOnly.value) return
+
   const selectedNodes = getSelectedNodes.value
   const selectedEdges = getSelectedEdges.value
 

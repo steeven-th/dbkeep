@@ -1,6 +1,6 @@
 import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../database/drizzle'
-import { project } from '../database/schema'
+import { project, user } from '../database/schema'
 
 /**
  * Project management service
@@ -48,6 +48,8 @@ export interface ProjectListItem {
   ownerType: string
   createdAt: Date
   updatedAt: Date
+  /** Nom de l'utilisateur qui a créé le projet */
+  createdByName: string | null
 }
 
 export interface ListProjectsOptions {
@@ -85,9 +87,11 @@ export async function listProjects(options: string | ListProjectsOptions): Promi
       ownerId: project.ownerId,
       ownerType: project.ownerType,
       createdAt: project.createdAt,
-      updatedAt: project.updatedAt
+      updatedAt: project.updatedAt,
+      createdByName: user.name
     })
     .from(project)
+    .leftJoin(user, eq(project.userId, user.id))
     .where(whereClause)
     .orderBy(desc(project.updatedAt))
 

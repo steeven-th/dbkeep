@@ -82,6 +82,7 @@
     "error_save": "Error saving project",
     "error_delete": "Error deleting project",
     "last_modified": "Last modified",
+    "created_by": "Created by",
     "back_to_list": "Back to project list",
     "active_project": "Active project"
   },
@@ -333,7 +334,8 @@
     "apply_or_cancel": "You have modified the SQL manually. Apply changes to update the schema or cancel to restore the generated SQL.",
     "apply_changes": "Apply changes",
     "has_errors": "SQL parsing errors",
-    "fix_errors_to_apply": "Fix the errors in your SQL before applying changes."
+    "fix_errors_to_apply": "Fix the errors in your SQL before applying changes.",
+    "readonly_message": "You are in read-only mode. You cannot edit this content."
   },
   "guest": {
     "mode_label": "Guest Mode",

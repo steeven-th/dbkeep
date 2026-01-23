@@ -82,6 +82,7 @@
     "error_save": "Erreur lors de la sauvegarde du projet",
     "error_delete": "Erreur lors de la suppression du projet",
     "last_modified": "Dernière modification",
+    "created_by": "Créé par",
     "back_to_list": "Retour à la liste des projets",
     "active_project": "Projet actif"
   },
@@ -333,7 +334,8 @@
     "apply_or_cancel": "Vous avez modifié le SQL manuellement. Appliquez les changements pour mettre à jour le schéma ou annulez pour restaurer le SQL généré.",
     "apply_changes": "Appliquer",
     "has_errors": "Erreurs de parsing SQL",
-    "fix_errors_to_apply": "Corrigez les erreurs dans votre SQL avant d'appliquer les changements."
+    "fix_errors_to_apply": "Corrigez les erreurs dans votre SQL avant d'appliquer les changements.",
+    "readonly_message": "Vous êtes en mode lecture seule. Vous ne pouvez pas modifier ce contenu."
   },
   "guest": {
     "mode_label": "Mode Invité",

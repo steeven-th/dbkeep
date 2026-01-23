@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { inject, type Ref } from 'vue'
 import { NodeResizer } from '@vue-flow/node-resizer'
 import type { GroupData } from '~/types/database'
 
@@ -10,6 +11,9 @@ const props = defineProps<{
 const { t } = useI18n()
 const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
+
+// Mode lecture seule injecté par le parent (page projet)
+const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
 // État pour l'édition du titre en ligne
 const isEditingTitle = ref(false)
@@ -28,9 +32,10 @@ watch(
 )
 
 /**
- * Démarre l'édition du titre en ligne
+ * Démarre l'édition du titre en ligne (si pas en lecture seule)
  */
 const startEditingTitle = () => {
+  if (canvasReadOnly.value) return
   editedTitle.value = props.data.name
   isEditingTitle.value = true
   nextTick(() => {
@@ -61,9 +66,10 @@ const cancelEditing = () => {
 }
 
 /**
- * Ouvre l'éditeur de groupe complet (Slideover)
+ * Ouvre l'éditeur de groupe complet (Slideover) - si pas en lecture seule
  */
 const openGroupEditor = () => {
+  if (canvasReadOnly.value) return
   projectStore.openGroupEditor(props.id)
 }
 
@@ -120,8 +126,11 @@ const backgroundColor = computed(() => {
       </span>
     </div>
 
-    <!-- Boutons d'action au survol -->
-    <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+    <!-- Boutons d'action au survol (masqués en lecture seule) -->
+    <div
+      v-if="!canvasReadOnly"
+      class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+    >
       <UButton
         icon="i-lucide-pencil"
         size="xs"

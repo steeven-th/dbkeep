@@ -6,6 +6,7 @@ import type { SqlParseError } from '~/composables/useSqlParser'
 const props = defineProps<{
   modelValue: string
   dialect?: 'PostgreSQL' | 'MySQL' | 'SQLite'
+  readOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -56,6 +57,13 @@ watch(() => props.modelValue, (newValue) => {
     localSql.value = newValue
     clearMarkers()
     currentErrors.value = []
+  }
+})
+
+// Quand readOnly change, mettre à jour les options de l'éditeur
+watch(() => props.readOnly, (newValue) => {
+  if (editorRef.value) {
+    editorRef.value.updateOptions({ readOnly: newValue ?? false })
   }
 })
 
@@ -134,8 +142,8 @@ const currentTheme = computed(() => {
   return colorMode.value === 'dark' ? THEME_DARK : THEME_LIGHT
 })
 
-// Options minimalistes de Monaco
-const editorOptions: editor.IStandaloneEditorConstructionOptions = {
+// Options minimalistes de Monaco (computed pour réagir à readOnly)
+const editorOptions = computed<editor.IStandaloneEditorConstructionOptions>(() => ({
   minimap: { enabled: false },
   lineNumbers: 'on',
   folding: false,
@@ -161,8 +169,9 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   parameterHints: { enabled: false },
   tabSize: 2,
   insertSpaces: true,
-  readOnly: false
-}
+  readOnly: props.readOnly ?? false,
+  readOnlyMessage: { value: t('sql.readonly_message') }
+}))
 
 // Définition des thèmes personnalisés
 const defineCustomThemes = (monaco: typeof import('monaco-editor')) => {

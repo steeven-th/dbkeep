@@ -136,7 +136,10 @@ export const useProjects = () => {
         notes: data.data?.notes || [],
         relations: data.data?.relations || [],
         createdAt: new Date(data.createdAt),
-        updatedAt: new Date(data.updatedAt)
+        updatedAt: new Date(data.updatedAt),
+        // Champs pour le cloud (ownership)
+        ownerType: data.ownerType,
+        ownerId: data.ownerId
       }
 
       // Charger dans le store

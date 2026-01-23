@@ -1,11 +1,11 @@
 /**
- * Types et interfaces pour DBKeep
- * Définit la structure des données pour la modélisation de bases de données
+ * Types and interfaces for DBKeep
+ * Defines data structures for database schema modeling
  */
 
-// Types de colonnes SQL supportés
+// Supported SQL column types
 export enum ColumnType {
-  // Numériques
+  // Numeric
   SMALLINT = 'SMALLINT',
   INT = 'INT',
   INTEGER = 'INTEGER',
@@ -17,18 +17,18 @@ export enum ColumnType {
   FLOAT = 'FLOAT',
   MONEY = 'MONEY',
 
-  // Auto-incrémentation
+  // Auto-increment
   SMALLSERIAL = 'SMALLSERIAL',
   SERIAL = 'SERIAL',
   BIGSERIAL = 'BIGSERIAL',
 
-  // Chaînes de caractères
+  // Character strings
   CHAR = 'CHAR',
   VARCHAR = 'VARCHAR',
   TEXT = 'TEXT',
   BYTEA = 'BYTEA',
 
-  // Date et heure
+  // Date and time
   DATE = 'DATE',
   TIME = 'TIME',
   TIMETZ = 'TIMETZ',
@@ -36,10 +36,10 @@ export enum ColumnType {
   TIMESTAMPTZ = 'TIMESTAMPTZ',
   INTERVAL = 'INTERVAL',
 
-  // Booléen
+  // Boolean
   BOOLEAN = 'BOOLEAN',
 
-  // Géométrie
+  // Geometry
   POINT = 'POINT',
   LINE = 'LINE',
   LSEG = 'LSEG',
@@ -48,7 +48,7 @@ export enum ColumnType {
   POLYGON = 'POLYGON',
   CIRCLE = 'CIRCLE',
 
-  // Réseau
+  // Network
   CIDR = 'CIDR',
   INET = 'INET',
   MACADDR = 'MACADDR',
@@ -58,7 +58,7 @@ export enum ColumnType {
   BIT = 'BIT',
   VARBIT = 'VARBIT',
 
-  // Recherche texte
+  // Text search
   TSVECTOR = 'TSVECTOR',
   TSQUERY = 'TSQUERY',
 
@@ -66,34 +66,34 @@ export enum ColumnType {
   JSON = 'JSON',
   JSONB = 'JSONB',
 
-  // Autres
+  // Other
   UUID = 'UUID',
   XML = 'XML',
 
-  // Vecteurs (pgvector)
+  // Vectors (pgvector)
   VECTOR = 'VECTOR',
   HALFVEC = 'HALFVEC',
   SPARSEVEC = 'SPARSEVEC'
 }
 
-// Moteurs de base de données supportés
+// Supported database engines
 export enum DatabaseEngine {
   PostgreSQL = 'PostgreSQL',
   MySQL = 'MySQL',
   SQLite = 'SQLite'
 }
 
-// Types de relations entre tables
+// Relation types between tables
 export enum RelationType {
   ONE_TO_ONE = '1:1',
   ONE_TO_MANY = '1:N',
   MANY_TO_MANY = 'N:M'
 }
 
-// Actions référentielles pour les clés étrangères
+// Referential actions for foreign keys
 export type ReferentialAction = 'CASCADE' | 'SET NULL' | 'RESTRICT' | 'NO ACTION'
 
-// Interface pour une colonne de table
+// Interface for a table column
 export interface Column {
   id: string
   name: string
@@ -102,30 +102,30 @@ export interface Column {
   nullable: boolean
   unique: boolean
   default?: string
-  // Paramètres de type
-  length?: number // Pour VARCHAR(n), CHAR(n), BIT(n), VARBIT(n)
-  precision?: number // Pour DECIMAL(p,s), NUMERIC(p,s) - nombre total de chiffres
-  scale?: number // Pour DECIMAL(p,s), NUMERIC(p,s) - chiffres après la virgule
-  dimension?: number // Pour VECTOR(n), HALFVEC(n), SPARSEVEC(n)
+  // Type parameters
+  length?: number // For VARCHAR(n), CHAR(n), BIT(n), VARBIT(n)
+  precision?: number // For DECIMAL(p,s), NUMERIC(p,s) - total digits
+  scale?: number // For DECIMAL(p,s), NUMERIC(p,s) - digits after decimal
+  dimension?: number // For VECTOR(n), HALFVEC(n), SPARSEVEC(n)
 }
 
-// Interface pour les données d'une table
+// Interface for table data
 export interface TableData {
   id: string
   name: string
-  color: string // Couleur hex du header
+  color: string // Hex color for header
   columns: Column[]
-  // Infos de présentation Vue Flow (optionnelles pour rétrocompatibilité)
+  // Vue Flow presentation info (optional for backward compatibility)
   position?: NodePosition
-  parentNode?: string // ID du groupe parent si la table est dans un groupe
+  parentNode?: string // Parent group ID if table is in a group
 }
 
-// Interface pour les données d'un groupe
+// Interface for group data
 export interface GroupData {
   id: string
   name: string
-  color: string // Couleur hex de la bordure
-  // Infos de présentation Vue Flow (optionnelles pour rétrocompatibilité)
+  color: string // Hex color for border
+  // Vue Flow presentation info (optional for backward compatibility)
   position?: NodePosition
   style?: {
     width: string
@@ -133,14 +133,14 @@ export interface GroupData {
   }
 }
 
-// Interface pour les données d'une note
+// Interface for note data
 export interface NoteData {
   id: string
-  name: string // Titre de la note
-  content: string // Contenu texte de la note
-  color: string // Couleur hex du fond
-  textColor: 'black' | 'white' // Couleur du texte
-  // Infos de présentation Vue Flow (optionnelles pour rétrocompatibilité)
+  name: string // Note title
+  content: string // Note text content
+  color: string // Hex color for background
+  textColor: 'black' | 'white' // Text color
+  // Vue Flow presentation info (optional for backward compatibility)
   position?: NodePosition
   style?: {
     width: string
@@ -148,7 +148,7 @@ export interface NoteData {
   }
 }
 
-// Interface pour une relation (clé étrangère)
+// Interface for a relation (foreign key)
 export interface Relation {
   id: string
   name?: string
@@ -161,7 +161,7 @@ export interface Relation {
   onUpdate?: ReferentialAction
 }
 
-// Interface pour le projet complet
+// Interface for complete project
 export interface Project {
   id: string
   name: string
@@ -172,25 +172,28 @@ export interface Project {
   relations: Relation[]
   createdAt: Date
   updatedAt: Date
+  // Optional ownership fields for multi-tenant deployments
+  ownerType?: 'user' | 'team'
+  ownerId?: string
 }
 
-// Types pour Vue Flow - Position d'un noeud
+// Vue Flow types - Node position
 export interface NodePosition {
   x: number
   y: number
 }
 
-// Interface pour un noeud table dans Vue Flow
+// Interface for a table node in Vue Flow
 export interface DbTableNode {
   id: string
   type: 'dbTable'
   position: NodePosition
   data: TableData
-  parentNode?: string // ID du groupe parent si nested
-  extent?: 'parent' // Contraint le drag dans le parent
+  parentNode?: string // Parent group ID if nested
+  extent?: 'parent' // Constrains drag within parent
 }
 
-// Interface pour un noeud groupe dans Vue Flow
+// Interface for a group node in Vue Flow
 export interface DbGroupNode {
   id: string
   type: 'dbGroup'
@@ -202,7 +205,7 @@ export interface DbGroupNode {
   }
 }
 
-// Interface pour un noeud note dans Vue Flow
+// Interface for a note node in Vue Flow
 export interface DbNoteNode {
   id: string
   type: 'dbNote'
@@ -214,21 +217,21 @@ export interface DbNoteNode {
   }
 }
 
-// Union type pour tous les noeuds
+// Union type for all nodes
 export type DbNode = DbTableNode | DbGroupNode | DbNoteNode
 
-// Interface pour un edge (relation) dans Vue Flow
+// Interface for an edge (relation) in Vue Flow
 export interface DbEdge {
   id: string
   type: 'relation'
-  source: string // ID du noeud source (table)
-  target: string // ID du noeud cible (table)
-  sourceHandle: string // ID de la colonne source
-  targetHandle: string // ID de la colonne cible
+  source: string // Source node ID (table)
+  target: string // Target node ID (table)
+  sourceHandle: string // Source column ID
+  targetHandle: string // Target column ID
   data: Relation
 }
 
-// Couleurs prédéfinies pour les tables et groupes
+// Predefined colors for tables and groups
 export const TABLE_COLORS = [
   { label: 'blue', value: '#3b82f6' },
   { label: 'green', value: '#22c55e' },
@@ -240,21 +243,21 @@ export const TABLE_COLORS = [
   { label: 'yellow', value: '#eab308' }
 ] as const
 
-// Couleur par défaut pour les nouvelles tables
+// Default color for new tables
 export const DEFAULT_TABLE_COLOR = '#3b82f6'
 
-// Couleur par défaut pour les nouveaux groupes
+// Default color for new groups
 export const DEFAULT_GROUP_COLOR = '#6b7280'
 
-// Couleur par défaut pour les nouvelles notes
-export const DEFAULT_NOTE_COLOR = '#fef3c7' // Jaune pâle (amber-100)
+// Default color for new notes
+export const DEFAULT_NOTE_COLOR = '#fef3c7' // Light yellow (amber-100)
 
-// Helper pour créer un UUID
+// Helper to create a UUID
 export const generateId = (): string => {
   return crypto.randomUUID()
 }
 
-// Helper pour créer une colonne par défaut
+// Helper to create a default column
 export const createDefaultColumn = (overrides?: Partial<Column>): Column => ({
   id: generateId(),
   name: '',
@@ -265,7 +268,7 @@ export const createDefaultColumn = (overrides?: Partial<Column>): Column => ({
   ...overrides
 })
 
-// Helper pour créer une colonne ID par défaut
+// Helper to create a default ID column
 export const createIdColumn = (): Column => ({
   id: generateId(),
   name: 'id',
@@ -275,7 +278,7 @@ export const createIdColumn = (): Column => ({
   unique: true
 })
 
-// Helper pour créer une table par défaut
+// Helper to create a default table
 export const createDefaultTable = (name: string, overrides?: Partial<TableData>): TableData => ({
   id: generateId(),
   name,
@@ -284,7 +287,7 @@ export const createDefaultTable = (name: string, overrides?: Partial<TableData>)
   ...overrides
 })
 
-// Helper pour créer un groupe par défaut
+// Helper to create a default group
 export const createDefaultGroup = (name: string, overrides?: Partial<GroupData>): GroupData => ({
   id: generateId(),
   name,
@@ -292,7 +295,7 @@ export const createDefaultGroup = (name: string, overrides?: Partial<GroupData>)
   ...overrides
 })
 
-// Helper pour créer une note par défaut
+// Helper to create a default note
 export const createDefaultNote = (name: string, overrides?: Partial<NoteData>): NoteData => ({
   id: generateId(),
   name,
@@ -302,7 +305,7 @@ export const createDefaultNote = (name: string, overrides?: Partial<NoteData>): 
   ...overrides
 })
 
-// Helper pour créer une relation par défaut
+// Helper to create a default relation
 export const createDefaultRelation = (overrides?: Partial<Relation>): Relation => ({
   id: generateId(),
   sourceTableId: '',
@@ -315,7 +318,7 @@ export const createDefaultRelation = (overrides?: Partial<Relation>): Relation =
   ...overrides
 })
 
-// Helper pour créer un projet par défaut
+// Helper to create a default project
 export const createDefaultProject = (name: string, engine: DatabaseEngine): Project => ({
   id: generateId(),
   name,

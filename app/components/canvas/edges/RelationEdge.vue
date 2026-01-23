@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { inject, type Ref } from 'vue'
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -12,6 +13,9 @@ const props = defineProps<EdgeProps<Relation>>()
 
 const { t } = useI18n()
 const projectStore = useProjectStore()
+
+// Mode lecture seule injecté par le parent (page projet)
+const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
 // Calcul du chemin de l'edge
 const path = computed(() => {
@@ -72,9 +76,10 @@ const edgeStyle = computed(() => {
 })
 
 /**
- * Ouvre l'éditeur de relation
+ * Ouvre l'éditeur de relation (si pas en lecture seule)
  */
 const openRelationEditor = () => {
+  if (canvasReadOnly.value) return
   if (props.data) {
     projectStore.openRelationEditor(props.id)
   }

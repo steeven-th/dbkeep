@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { inject, type Ref } from 'vue'
 import { Handle, Position } from '@vue-flow/core'
 import type { TableData, Column } from '~/types/database'
 
@@ -10,10 +11,14 @@ const props = defineProps<{
 const { t } = useI18n()
 const projectStore = useProjectStore()
 
+// Mode lecture seule injecté par le parent (page projet)
+const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
+
 /**
- * Ouvre l'éditeur de table dans le Slideover
+ * Ouvre l'éditeur de table dans le Slideover (si pas en lecture seule)
  */
 const openEditor = () => {
+  if (canvasReadOnly.value) return
   projectStore.openTableEditor(props.id)
 }
 
@@ -74,6 +79,7 @@ const isTargetConnected = (columnId: string): boolean => {
         <span class="font-semibold text-white truncate">{{ data.name }}</span>
       </div>
       <UButton
+        v-if="!canvasReadOnly"
         icon="i-lucide-pencil"
         size="xs"
         color="white"
