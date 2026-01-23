@@ -100,7 +100,8 @@ const openRelationEditor = () => {
       :style="{
         position: 'absolute',
         transform: `translate(-50%, -50%) translate(${labelPosition.x}px, ${labelPosition.y}px)`,
-        pointerEvents: 'all'
+        pointerEvents: 'all',
+        zIndex: 1002
       }"
       class="nodrag nopan"
     >

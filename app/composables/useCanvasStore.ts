@@ -115,7 +115,8 @@ export const useCanvasStore = () => {
           target: relation.targetTableId,
           sourceHandle: `${relation.sourceColumnId}-source`,
           targetHandle: `${relation.targetColumnId}-target`,
-          data: relation
+          data: relation,
+          zIndex: 1001 // Above tables (1000) and groups (0)
         })
       }
     })
@@ -154,7 +155,8 @@ export const useCanvasStore = () => {
       target: relation.targetTableId,
       sourceHandle: `${relation.sourceColumnId}-source`,
       targetHandle: `${relation.targetColumnId}-target`,
-      data: relation
+      data: relation,
+      zIndex: 1001 // Above tables (1000) and groups (0)
     })).filter(edge => {
       // Verify that source and target nodes exist
       return nodes.value.some(n => n.id === edge.source) &&
@@ -363,7 +365,8 @@ export const useCanvasStore = () => {
       target: relation.targetTableId,
       sourceHandle: `${relation.sourceColumnId}-source`,
       targetHandle: `${relation.targetColumnId}-target`,
-      data: relation
+      data: relation,
+      zIndex: 1001 // Above tables (1000) and groups (0)
     }
   }
 

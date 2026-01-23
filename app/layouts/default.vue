@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// Nuxt UI locale synced with i18n
+const nuxtUiLocale = useNuxtUiLocale()
+
 // New project modal state
 const showNewProjectModal = ref(false)
 
@@ -12,7 +15,7 @@ const openNewProjectModal = () => {
 </script>
 
 <template>
-  <UApp class="h-screen">
+  <UApp class="h-screen" :locale="nuxtUiLocale">
     <div class="h-full flex flex-col overflow-hidden">
       <!-- Navbar -->
       <LayoutNavbar
