@@ -5,14 +5,14 @@ const router = useRouter()
 const { t } = useI18n()
 const { createProject: createAndSaveProject, isSaving } = useProjects()
 
-// Props pour contrôler l'ouverture du modal
+// Props to control modal open state
 const isOpen = defineModel<boolean>('open', { default: false })
 
-// État du formulaire
+// Form state
 const projectName = ref('')
 const selectedEngine = ref<DatabaseEngine>(DatabaseEngine.PostgreSQL)
 
-// Options pour le sélecteur de moteur de BDD
+// Database engine selector options
 const engineOptions = computed(() => [
   {
     label: t('engines.postgresql'),
@@ -31,43 +31,43 @@ const engineOptions = computed(() => [
   }
 ])
 
-// Icône du moteur sélectionné
+// Selected engine icon
 const selectedEngineIcon = computed(() => {
   const engine = engineOptions.value.find(e => e.value === selectedEngine.value)
   return engine?.icon || 'i-lucide-database'
 })
 
-// Validation du formulaire
+// Form validation
 const isValid = computed(() => {
   return projectName.value.trim().length > 0
 })
 
 /**
- * Crée le projet et ferme le modal
+ * Creates the project and closes the modal
  */
 const createProject = async () => {
   if (!isValid.value || isSaving.value) return
 
-  // Créer et sauvegarder le projet en BDD
+  // Create and save the project to database
   const project = await createAndSaveProject(
     projectName.value.trim(),
     selectedEngine.value
   )
 
   if (project) {
-    // Réinitialiser le formulaire
+    // Reset the form
     resetForm()
 
-    // Fermer le modal
+    // Close the modal
     isOpen.value = false
 
-    // Naviguer vers le projet créé
+    // Navigate to the created project
     router.push(`/app/project/${project.id}`)
   }
 }
 
 /**
- * Réinitialise le formulaire
+ * Resets the form
  */
 const resetForm = () => {
   projectName.value = ''
@@ -75,14 +75,14 @@ const resetForm = () => {
 }
 
 /**
- * Ferme le modal et réinitialise le formulaire
+ * Closes the modal and resets the form
  */
 const closeModal = () => {
   resetForm()
   isOpen.value = false
 }
 
-// Réinitialiser le formulaire quand le modal s'ouvre
+// Reset the form when the modal opens
 watch(isOpen, (newValue) => {
   if (newValue) {
     resetForm()
@@ -98,7 +98,7 @@ watch(isOpen, (newValue) => {
   >
     <template #body>
       <div class="space-y-6">
-        <!-- Nom du projet -->
+        <!-- Project name -->
         <UFormField
           :label="t('project.name')"
           required
@@ -112,7 +112,7 @@ watch(isOpen, (newValue) => {
           />
         </UFormField>
 
-        <!-- Moteur de base de données -->
+        <!-- Database engine -->
         <UFormField
           :label="t('project.engine')"
           required

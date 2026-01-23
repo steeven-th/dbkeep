@@ -11,7 +11,7 @@ const { t } = useI18n()
 const { user, logout, isAuthenticated, isLoading: isAuthLoading } = useAuth()
 const { isGuestModeEnabled, guestUser } = useAppMode()
 
-// Utilisateur effectif (réel ou invité)
+// Effective user (real or guest)
 const effectiveUser = computed(() => {
   if (isGuestModeEnabled.value) {
     return guestUser.value
@@ -19,19 +19,19 @@ const effectiveUser = computed(() => {
   return user.value
 })
 
-// Vérifie si l'utilisateur est considéré comme connecté (auth réelle ou mode invité)
+// Check if user is considered logged in (real auth or guest mode)
 const isEffectivelyAuthenticated = computed(() => {
   return isGuestModeEnabled.value || isAuthenticated.value
 })
 
-// Retourne à la liste des projets
+// Return to projects list
 const goToProjectList = () => {
   router.push('/app')
 }
 
-// Items du dropdown menu utilisateur (adapté selon le mode)
+// User dropdown menu items (adapted based on mode)
 const userMenuItems = computed<DropdownMenuItem[][]>(() => {
-  // En mode invité, menu simplifié sans profil/paramètres
+  // In guest mode, simplified menu without profile/settings
   if (isGuestModeEnabled.value) {
     return [
       [
@@ -44,7 +44,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
     ]
   }
 
-  // Mode normal avec authentification
+  // Normal mode with authentication
   return [
     [
       {
@@ -72,7 +72,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
 
 <template>
   <header class="h-14 border-b border-default bg-default flex items-center px-4 shrink-0">
-    <!-- Logo à gauche -->
+    <!-- Logo on the left -->
     <div class="flex items-center gap-2">
       <NuxtLink
         to="/"
@@ -88,11 +88,11 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
         </span>
       </NuxtLink>
 
-      <!-- Slot pour éléments additionnels (ex: WorkspaceSwitcher) -->
+      <!-- Slot for additional elements (e.g., WorkspaceSwitcher) -->
       <slot name="after-logo" />
     </div>
 
-    <!-- Actions centrales -->
+    <!-- Center actions -->
     <div class="flex-1 flex items-center justify-center gap-2">
       <ClientOnly>
         <UButton
@@ -116,9 +116,9 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
       </ClientOnly>
     </div>
 
-    <!-- Actions à droite -->
+    <!-- Right actions -->
     <div class="flex items-center gap-2">
-      <!-- Sélecteur de thème -->
+      <!-- Theme selector -->
       <ClientOnly>
         <UColorModeButton />
         <template #fallback>
@@ -126,7 +126,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
         </template>
       </ClientOnly>
 
-      <!-- Sélecteur de langue -->
+      <!-- Language selector -->
       <ClientOnly>
         <LanguageSwitcher />
         <template #fallback>
@@ -134,15 +134,15 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
         </template>
       </ClientOnly>
 
-      <!-- Menu utilisateur -->
+      <!-- User menu -->
       <ClientOnly>
-        <!-- Skeleton pendant le chargement (sauf en mode invité) -->
+        <!-- Skeleton during loading (except in guest mode) -->
         <USkeleton
           v-if="isAuthLoading && !isGuestModeEnabled"
           class="size-8 rounded-full"
         />
 
-        <!-- Utilisateur connecté (auth réelle ou mode invité) -->
+        <!-- Logged in user (real auth or guest mode) -->
         <UDropdownMenu
           v-else-if="isEffectivelyAuthenticated"
           :items="userMenuItems"
@@ -156,7 +156,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
           </button>
         </UDropdownMenu>
 
-        <!-- Fallback SSR -->
+        <!-- SSR Fallback -->
         <template #fallback>
           <USkeleton class="size-8 rounded-full" />
         </template>
@@ -166,7 +166,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
 </template>
 
 <style scoped>
-/* Cursor pointer sur tous les boutons du header */
+/* Pointer cursor on all header buttons */
 header :deep(button) {
   cursor: pointer;
 }

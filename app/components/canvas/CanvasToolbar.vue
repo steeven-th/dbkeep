@@ -9,62 +9,62 @@ const canvasStore = useCanvasStore()
 const { saveProject: saveToDb, isSaving } = useProjects()
 const toast = useToast()
 
-// Mode lecture seule injecté par le parent (page projet)
+// Read-only mode injected by parent (project page)
 const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
 /**
- * Ferme le projet et retourne à la liste
+ * Closes the project and returns to the list
  */
 const handleCloseProject = async () => {
-  // Sauvegarder avant de fermer (sauf en mode lecture seule)
+  // Save before closing (except in read-only mode)
   if (!canvasReadOnly.value) {
     await saveToDb()
   }
-  // Naviguer vers la liste des projets
+  // Navigate to projects list
   router.push('/app')
 }
 
 /**
- * Ajoute une nouvelle table au projet et au canvas
+ * Adds a new table to the project and canvas
  */
 const addNewTable = () => {
-  // Créer la table dans le store projet
+  // Create the table in the project store
   const table = projectStore.addTable(t('table.default_name'))
 
   if (table) {
-    // Ajouter le noeud au canvas
+    // Add the node to the canvas
     canvasStore.addTableNode(table)
   }
 }
 
 /**
- * Ajoute un nouveau groupe au projet et au canvas
+ * Adds a new group to the project and canvas
  */
 const addNewGroup = () => {
-  // Créer le groupe dans le store projet
+  // Create the group in the project store
   const group = projectStore.addGroup(t('group.default_name'))
 
   if (group) {
-    // Ajouter le noeud au canvas
+    // Add the node to the canvas
     canvasStore.addGroupNode(group)
   }
 }
 
 /**
- * Ajoute une nouvelle note au projet et au canvas
+ * Adds a new note to the project and canvas
  */
 const addNewNote = () => {
-  // Créer la note dans le store projet
+  // Create the note in the project store
   const note = projectStore.addNote(t('note.default_name'))
 
   if (note) {
-    // Ajouter le noeud au canvas
+    // Add the node to the canvas
     canvasStore.addNoteNode(note)
   }
 }
 
 /**
- * Sauvegarde le projet en BDD
+ * Saves the project to the database
  */
 const handleSave = async () => {
   const success = await saveToDb()
@@ -83,7 +83,7 @@ const handleSave = async () => {
     <div
       class="flex items-center gap-1 bg-default border border-default rounded-lg p-1.5 shadow-lg mt-4"
     >
-      <!-- Bouton retour à la liste des projets -->
+      <!-- Back to project list button -->
       <UTooltip :text="t('project.back_to_list')" :delay-duration="0">
         <UButton
           icon="i-lucide-arrow-left"
@@ -94,19 +94,19 @@ const handleSave = async () => {
         />
       </UTooltip>
 
-      <!-- Boutons d'édition (masqués en mode lecture seule) -->
+      <!-- Edit buttons (hidden in read-only mode) -->
       <template v-if="!canvasReadOnly">
-        <!-- Séparateur -->
+        <!-- Separator -->
         <div class="w-px h-6 bg-muted mx-1" />
 
-        <!-- Bouton Ajouter une table -->
+        <!-- Add table button -->
         <UTooltip :text="t('canvas.add_table')" :delay-duration="0">
           <UButton
             size="sm"
             variant="soft"
             @click="addNewTable"
           >
-            <!-- Icône table avec + -->
+            <!-- Table icon with + -->
             <svg
               width="20"
               height="20"
@@ -117,18 +117,18 @@ const handleSave = async () => {
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <!-- Table -->
+              <!-- Table shape -->
               <rect x="2" y="4" width="14" height="12" rx="2" />
               <line x1="2" y1="9" x2="16" y2="9" />
               <line x1="9" y1="4" x2="9" y2="16" />
-              <!-- Plus -->
+              <!-- Plus sign -->
               <line x1="19" y1="15" x2="19" y2="21" />
               <line x1="16" y1="18" x2="22" y2="18" />
             </svg>
           </UButton>
         </UTooltip>
 
-        <!-- Bouton Créer un groupe -->
+        <!-- Create group button -->
         <UTooltip :text="t('group.create')" :delay-duration="0">
           <UButton
             size="sm"
@@ -136,7 +136,7 @@ const handleSave = async () => {
             variant="soft"
             @click="addNewGroup"
           >
-            <!-- Icône groupe avec + -->
+            <!-- Group icon with + -->
             <svg
               width="20"
               height="20"
@@ -147,16 +147,16 @@ const handleSave = async () => {
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <!-- Rectangle groupe -->
+              <!-- Group rectangle -->
               <rect x="2" y="4" width="14" height="12" rx="2" stroke-dasharray="4 2" />
-              <!-- Plus -->
+              <!-- Plus sign -->
               <line x1="19" y1="15" x2="19" y2="21" />
               <line x1="16" y1="18" x2="22" y2="18" />
             </svg>
           </UButton>
         </UTooltip>
 
-        <!-- Bouton Créer une note -->
+        <!-- Create note button -->
         <UTooltip :text="t('note.create')" :delay-duration="0">
           <UButton
             size="sm"
@@ -164,7 +164,7 @@ const handleSave = async () => {
             variant="soft"
             @click="addNewNote"
           >
-            <!-- Icône note avec + -->
+            <!-- Note icon with + -->
             <svg
               width="20"
               height="20"
@@ -175,22 +175,22 @@ const handleSave = async () => {
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <!-- Rectangle note (plein) -->
+              <!-- Note rectangle (solid) -->
               <rect x="2" y="4" width="14" height="12" rx="2" />
-              <!-- Lignes de texte -->
+              <!-- Text lines -->
               <line x1="5" y1="8" x2="13" y2="8" />
               <line x1="5" y1="12" x2="10" y2="12" />
-              <!-- Plus -->
+              <!-- Plus sign -->
               <line x1="19" y1="15" x2="19" y2="21" />
               <line x1="16" y1="18" x2="22" y2="18" />
             </svg>
           </UButton>
         </UTooltip>
 
-        <!-- Séparateur -->
+        <!-- Separator -->
         <div class="w-px h-6 bg-muted mx-1" />
 
-        <!-- Bouton Enregistrer -->
+        <!-- Save button -->
         <UTooltip :text="t('common.save')" :delay-duration="0">
           <UButton
             icon="i-lucide-save"
@@ -207,7 +207,7 @@ const handleSave = async () => {
 </template>
 
 <style scoped>
-/* Cursor pointer sur tous les boutons */
+/* Pointer cursor on all buttons */
 :deep(button) {
   cursor: pointer;
 }

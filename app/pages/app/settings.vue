@@ -19,7 +19,7 @@ const { t } = useI18n()
         </p>
       </div>
 
-      <!-- Section Préférences -->
+      <!-- Preferences Section -->
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
@@ -32,7 +32,7 @@ const { t } = useI18n()
         </template>
 
         <div class="space-y-4">
-          <!-- Thème -->
+          <!-- Theme -->
           <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">{{ t('settings.theme') }}</p>
@@ -41,7 +41,7 @@ const { t } = useI18n()
             <UColorModeSelect />
           </div>
 
-          <!-- Langue -->
+          <!-- Language -->
           <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">{{ t('settings.language') }}</p>
@@ -52,7 +52,7 @@ const { t } = useI18n()
         </div>
       </UCard>
 
-      <!-- Section À propos -->
+      <!-- About Section -->
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
@@ -79,6 +79,6 @@ const { t } = useI18n()
 
 <style scoped>
 .settings-page {
-  height: calc(100vh - 3.5rem); /* 3.5rem = h-14 de la navbar */
+  height: calc(100vh - 3.5rem); /* 3.5rem = h-14 navbar height */
 }
 </style>

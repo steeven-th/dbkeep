@@ -21,16 +21,16 @@ const toast = useToast()
 const colorMode = useColorMode()
 const { validateSql } = useSqlParser()
 
-// État local du SQL (permet de tracker les modifications manuelles)
+// Local SQL state (allows tracking manual modifications)
 const localSql = ref(props.modelValue)
 const isManuallyModified = ref(false)
 const currentErrors = ref<SqlParseError[]>([])
 
-// Référence à l'éditeur Monaco et au modèle
+// Reference to Monaco editor and model
 const editorRef = shallowRef<editor.IStandaloneCodeEditor>()
 const monacoRef = shallowRef<typeof import('monaco-editor')>()
 
-// Exposer l'état de modification pour le parent
+// Expose modification state to parent
 defineExpose({
   isManuallyModified,
   currentErrors,
@@ -40,18 +40,18 @@ defineExpose({
     clearMarkers()
     emit('cancel-changes')
   },
-  // Appelé après application des changements SQL : réinitialise l'état sans émettre d'événement
+  // Called after applying SQL changes: resets state without emitting events
   acceptChanges: () => {
     isManuallyModified.value = false
     clearMarkers()
     currentErrors.value = []
   },
   getLocalSql: () => localSql.value,
-  // Permet au parent de forcer une validation
+  // Allows parent to force validation
   forceValidation: () => validateAndUpdateMarkers(localSql.value)
 })
 
-// Quand le SQL généré change (depuis le store), on met à jour seulement si pas de modification manuelle
+// When generated SQL changes (from store), update only if no manual modification
 watch(() => props.modelValue, (newValue) => {
   if (!isManuallyModified.value) {
     localSql.value = newValue
@@ -60,7 +60,7 @@ watch(() => props.modelValue, (newValue) => {
   }
 })
 
-// Quand readOnly change, mettre à jour les options de l'éditeur
+// When readOnly changes, update editor options
 watch(() => props.readOnly, (newValue) => {
   if (editorRef.value) {
     editorRef.value.updateOptions({ readOnly: newValue ?? false })
@@ -68,7 +68,7 @@ watch(() => props.readOnly, (newValue) => {
 })
 
 /**
- * Efface tous les markers d'erreur dans Monaco
+ * Clears all error markers in Monaco
  */
 const clearMarkers = () => {
   if (!monacoRef.value || !editorRef.value) return
@@ -80,7 +80,7 @@ const clearMarkers = () => {
 }
 
 /**
- * Met à jour les markers Monaco avec les erreurs de parsing
+ * Updates Monaco markers with parsing errors
  */
 const updateMarkers = (errors: SqlParseError[]) => {
   if (!monacoRef.value || !editorRef.value) return
@@ -94,14 +94,14 @@ const updateMarkers = (errors: SqlParseError[]) => {
     startLineNumber: error.line,
     startColumn: error.column,
     endLineNumber: error.line,
-    endColumn: error.column + 10 // Approximation de la longueur
+    endColumn: error.column + 10 // Approximate length
   }))
 
   monacoRef.value.editor.setModelMarkers(model, 'sql-validation', markers)
 }
 
 /**
- * Valide le SQL et met à jour les markers
+ * Validates SQL and updates markers
  */
 const validateAndUpdateMarkers = (sql: string) => {
   const dialect = props.dialect || 'PostgreSQL'
@@ -114,16 +114,16 @@ const validateAndUpdateMarkers = (sql: string) => {
   return result.valid
 }
 
-// Quand l'utilisateur tape dans l'éditeur
+// When user types in the editor
 const handleEditorChange = (value: string) => {
   localSql.value = value
 
-  // Comparer avec le SQL généré pour détecter les modifications manuelles
+  // Compare with generated SQL to detect manual modifications
   if (value !== props.modelValue) {
     isManuallyModified.value = true
     emit('manual-change', value)
 
-    // Valider le SQL modifié
+    // Validate modified SQL
     validateAndUpdateMarkers(value)
   } else {
     isManuallyModified.value = false
@@ -133,21 +133,21 @@ const handleEditorChange = (value: string) => {
   }
 }
 
-// Nom du thème personnalisé
+// Custom theme name
 const THEME_LIGHT = 'dbkeep-light'
 const THEME_DARK = 'dbkeep-dark'
 
-// Thème actuel basé sur le mode couleur
+// Current theme based on color mode
 const currentTheme = computed(() => {
   return colorMode.value === 'dark' ? THEME_DARK : THEME_LIGHT
 })
 
-// Options minimalistes de Monaco (computed pour réagir à readOnly)
+// Minimalist Monaco options (computed to react to readOnly)
 const editorOptions = computed<editor.IStandaloneEditorConstructionOptions>(() => ({
   minimap: { enabled: false },
   lineNumbers: 'on',
   folding: false,
-  glyphMargin: true, // Activé pour afficher les icônes d'erreur
+  glyphMargin: true, // Enabled to display error icons
   lineDecorationsWidth: 0,
   lineNumbersMinChars: 3,
   scrollbar: {
@@ -173,9 +173,9 @@ const editorOptions = computed<editor.IStandaloneEditorConstructionOptions>(() =
   readOnlyMessage: { value: t('sql.readonly_message') }
 }))
 
-// Définition des thèmes personnalisés
+// Custom theme definitions
 const defineCustomThemes = (monaco: typeof import('monaco-editor')) => {
-  // Thème clair
+  // Light theme
   monaco.editor.defineTheme(THEME_LIGHT, {
     base: 'vs',
     inherit: true,
@@ -199,7 +199,7 @@ const defineCustomThemes = (monaco: typeof import('monaco-editor')) => {
     }
   })
 
-  // Thème sombre
+  // Dark theme
   monaco.editor.defineTheme(THEME_DARK, {
     base: 'vs-dark',
     inherit: true,
@@ -224,18 +224,18 @@ const defineCustomThemes = (monaco: typeof import('monaco-editor')) => {
   })
 }
 
-// Callback avant le montage de Monaco
+// Callback before Monaco mount
 const handleBeforeMount = (monaco: typeof import('monaco-editor')) => {
   monacoRef.value = monaco
   defineCustomThemes(monaco)
 }
 
-// Callback après le montage de l'éditeur
+// Callback after editor mount
 const handleMount = (editor: editor.IStandaloneCodeEditor) => {
   editorRef.value = editor
 }
 
-// Copier le contenu dans le presse-papier
+// Copy content to clipboard
 const copyToClipboard = async () => {
   try {
     await navigator.clipboard.writeText(localSql.value)
@@ -256,13 +256,13 @@ const copyToClipboard = async () => {
 
 <template>
   <div class="sql-preview h-full flex flex-col bg-muted">
-    <!-- Header avec bouton copier -->
+    <!-- Header with copy button -->
     <div class="flex items-center justify-between px-3 py-2 border-b border-default">
       <div class="flex items-center gap-2">
         <span class="text-xs font-medium text-muted uppercase tracking-wider">
           SQL
         </span>
-        <!-- Indicateur d'erreur -->
+        <!-- Error indicator -->
         <UBadge
           v-if="currentErrors.length > 0"
           color="error"
@@ -283,7 +283,7 @@ const copyToClipboard = async () => {
       </UTooltip>
     </div>
 
-    <!-- Éditeur Monaco -->
+    <!-- Monaco Editor -->
     <div class="flex-1 min-h-0">
       <ClientOnly>
         <VueMonacoEditor
@@ -307,11 +307,11 @@ const copyToClipboard = async () => {
 
 <style scoped>
 .sql-preview {
-  /* Assure que l'éditeur prend toute la hauteur */
+  /* Ensures editor takes full height */
   overflow: hidden;
 }
 
-/* Override des styles Monaco pour un rendu plus propre */
+/* Override Monaco styles for cleaner rendering */
 :deep(.monaco-editor) {
   padding: 0 !important;
 }
@@ -320,7 +320,7 @@ const copyToClipboard = async () => {
   background: transparent !important;
 }
 
-/* Style pour les markers d'erreur */
+/* Style for error markers */
 :deep(.squiggly-error) {
   background: rgba(239, 68, 68, 0.2) !important;
 }

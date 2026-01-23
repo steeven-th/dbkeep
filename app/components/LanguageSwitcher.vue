@@ -3,13 +3,13 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { locale, locales, setLocale } = useI18n()
 
-// Locale courante avec son nom
+// Current locale with its name
 const currentLocale = computed(() => {
   const loc = (locales.value as { code: string; name: string }[]).find(l => l.code === locale.value)
   return loc?.name || locale.value
 })
 
-// Items du dropdown pour les langues
+// Dropdown items for languages
 const localeItems = computed<DropdownMenuItem[][]>(() => [
   (locales.value as { code: string; name: string }[]).map(loc => ({
     label: loc.name,

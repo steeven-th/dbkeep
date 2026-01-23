@@ -6,7 +6,7 @@ const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
 const deleteConfirm = useDeleteConfirm()
 
-// État d'ouverture basé sur editingGroup
+// Open state based on editingGroup
 const isOpen = computed({
   get: () => !!projectStore.editingGroup.value,
   set: (val) => {
@@ -16,19 +16,19 @@ const isOpen = computed({
   }
 })
 
-// Référence au groupe en cours d'édition
+// Reference to the group being edited
 const group = computed(() => projectStore.editingGroup.value)
 
-// Référence au color picker
+// Reference to color picker
 const colorPickerRef = ref<HTMLInputElement | null>(null)
 
-// Ouvre le color picker natif
+// Opens native color picker
 const openColorPicker = () => {
   colorPickerRef.value?.click()
 }
 
 /**
- * Met à jour le nom du groupe
+ * Updates group name
  */
 const updateGroupName = (name: string) => {
   if (!group.value) return
@@ -37,7 +37,7 @@ const updateGroupName = (name: string) => {
 }
 
 /**
- * Met à jour la couleur du groupe
+ * Updates group color
  */
 const updateGroupColor = (color: string) => {
   if (!group.value) return
@@ -46,7 +46,7 @@ const updateGroupColor = (color: string) => {
 }
 
 /**
- * Supprime le groupe (avec confirmation)
+ * Deletes the group (with confirmation)
  */
 const deleteGroup = () => {
   if (!group.value) return
@@ -57,19 +57,19 @@ const deleteGroup = () => {
     type: 'group',
     ids: [groupId],
     onConfirm: () => {
-      // Fermer l'éditeur d'abord
+      // Close editor first
       projectStore.closeGroupEditor()
 
-      // Retirer les tables enfants du groupe (les désassigner)
+      // Remove child tables from group (unassign them)
       const children = canvasStore.getGroupChildren(groupId)
       children.forEach(child => {
         canvasStore.assignToGroup(child.id, null)
       })
 
-      // Supprimer le noeud du canvas
+      // Remove node from canvas
       canvasStore.removeNode(groupId)
 
-      // Supprimer le groupe du projet
+      // Delete group from project
       projectStore.deleteGroup(groupId)
     }
   })
@@ -88,9 +88,9 @@ const deleteGroup = () => {
         v-if="group"
         class="space-y-6"
       >
-        <!-- Section: Informations du groupe -->
+        <!-- Section: Group information -->
         <div class="space-y-4">
-          <!-- Nom du groupe -->
+          <!-- Group name -->
           <UFormField :label="t('group.name')">
             <UInput
               :model-value="group.name"
@@ -99,10 +99,10 @@ const deleteGroup = () => {
             />
           </UFormField>
 
-          <!-- Couleur du contour et fond -->
+          <!-- Border and background color -->
           <UFormField :label="t('group.color')">
             <div class="flex items-center gap-2 flex-wrap">
-              <!-- Couleurs prédéfinies -->
+              <!-- Predefined colors -->
               <button
                 v-for="color in TABLE_COLORS"
                 :key="color.value"
@@ -113,7 +113,7 @@ const deleteGroup = () => {
                 :title="t(`colors.${color.label}`)"
                 @click="updateGroupColor(color.value)"
               />
-              <!-- Bouton color picker personnalisé -->
+              <!-- Custom color picker button -->
               <button
                 type="button"
                 class="color-swatch color-swatch-custom"
@@ -126,7 +126,7 @@ const deleteGroup = () => {
                   class="size-3 text-white drop-shadow"
                 />
               </button>
-              <!-- Input color caché -->
+              <!-- Hidden color input -->
               <input
                 ref="colorPickerRef"
                 type="color"
@@ -138,7 +138,7 @@ const deleteGroup = () => {
           </UFormField>
         </div>
 
-        <!-- Aperçu du groupe -->
+        <!-- Group preview -->
         <div class="space-y-2">
           <label class="text-sm font-medium text-muted">{{ t('group.preview') }}</label>
           <div
@@ -159,7 +159,7 @@ const deleteGroup = () => {
 
         <USeparator />
 
-        <!-- Zone de danger -->
+        <!-- Danger zone -->
         <div class="space-y-4">
           <h3 class="font-semibold text-sm text-error">
             {{ t('common.danger_zone') }}

@@ -7,10 +7,10 @@ const { t } = useI18n()
 const { isGuestModeEnabled, isRegisterEnabled } = useAppMode()
 const { isAuthenticated } = useAuth()
 
-// Détermine si l'utilisateur peut accéder directement à l'app
+// Determines if user can directly access the app
 const canAccessApp = computed(() => isGuestModeEnabled.value || isAuthenticated.value)
 
-// Détermine la destination du bouton principal d'action
+// Determines main action button destination
 const primaryActionRoute = computed(() => canAccessApp.value ? '/app' : '/login')
 const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_app') : t('auth.login_link'))
 </script>
@@ -40,7 +40,7 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
             color="neutral"
             variant="ghost"
           />
-          <!-- Bouton Connexion / Accéder à l'app -->
+          <!-- Login / Access app button -->
           <UButton
             :to="primaryActionRoute"
             color="neutral"
@@ -48,7 +48,7 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
           >
             {{ primaryActionLabel }}
           </UButton>
-          <!-- Bouton Inscription (masqué si connecté, si enableRegister=false OU si guestMode=true) -->
+          <!-- Register button (hidden if logged in, if enableRegister=false OR if guestMode=true) -->
           <UButton
             v-if="isRegisterEnabled && !isGuestModeEnabled && !isAuthenticated"
             to="/register"
@@ -69,7 +69,7 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
           {{ t('landing.hero_description') }}
         </p>
         <div class="flex items-center justify-center gap-4">
-          <!-- Bouton principal : Accéder à l'app (guest ou connecté) ou Commencer (non connecté) -->
+          <!-- Main button: Access app (guest or logged in) or Get started (not logged in) -->
           <UButton
             :to="canAccessApp ? '/app' : '/register'"
             size="xl"
@@ -128,7 +128,7 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
       </div>
     </section>
 
-    <!-- CTA Section (masquée en mode guest ou si connecté) -->
+    <!-- CTA Section (hidden in guest mode or if logged in) -->
     <section v-if="!canAccessApp" class="py-24 px-4">
       <div class="container mx-auto text-center max-w-2xl">
         <h2 class="text-3xl font-bold mb-4">
@@ -137,7 +137,7 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
         <p class="text-muted mb-8">
           {{ t('landing.cta_description') }}
         </p>
-        <!-- Bouton CTA : visible uniquement si inscription activée -->
+        <!-- CTA button: visible only if registration enabled -->
         <UButton
           v-if="isRegisterEnabled"
           to="/register"
@@ -147,7 +147,7 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
         >
           {{ t('landing.cta_button') }}
         </UButton>
-        <!-- Bouton alternatif si inscription désactivée mais pas en guest mode -->
+        <!-- Alternative button if registration disabled but not in guest mode -->
         <UButton
           v-else
           to="/login"

@@ -35,7 +35,7 @@ export const auth = betterAuth({
     // Password reset email
     sendResetPassword: async ({ user, url }) => {
       if (!isEmailConfigured()) {
-        console.warn('[Auth] Email non configuré - lien de reset:', url)
+        console.warn('[Auth] Email not configured - reset link:', url)
         return
       }
 
@@ -51,7 +51,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       if (!isEmailConfigured()) {
-        console.warn('[Auth] Email non configuré - lien de vérification:', url)
+        console.warn('[Auth] Email not configured - verification link:', url)
         return
       }
 
@@ -61,7 +61,7 @@ export const auth = betterAuth({
         userName: user.name
       })
     },
-    // Désactivé par défaut, peut être activé via env
+    // Disabled by default, can be enabled via env
     sendOnSignUp: process.env.REQUIRE_EMAIL_VERIFICATION === 'true'
   },
 

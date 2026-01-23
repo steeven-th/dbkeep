@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Note: Les types 'any' sont nécessaires car node-sql-parser retourne un AST dynamique
-// dont la structure varie selon le dialecte SQL et le type de requête
+// Note: 'any' types are necessary because node-sql-parser returns a dynamic AST
+// whose structure varies depending on the SQL dialect and query type
 
 import { Parser } from 'node-sql-parser'
 import type { TableData, Column, Relation } from '~/types/database'
 import { ColumnType, RelationType, generateId } from '~/types/database'
 
 /**
- * Erreur de parsing SQL avec position pour Monaco
+ * SQL parsing error with position for Monaco
  */
 export interface SqlParseError {
   message: string
@@ -18,7 +18,7 @@ export interface SqlParseError {
 }
 
 /**
- * Résultat du parsing SQL
+ * SQL parsing result
  */
 export interface SqlParseResult {
   success: boolean
@@ -28,8 +28,8 @@ export interface SqlParseResult {
 }
 
 /**
- * Structure normalisée d'une colonne extraite de l'AST
- * Cette interface capture TOUTES les informations possibles de l'AST
+ * Normalized column structure extracted from AST
+ * This interface captures ALL possible information from the AST
  */
 interface NormalizedColumnDef {
   name: string
@@ -51,12 +51,12 @@ interface NormalizedColumnDef {
       onUpdate?: string
     }
   }
-  // Champ extra pour stocker les propriétés AST non reconnues (évolutivité)
+  // Extra field to store unrecognized AST properties (extensibility)
   extra: Record<string, unknown>
 }
 
 /**
- * Structure normalisée d'une contrainte de table
+ * Normalized table constraint structure
  */
 interface NormalizedTableConstraint {
   type: 'PRIMARY KEY' | 'FOREIGN KEY' | 'UNIQUE' | 'CHECK' | 'INDEX' | 'UNKNOWN'
@@ -72,21 +72,21 @@ interface NormalizedTableConstraint {
 }
 
 /**
- * Composable pour parser du SQL et extraire les tables/relations
- * Utilise node-sql-parser pour une validation robuste
- * Approche : Normalisation complète de l'AST pour une extraction fiable
+ * Composable to parse SQL and extract tables/relations
+ * Uses node-sql-parser for robust validation
+ * Approach: Complete AST normalization for reliable extraction
  */
 export const useSqlParser = () => {
   const parser = new Parser()
 
   /**
-   * Mappe un type SQL vers notre enum ColumnType
+   * Maps a SQL type to our ColumnType enum
    */
   const mapSqlTypeToColumnType = (dataType: string): ColumnType => {
     const normalizedType = dataType.toUpperCase().trim()
 
     const typeMap: Record<string, ColumnType> = {
-      // Entiers
+      // Integers
       'SMALLINT': ColumnType.SMALLINT,
       'INT': ColumnType.INT,
       'INT2': ColumnType.SMALLINT,
@@ -97,7 +97,7 @@ export const useSqlParser = () => {
       'TINYINT': ColumnType.INT,
       'MEDIUMINT': ColumnType.INT,
 
-      // Décimaux
+      // Decimals
       'DECIMAL': ColumnType.DECIMAL,
       'NUMERIC': ColumnType.NUMERIC,
       'REAL': ColumnType.REAL,
@@ -115,7 +115,7 @@ export const useSqlParser = () => {
       'BIGSERIAL': ColumnType.BIGSERIAL,
       'SERIAL8': ColumnType.BIGSERIAL,
 
-      // Chaînes
+      // Strings
       'CHAR': ColumnType.CHAR,
       'CHARACTER': ColumnType.CHAR,
       'VARCHAR': ColumnType.VARCHAR,
@@ -140,11 +140,11 @@ export const useSqlParser = () => {
       'DATETIME': ColumnType.TIMESTAMP,
       'INTERVAL': ColumnType.INTERVAL,
 
-      // Booléen
+      // Boolean
       'BOOLEAN': ColumnType.BOOLEAN,
       'BOOL': ColumnType.BOOLEAN,
 
-      // Géométrie
+      // Geometry
       'POINT': ColumnType.POINT,
       'LINE': ColumnType.LINE,
       'LSEG': ColumnType.LSEG,
@@ -153,7 +153,7 @@ export const useSqlParser = () => {
       'POLYGON': ColumnType.POLYGON,
       'CIRCLE': ColumnType.CIRCLE,
 
-      // Réseau
+      // Network
       'CIDR': ColumnType.CIDR,
       'INET': ColumnType.INET,
       'MACADDR': ColumnType.MACADDR,
@@ -164,7 +164,7 @@ export const useSqlParser = () => {
       'VARBIT': ColumnType.VARBIT,
       'BIT VARYING': ColumnType.VARBIT,
 
-      // Recherche texte
+      // Text search
       'TSVECTOR': ColumnType.TSVECTOR,
       'TSQUERY': ColumnType.TSQUERY,
 
@@ -186,15 +186,15 @@ export const useSqlParser = () => {
   }
 
   /**
-   * Extrait une valeur string depuis n'importe quelle structure AST
-   * Gère tous les formats possibles de node-sql-parser
+   * Extracts a string value from any AST structure
+   * Handles all possible formats from node-sql-parser
    */
   const extractStringValue = (value: any): string | null => {
     if (!value) return null
     if (typeof value === 'string') return value
     if (typeof value === 'number') return String(value)
 
-    // Cas objet avec différentes propriétés possibles
+    // Object case with different possible properties
     if (typeof value === 'object') {
       // { value: "..." }
       if (value.value !== undefined) return extractStringValue(value.value)
@@ -232,8 +232,8 @@ export const useSqlParser = () => {
   }
 
   /**
-   * Extrait une valeur DEFAULT depuis l'AST
-   * Gère les strings, nombres, et fonctions SQL (CURRENT_TIMESTAMP, NOW(), etc.)
+   * Extracts a DEFAULT value from the AST
+   * Handles strings, numbers, and SQL functions (CURRENT_TIMESTAMP, NOW(), etc.)
    */
   const extractDefaultValue = (defaultVal: any): string | null => {
     if (!defaultVal) return null
@@ -252,9 +252,9 @@ export const useSqlParser = () => {
       // { type: "function", name: { name: [...] }, args: ... }
       if (defaultVal.type === 'function') {
         const funcName = extractFunctionName(defaultVal.name)
-        // Args peut être vide ou contenir des valeurs
+        // Args can be empty or contain values
         const hasArgs = defaultVal.args?.value && defaultVal.args.value.length > 0
-        // CURRENT_TIMESTAMP n'a pas de parenthèses, NOW() en a
+        // CURRENT_TIMESTAMP has no parentheses, NOW() does
         if (funcName === 'CURRENT_TIMESTAMP' && !hasArgs) {
           return 'CURRENT_TIMESTAMP'
         }
@@ -296,19 +296,19 @@ export const useSqlParser = () => {
   }
 
   /**
-   * Normalise une définition de colonne AST en structure uniforme
-   * C'est le cœur du mapper : il parcourt TOUT l'objet et extrait les contraintes
+   * Normalizes an AST column definition into a uniform structure
+   * This is the core of the mapper: it traverses the entire object and extracts constraints
    */
   const normalizeColumnDef = (colDef: any): NormalizedColumnDef | null => {
-    // Extraction du nom de la colonne
+    // Extract column name
     const name = extractStringValue(colDef.column)
     if (!name) return null
 
-    // Extraction du type de données
+    // Extract data type
     const dataType = (colDef.definition?.dataType || '').toUpperCase().replace(/\(.*\)/, '').trim()
     if (!dataType) return null
 
-    // Initialisation de la structure normalisée
+    // Initialize the normalized structure
     const normalized: NormalizedColumnDef = {
       name,
       dataType,
@@ -340,7 +340,7 @@ export const useSqlParser = () => {
 
     // === PARCOURS COMPLET DE L'OBJET POUR EXTRAIRE LES CONTRAINTES ===
 
-    // 1. Propriété "nullable" - peut être boolean, objet, ou string
+    // 1. "nullable" property - can be boolean, object, or string
     const nullable = colDef.nullable ?? colDef.definition?.nullable
     if (nullable !== undefined) {
       if (nullable === false) {
@@ -356,12 +356,12 @@ export const useSqlParser = () => {
       }
     }
 
-    // 2. Propriété "not_null" directe
+    // 2. Direct "not_null" property
     if (colDef.not_null || colDef.definition?.not_null) {
       normalized.constraints.notNull = true
     }
 
-    // 3. Propriété "unique" - peut être boolean ou string
+    // 3. "unique" property - can be boolean or string
     const unique = colDef.unique ?? colDef.definition?.unique
     if (unique) {
       if (unique === true || (typeof unique === 'string' && unique.toLowerCase() === 'unique')) {
@@ -369,14 +369,14 @@ export const useSqlParser = () => {
       }
     }
 
-    // 4. Propriété "primary_key" directe
+    // 4. Direct "primary_key" property
     if (colDef.primary_key || colDef.definition?.primary_key) {
       normalized.constraints.primaryKey = true
       normalized.constraints.notNull = true // PK implique NOT NULL
       normalized.constraints.unique = true // PK implique UNIQUE
     }
 
-    // 5. Propriété "auto_increment" directe (MySQL)
+    // 5. Direct "auto_increment" property (MySQL)
     if (colDef.auto_increment || colDef.definition?.auto_increment) {
       normalized.constraints.autoIncrement = true
     }
@@ -390,7 +390,7 @@ export const useSqlParser = () => {
       }
     }
 
-    // 7. Parcours du tableau "constraint" si présent
+    // 7. Traverse "constraint" array if present
     const constraints = colDef.constraint ?? colDef.definition?.constraint
     if (constraints) {
       const constraintList = Array.isArray(constraints) ? constraints : [constraints]
@@ -435,7 +435,7 @@ export const useSqlParser = () => {
       }
     }
 
-    // 8. Vérification des références directes (colDef.references)
+    // 8. Check for direct references (colDef.references)
     if (colDef.references) {
       const refTable = extractStringValue(colDef.references.table)
       const refColumn = extractStringValue(colDef.references.columns?.[0])
@@ -449,7 +449,7 @@ export const useSqlParser = () => {
       }
     }
 
-    // 9. Stocker les propriétés non traitées dans extra (pour évolutivité)
+    // 9. Store unprocessed properties in extra (for extensibility)
     const knownProperties = new Set([
       'column', 'definition', 'resource', 'nullable', 'not_null', 'unique',
       'primary_key', 'auto_increment', 'default_val', 'constraint', 'references'
@@ -480,7 +480,7 @@ export const useSqlParser = () => {
       const items = Array.isArray(source) ? source : [source]
 
       for (const item of items) {
-        // Ignorer les définitions de colonnes
+        // Ignore column definitions
         if (item?.resource === 'column' || (item?.column && item?.definition?.dataType)) {
           continue
         }
@@ -501,7 +501,7 @@ export const useSqlParser = () => {
         else if (constraintType.includes('INDEX')) type = 'INDEX'
         else if (!constraintType && !item?.constraint_type) continue // Pas une contrainte
 
-        // Extraire les colonnes concernées
+        // Extract the relevant columns
         const columnSources = item?.definition || item?.columns || item?.index_columns || []
         const columnList = Array.isArray(columnSources) ? columnSources : [columnSources]
         const columns: string[] = []
@@ -511,7 +511,7 @@ export const useSqlParser = () => {
           if (colName) columns.push(colName)
         }
 
-        // Créer la contrainte normalisée
+        // Create the normalized constraint
         const normalized: NormalizedTableConstraint = {
           type,
           name: item?.constraint_name || item?.name,
@@ -519,9 +519,9 @@ export const useSqlParser = () => {
           extra: {}
         }
 
-        // Ajouter les références pour les FK
-        // Note: node-sql-parser utilise "reference_definition" (pas "reference")
-        // et "on_action" est un tableau au lieu de on_delete/on_update séparés
+        // Add references for FKs
+        // Note: node-sql-parser uses "reference_definition" (not "reference")
+        // and "on_action" is an array instead of separate on_delete/on_update
         const refDef = item?.reference_definition || item?.reference
         if (type === 'FOREIGN KEY' && refDef) {
           const refTable = extractStringValue(refDef.table?.[0] || refDef.table)
@@ -551,7 +551,7 @@ export const useSqlParser = () => {
             }
           }
 
-          // Fallback aux anciennes propriétés
+          // Fallback to legacy properties
           if (!onDelete) {
             onDelete = refDef.on_delete?.toUpperCase() || item.on_delete?.toUpperCase()
           }
@@ -577,7 +577,7 @@ export const useSqlParser = () => {
   }
 
   /**
-   * Convertit une colonne normalisée en Column du store
+   * Converts a normalized column to a store Column
    */
   const normalizedToColumn = (normalized: NormalizedColumnDef): Column => {
     return {
@@ -595,8 +595,8 @@ export const useSqlParser = () => {
   }
 
   /**
-   * Parse du SQL complet et extrait les tables et relations
-   * Utilise la normalisation complète de l'AST
+   * Parses complete SQL and extracts tables and relations
+   * Uses complete AST normalization
    */
   const parseSql = (sql: string, dialect: 'PostgreSQL' | 'MySQL' | 'SQLite' = 'PostgreSQL'): SqlParseResult => {
     const errors: SqlParseError[] = []
@@ -623,7 +623,7 @@ export const useSqlParser = () => {
       try {
         ast = parser.astify(sql, { database: dbType })
       } catch (parseError: any) {
-        const errorMessage = parseError.message || 'Erreur de syntaxe SQL'
+        const errorMessage = parseError.message || 'SQL syntax error'
         let line = 1
         let column = 1
 
@@ -835,7 +835,7 @@ export const useSqlParser = () => {
       }
     } catch (e: any) {
       errors.push({
-        message: `Erreur de parsing: ${e.message}`,
+        message: `Parsing error: ${e.message}`,
         line: 1,
         column: 1
       })

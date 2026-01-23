@@ -17,22 +17,22 @@ const { loadProject, isLoadingProject, saveProject } = useProjects()
 const { sql } = useSqlGenerator()
 const { parseSql } = useSqlParser()
 
-// Récupère l'ID du projet depuis l'URL
+// Get the project ID from the URL
 const projectId = computed(() => route.params.id as string)
 
-// État d'erreur
+// Error state
 const error = ref<string | null>(null)
 
-// État de la sidebar (ouverte/fermée)
+// Sidebar state (open/closed)
 const isSidebarOpen = ref(true)
 
-// Largeur de la sidebar
+// Sidebar width
 const sidebarWidth = ref(350)
 
-// Référence au composant canvas
+// Reference to the canvas component
 const canvasRef = ref<{ forceRefresh: () => void } | null>(null)
 
-// État des modifications SQL manuelles
+// State for manual SQL modifications
 const sqlPreviewRef = ref<{
   isManuallyModified: { value: boolean }
   currentErrors: { value: SqlParseError[] }
@@ -45,7 +45,7 @@ const isSqlManuallyModified = ref(false)
 const sqlParseResult = ref<SqlParseResult | null>(null)
 const sqlErrors = ref<SqlParseError[]>([])
 
-// Dialecte SQL basé sur l'engine du projet
+// SQL dialect based on the project engine
 const sqlDialect = computed((): 'PostgreSQL' | 'MySQL' | 'SQLite' => {
   const engine = projectStore.currentProject.value?.engine
   switch (engine) {
@@ -56,14 +56,14 @@ const sqlDialect = computed((): 'PostgreSQL' | 'MySQL' | 'SQLite' => {
   }
 })
 
-// Vérifie si le projet est chargé
+// Check if the project is loaded
 const isProjectLoaded = computed(() => {
   return projectStore.currentProject.value?.id === projectId.value
 })
 
-// Charge le projet au montage si nécessaire
+// Load the project on mount if necessary
 onMounted(async () => {
-  // Si le projet n'est pas déjà chargé ou si c'est un projet différent
+  // If the project is not already loaded or it's a different project
   if (!isProjectLoaded.value) {
     const result = await loadProject(projectId.value)
     if (!result) {
@@ -72,7 +72,7 @@ onMounted(async () => {
   }
 })
 
-// Retour à la liste des projets
+// Return to projects list
 const goBack = () => {
   router.push('/app')
 }
@@ -82,14 +82,14 @@ const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
 
-// Stocker le SQL original pour pouvoir détecter les renommages
+// Store the original SQL to detect renames
 const originalSqlSnapshot = ref<string>('')
 
-// Gestion des changements de validation SQL (depuis SqlPreview)
+// Handle SQL validation changes (from SqlPreview)
 const handleValidationChange = (valid: boolean, errors: SqlParseError[]) => {
   sqlErrors.value = errors
 
-  // Si valide, parser pour extraire les tables et relations
+  // If valid, parse to extract tables and relations
   if (valid && sqlPreviewRef.value) {
     const localSql = sqlPreviewRef.value.getLocalSql()
     const result = parseSql(localSql, sqlDialect.value)
@@ -99,18 +99,18 @@ const handleValidationChange = (valid: boolean, errors: SqlParseError[]) => {
   }
 }
 
-// Gestion des changements SQL manuels
+// Handle manual SQL changes
 const handleSqlManualChange = (newSql: string) => {
-  // Sauvegarder le SQL original au premier changement
+  // Save the original SQL on first change
   if (!isSqlManuallyModified.value) {
     originalSqlSnapshot.value = sql.value
   }
 
   isSqlManuallyModified.value = true
-  // La validation est maintenant gérée par SqlPreview via handleValidationChange
+  // Validation is now handled by SqlPreview via handleValidationChange
 }
 
-// Annuler les changements SQL
+// Cancel SQL changes
 const handleCancelSqlChanges = () => {
   isSqlManuallyModified.value = false
   sqlParseResult.value = null
@@ -119,7 +119,7 @@ const handleCancelSqlChanges = () => {
   sqlPreviewRef.value?.resetToGenerated()
 }
 
-// Appliquer les changements SQL
+// Apply SQL changes
 const handleApplySqlChanges = async () => {
   if (!sqlParseResult.value || !sqlParseResult.value.success || sqlErrors.value.length > 0) {
     return
@@ -128,15 +128,15 @@ const handleApplySqlChanges = async () => {
   const currentProject = projectStore.currentProject.value
   if (!currentProject) return
 
-  // Parser le SQL original pour détecter les renommages
+  // Parse the original SQL to detect renames
   const originalParsed = parseSql(originalSqlSnapshot.value)
   const originalTables = originalParsed.success ? originalParsed.tables : []
 
-  // Mettre à jour le store avec les nouvelles tables et relations
+  // Update the store with the new tables and relations
   const { tables: newTables, relations: newRelations } = sqlParseResult.value
 
-  // Créer un mapping entre les tables originales et les nouvelles par leur position
-  // (l'ordre des CREATE TABLE dans le SQL)
+  // Create a mapping between original and new tables by position
+  // (the order of CREATE TABLE statements in the SQL)
   const tableMapping = new Map<number, { oldTable: typeof originalTables[0], newTable: typeof newTables[0] }>()
 
   for (let i = 0; i < Math.max(originalTables.length, newTables.length); i++) {
@@ -145,25 +145,25 @@ const handleApplySqlChanges = async () => {
     }
   }
 
-  // Mapping des anciens noms de tables vers les nouveaux (pour mettre à jour les relations)
+  // Mapping of old table names to new ones (to update relations)
   const tableRenameMap = new Map<string, string>()
 
-  // Conserver les positions, parentNode et IDs des colonnes des tables existantes
+  // Preserve positions, parentNode and column IDs from existing tables
   const updatedTables = newTables.map((newTable, index) => {
-    // 1. D'abord essayer de matcher par nom exact
+    // 1. First try to match by exact name
     let existingTable = currentProject.tables.find(
       t => t.name.toLowerCase() === newTable.name.toLowerCase()
     )
 
-    // 2. Si pas trouvé, essayer de matcher par position (table renommée)
+    // 2. If not found, try to match by position (renamed table)
     if (!existingTable) {
       const mapping = tableMapping.get(index)
       if (mapping) {
-        // Trouver la table existante qui correspond à l'ancienne table à cette position
+        // Find the existing table that corresponds to the old table at this position
         existingTable = currentProject.tables.find(
           t => t.name.toLowerCase() === mapping.oldTable.name.toLowerCase()
         )
-        // Enregistrer le renommage
+        // Record the rename
         if (existingTable && existingTable.name.toLowerCase() !== newTable.name.toLowerCase()) {
           tableRenameMap.set(existingTable.id, newTable.name)
         }
@@ -171,16 +171,16 @@ const handleApplySqlChanges = async () => {
     }
 
     if (existingTable) {
-      // Récupérer le parentNode depuis le canvas (c'est là qu'il est stocké)
+      // Get the parentNode from the canvas (that's where it's stored)
       const canvasNode = canvasStore.getNode(existingTable.id)
 
-      // Mapper les colonnes en préservant les IDs existants
+      // Map columns while preserving existing IDs
       const updatedColumns = newTable.columns.map(newCol => {
         const existingCol = existingTable!.columns.find(
           c => c.name.toLowerCase() === newCol.name.toLowerCase()
         )
         if (existingCol) {
-          // Préserver l'ID existant mais prendre les nouvelles propriétés
+          // Preserve existing ID but take new properties
           return {
             ...newCol,
             id: existingCol.id
@@ -201,15 +201,15 @@ const handleApplySqlChanges = async () => {
     return newTable
   })
 
-  // Créer un mapping rapide: nom de table -> table mise à jour
+  // Create a quick mapping: table name -> updated table
   const tableByName = new Map(updatedTables.map(t => [t.name.toLowerCase(), t]))
 
-  // Créer un mapping: ancien ID de table -> nouveau ID de table
+  // Create a mapping: old table ID -> new table ID
   const tableIdMap = new Map<string, string>()
   for (const [index, mapping] of tableMapping.entries()) {
     const updatedTable = updatedTables[index]
     if (updatedTable) {
-      // Chercher la table existante par l'ancien nom
+      // Find the existing table by old name
       const existingTable = currentProject.tables.find(
         t => t.name.toLowerCase() === mapping.oldTable.name.toLowerCase()
       )
@@ -219,28 +219,28 @@ const handleApplySqlChanges = async () => {
     }
   }
 
-  // Conserver les relations existantes et les mettre à jour si nécessaire
+  // Preserve existing relations and update them if necessary
   const existingRelations = currentProject.relations.map(relation => {
     let sourceTableId = relation.sourceTableId
     let targetTableId = relation.targetTableId
     let sourceColumnId = relation.sourceColumnId
     let targetColumnId = relation.targetColumnId
 
-    // Vérifier si les tables existent encore
+    // Check if tables still exist
     const sourceTable = updatedTables.find(t => t.id === sourceTableId)
     const targetTable = updatedTables.find(t => t.id === targetTableId)
 
     if (!sourceTable || !targetTable) {
-      // La table source ou cible n'existe plus, marquer pour suppression
+      // Source or target table no longer exists, mark for deletion
       return null
     }
 
-    // Vérifier si les colonnes existent encore
+    // Check if columns still exist
     const sourceColumn = sourceTable.columns.find(c => c.id === sourceColumnId)
     const targetColumn = targetTable.columns.find(c => c.id === targetColumnId)
 
     if (!sourceColumn || !targetColumn) {
-      // La colonne source ou cible n'existe plus, marquer pour suppression
+      // Source or target column no longer exists, mark for deletion
       return null
     }
 
@@ -253,11 +253,11 @@ const handleApplySqlChanges = async () => {
     }
   }).filter((r): r is NonNullable<typeof r> => r !== null)
 
-  // Ajouter les nouvelles relations du SQL parsé (en évitant les doublons)
+  // Add new relations from parsed SQL (avoiding duplicates)
   const finalRelations = [...existingRelations]
 
   for (const newRelation of newRelations) {
-    // Trouver les tables et colonnes correspondantes par nom
+    // Find corresponding tables and columns by name
     const parsedSourceTable = sqlParseResult.value?.tables.find(t => t.id === newRelation.sourceTableId)
     const parsedTargetTable = sqlParseResult.value?.tables.find(t => t.id === newRelation.targetTableId)
 
@@ -278,7 +278,7 @@ const handleApplySqlChanges = async () => {
 
     if (!sourceColumn || !targetColumn) continue
 
-    // Vérifier si cette relation existe déjà
+    // Check if this relation already exists
     const alreadyExists = finalRelations.some(r =>
       (r.sourceTableId === sourceTable.id && r.sourceColumnId === sourceColumn.id
         && r.targetTableId === targetTable.id && r.targetColumnId === targetColumn.id)
@@ -297,35 +297,35 @@ const handleApplySqlChanges = async () => {
     }
   }
 
-  // Reset l'état AVANT d'appliquer les changements pour que le watcher SQL reprenne la main
+  // Reset state BEFORE applying changes so the SQL watcher takes over
   isSqlManuallyModified.value = false
   sqlParseResult.value = null
   originalSqlSnapshot.value = ''
   sqlErrors.value = []
   sqlPreviewRef.value?.acceptChanges()
 
-  // Appliquer les changements au store (le watcher SQL va capter les changements)
+  // Apply changes to the store (the SQL watcher will pick up changes)
   projectStore.setTables(updatedTables)
   projectStore.setRelations(finalRelations)
 
-  // Resynchroniser le canvas depuis le projet mis à jour
+  // Resync canvas from the updated project
   const updatedProject = projectStore.currentProject.value
   if (updatedProject) {
     await canvasStore.syncFromProject(updatedProject as unknown as import('~/types/database').Project)
   }
 
-  // Forcer le re-render de Vue Flow pour appliquer les changements
+  // Force Vue Flow re-render to apply changes
   await nextTick()
   canvasRef.value?.forceRefresh()
 
-  // Sauvegarder le projet en BDD (le toast est géré par saveProject)
+  // Save project to database (toast is handled by saveProject)
   await saveProject()
 }
 </script>
 
 <template>
   <div class="project-page">
-    <!-- Chargement -->
+    <!-- Loading -->
     <div
       v-if="isLoadingProject"
       class="h-full flex items-center justify-center bg-muted"
@@ -341,7 +341,7 @@ const handleApplySqlChanges = async () => {
       </div>
     </div>
 
-    <!-- Erreur -->
+    <!-- Error -->
     <div
       v-else-if="error"
       class="h-full flex items-center justify-center bg-muted"
@@ -364,24 +364,24 @@ const handleApplySqlChanges = async () => {
       </div>
     </div>
 
-    <!-- Layout avec sidebar et canvas -->
+    <!-- Layout with sidebar and canvas -->
     <div
       v-else-if="isProjectLoaded"
       class="h-full flex"
     >
-      <!-- Sidebar SQL -->
+      <!-- SQL Sidebar -->
       <aside
         v-show="isSidebarOpen"
         class="h-full border-r border-default flex-shrink-0 relative flex flex-col"
         :style="{ width: `${sidebarWidth}px` }"
       >
-        <!-- Nom du projet -->
+        <!-- Project name -->
         <div class="px-3 py-2 border-b border-default bg-default flex items-center gap-2">
           <span class="text-xs text-muted whitespace-nowrap">{{ t('project.active_project') }} :</span>
           <span class="text-sm font-semibold truncate">{{ projectStore.currentProject.value?.name }}</span>
         </div>
 
-        <!-- Prévisualisation SQL -->
+        <!-- SQL Preview -->
         <SidebarSqlPreview
           ref="sqlPreviewRef"
           class="flex-1 min-h-0"
@@ -392,7 +392,7 @@ const handleApplySqlChanges = async () => {
           @validation-change="handleValidationChange"
         />
 
-        <!-- Bouton toggle sidebar (visible au survol) -->
+        <!-- Sidebar toggle button (visible on hover) -->
         <button
           class="absolute top-1/2 -right-3 transform -translate-y-1/2 z-10 w-6 h-12 bg-default border border-default rounded-r-md flex items-center justify-center hover:bg-elevated transition-colors"
           @click="toggleSidebar"
@@ -404,7 +404,7 @@ const handleApplySqlChanges = async () => {
         </button>
       </aside>
 
-      <!-- Bouton pour rouvrir la sidebar quand fermée -->
+      <!-- Button to reopen sidebar when closed -->
       <button
         v-if="!isSidebarOpen"
         class="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-6 h-12 bg-default border border-default rounded-r-md flex items-center justify-center hover:bg-elevated transition-colors"
@@ -420,7 +420,7 @@ const handleApplySqlChanges = async () => {
       <div class="flex-1 h-full min-w-0 relative">
         <CanvasDatabaseCanvas ref="canvasRef" class="h-full" />
 
-        <!-- Overlay pour les changements SQL -->
+        <!-- Overlay for SQL changes -->
         <CanvasSqlChangesOverlay
           :show="isSqlManuallyModified"
           :has-errors="sqlErrors.length > 0"
@@ -435,7 +435,7 @@ const handleApplySqlChanges = async () => {
 
 <style scoped>
 .project-page {
-  height: calc(100vh - 3.5rem); /* 3.5rem = h-14 de la navbar */
+  height: calc(100vh - 3.5rem); /* 3.5rem = h-14 of the navbar */
   width: 100%;
   position: relative;
 }

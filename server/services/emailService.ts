@@ -2,21 +2,21 @@ import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
 
 /**
- * Service d'envoi d'emails via SMTP
+ * Email sending service via SMTP
  *
- * Compatible avec :
+ * Compatible with:
  * - Brevo (smtp-relay.brevo.com)
- * - Mailpit (dev local)
- * - Mailgun, SendGrid, ou tout serveur SMTP
+ * - Mailpit (local dev)
+ * - Mailgun, SendGrid, or any SMTP server
  *
- * Configuration via variables d'environnement :
- * - SMTP_HOST : Hôte SMTP (ex: smtp-relay.brevo.com, localhost)
- * - SMTP_PORT : Port SMTP (ex: 587, 1025)
- * - SMTP_USER : Utilisateur SMTP (optionnel pour dev local)
- * - SMTP_PASSWORD : Mot de passe SMTP (optionnel pour dev local)
- * - SMTP_SECURE : true pour SSL/TLS (port 465), false sinon
- * - EMAIL_FROM : Adresse d'expéditeur (ex: "DBKeep <noreply@dbkeep.io>")
- * - NUXT_PUBLIC_APP_URL : URL de l'application (pour les liens dans les emails)
+ * Configuration via environment variables:
+ * - SMTP_HOST: SMTP host (e.g., smtp-relay.brevo.com, localhost)
+ * - SMTP_PORT: SMTP port (e.g., 587, 1025)
+ * - SMTP_USER: SMTP user (optional for local dev)
+ * - SMTP_PASSWORD: SMTP password (optional for local dev)
+ * - SMTP_SECURE: true for SSL/TLS (port 465), false otherwise
+ * - EMAIL_FROM: Sender address (e.g., "DBKeep <noreply@dbkeep.io>")
+ * - NUXT_PUBLIC_APP_URL: Application URL (for email links)
  */
 
 // ============================================================================
@@ -38,7 +38,7 @@ const APP_NAME = process.env.APP_NAME || 'DBKeep'
 // ============================================================================
 
 /**
- * Crée le transporter Nodemailer
+ * Creates the Nodemailer transporter
  */
 function createTransporter(): Transporter | null {
   if (!SMTP_HOST) {
@@ -51,7 +51,7 @@ function createTransporter(): Transporter | null {
     secure: SMTP_SECURE
   } as nodemailer.TransportOptions
 
-  // Ajouter l'auth seulement si user/password sont fournis
+  // Add auth only if user/password are provided
   if (SMTP_USER && SMTP_PASSWORD) {
     (config as any).auth = {
       user: SMTP_USER,
@@ -73,7 +73,7 @@ function getTransporter(): Transporter | null {
 }
 
 /**
- * Vérifie si le service email est configuré
+ * Checks if the email service is configured
  */
 export function isEmailConfigured(): boolean {
   return !!SMTP_HOST
@@ -97,17 +97,17 @@ export interface SendEmailResult {
 }
 
 // ============================================================================
-// Fonction générique d'envoi
+// Generic send function
 // ============================================================================
 
 /**
- * Envoie un email via SMTP
+ * Sends an email via SMTP
  */
 export async function sendEmail(options: SendEmailOptions): Promise<SendEmailResult> {
   const transport = getTransporter()
 
   if (!transport) {
-    console.warn('[EmailService] SMTP non configuré (SMTP_HOST manquant). Email non envoyé.')
+    console.warn('[EmailService] SMTP not configured (SMTP_HOST missing). Email not sent.')
     return {
       success: false,
       error: 'Email service not configured'
@@ -123,14 +123,14 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
       text: options.text || stripHtml(options.html)
     })
 
-    console.log(`[EmailService] Email envoyé à ${options.to} (ID: ${result.messageId})`)
+    console.log(`[EmailService] Email sent to ${options.to} (ID: ${result.messageId})`)
 
     return {
       success: true,
       messageId: result.messageId
     }
   } catch (err: any) {
-    console.error('[EmailService] Erreur envoi email:', err)
+    console.error('[EmailService] Error sending email:', err)
     return {
       success: false,
       error: err.message || 'Unknown error'
@@ -145,26 +145,26 @@ export async function testEmailConfiguration(): Promise<boolean> {
   const transport = getTransporter()
 
   if (!transport) {
-    console.warn('[EmailService] SMTP non configuré pour le test')
+    console.warn('[EmailService] SMTP not configured for test')
     return false
   }
 
   try {
     await transport.verify()
-    console.log('[EmailService] Configuration SMTP vérifiée avec succès')
+    console.log('[EmailService] SMTP configuration verified successfully')
     return true
   } catch (err) {
-    console.error('[EmailService] Erreur de configuration SMTP:', err)
+    console.error('[EmailService] SMTP configuration error:', err)
     return false
   }
 }
 
 // ============================================================================
-// Templates de base
+// Base templates
 // ============================================================================
 
 /**
- * Génère le wrapper HTML pour tous les emails
+ * Generates the HTML wrapper for all emails
  */
 function emailWrapper(content: string, title: string): string {
   return `
@@ -204,7 +204,7 @@ function emailWrapper(content: string, title: string): string {
           <tr>
             <td align="center">
               <p style="margin: 0; font-size: 13px; color: #a1a1aa;">
-                © ${new Date().getFullYear()} ${APP_NAME}. Tous droits réservés.
+                © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
               </p>
             </td>
           </tr>
@@ -218,7 +218,7 @@ function emailWrapper(content: string, title: string): string {
 }
 
 /**
- * Génère un bouton CTA pour les emails
+ * Generates a CTA button for emails
  */
 function emailButton(url: string, text: string): string {
   return `
@@ -236,7 +236,7 @@ function emailButton(url: string, text: string): string {
 }
 
 /**
- * Supprime les balises HTML pour générer le texte brut
+ * Strips HTML tags to generate plain text
  */
 function stripHtml(html: string): string {
   return html
@@ -248,7 +248,7 @@ function stripHtml(html: string): string {
 }
 
 // ============================================================================
-// Emails d'authentification
+// Authentication emails
 // ============================================================================
 
 interface PasswordResetEmailData {
@@ -258,7 +258,7 @@ interface PasswordResetEmailData {
 }
 
 /**
- * Envoie un email de réinitialisation de mot de passe
+ * Sends a password reset email
  */
 export async function sendPasswordResetEmail(data: PasswordResetEmailData): Promise<SendEmailResult> {
   const expiresIn = data.expiresInMinutes || 60
@@ -303,7 +303,7 @@ interface EmailVerificationData {
 }
 
 /**
- * Envoie un email de vérification d'adresse email
+ * Sends an email verification email
  */
 export async function sendEmailVerification(data: EmailVerificationData): Promise<SendEmailResult> {
   const greeting = data.userName ? `Bonjour ${data.userName},` : 'Bonjour,'
@@ -342,7 +342,7 @@ ${emailButton(data.verifyUrl, 'Vérifier mon email')}
 }
 
 // ============================================================================
-// Exports pour extension (utilisés par le CLOUD)
+// Exports for extension (used by CLOUD)
 // ============================================================================
 
 export {

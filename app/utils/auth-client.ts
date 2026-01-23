@@ -1,8 +1,8 @@
 import { createAuthClient } from 'better-auth/vue'
 
 /**
- * Client Better Auth pour le frontend Vue/Nuxt
- * Note: Better Auth nécessite une URL absolue pour le SSR
+ * Better Auth client for Vue/Nuxt frontend
+ * Note: Better Auth requires an absolute URL for SSR
  */
 export const authClient = createAuthClient({
   baseURL: import.meta.server
@@ -10,7 +10,7 @@ export const authClient = createAuthClient({
     : window.location.origin
 })
 
-// Export des méthodes principales
+// Export main methods
 export const {
   signIn,
   signUp,

@@ -8,10 +8,10 @@ const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
 const deleteConfirm = useDeleteConfirm()
 
-// Liste locale des colonnes pour le drag & drop
+// Local columns list for drag & drop
 const localColumns = ref<Column[]>([])
 
-// Synchroniser les colonnes locales avec la table
+// Sync local columns with table
 watch(
   () => projectStore.editingTable.value?.columns,
   (columns) => {
@@ -22,19 +22,19 @@ watch(
   { immediate: true, deep: true }
 )
 
-// Appelé quand l'ordre change après un drag & drop
+// Called when order changes after drag & drop
 const onDragEnd = () => {
   if (!table.value) return
-  // Mettre à jour l'ordre des colonnes dans le store
+  // Update column order in store
   projectStore.reorderColumns(table.value.id, localColumns.value)
-  // Mettre à jour le canvas
+  // Update canvas
   const updatedTable = projectStore.getTable(table.value.id)
   if (updatedTable) {
     canvasStore.updateNodeData(table.value.id, { columns: updatedTable.columns })
   }
 }
 
-// Types qui nécessitent un paramètre de longueur
+// Types that require a length parameter
 const typesWithLength = [
   ColumnType.CHAR,
   ColumnType.VARCHAR,
@@ -42,29 +42,29 @@ const typesWithLength = [
   ColumnType.VARBIT
 ]
 
-// Types qui nécessitent precision et scale
+// Types that require precision and scale
 const typesWithPrecision = [
   ColumnType.DECIMAL,
   ColumnType.NUMERIC
 ]
 
-// Types qui nécessitent une dimension (vecteurs)
+// Types that require a dimension (vectors)
 const typesWithDimension = [
   ColumnType.VECTOR,
   ColumnType.HALFVEC,
   ColumnType.SPARSEVEC
 ]
 
-// Vérifie si un type nécessite le champ longueur
+// Checks if a type needs the length field
 const needsLength = (type: ColumnType) => typesWithLength.includes(type)
 
-// Vérifie si un type nécessite les champs precision/scale
+// Checks if a type needs the precision/scale fields
 const needsPrecision = (type: ColumnType) => typesWithPrecision.includes(type)
 
-// Vérifie si un type nécessite le champ dimension
+// Checks if a type needs the dimension field
 const needsDimension = (type: ColumnType) => typesWithDimension.includes(type)
 
-// Défauts par type
+// Defaults by type
 const getLengthDefault = (type: ColumnType) => {
   switch (type) {
     case ColumnType.CHAR: return 1
@@ -75,7 +75,7 @@ const getLengthDefault = (type: ColumnType) => {
   }
 }
 
-// État d'ouverture basé sur editingTable
+// Open state based on editingTable
 const isOpen = computed({
   get: () => !!projectStore.editingTable.value,
   set: (val) => {
@@ -85,18 +85,18 @@ const isOpen = computed({
   }
 })
 
-// Référence à la table en cours d'édition
+// Reference to the table being edited
 const table = computed(() => projectStore.editingTable.value)
 
-// ID de la colonne actuellement ouverte dans l'accordéon
+// ID of the currently open column in the accordion
 const openColumnId = ref<string | null>(null)
 
-// Ouvre/ferme une colonne
+// Opens/closes a column
 const toggleColumn = (columnId: string) => {
   openColumnId.value = openColumnId.value === columnId ? null : columnId
 }
 
-// Options pour les types de colonnes
+// Options for column types
 const columnTypeOptions = computed(() =>
   Object.values(ColumnType).map(type => ({
     label: t(`types.${type}`),
@@ -104,16 +104,16 @@ const columnTypeOptions = computed(() =>
   }))
 )
 
-// Référence au color picker
+// Reference to color picker
 const colorPickerRef = ref<HTMLInputElement | null>(null)
 
-// Ouvre le color picker natif
+// Opens native color picker
 const openColorPicker = () => {
   colorPickerRef.value?.click()
 }
 
 /**
- * Met à jour le nom de la table
+ * Updates table name
  */
 const updateTableName = (name: string) => {
   if (!table.value) return
@@ -122,7 +122,7 @@ const updateTableName = (name: string) => {
 }
 
 /**
- * Met à jour la couleur de la table
+ * Updates table color
  */
 const updateTableColor = (color: string) => {
   if (!table.value) return
@@ -131,25 +131,25 @@ const updateTableColor = (color: string) => {
 }
 
 /**
- * Ajoute une nouvelle colonne à la table
+ * Adds a new column to the table
  */
 const addColumn = () => {
   if (!table.value) return
   const newColumn = projectStore.addColumn(table.value.id)
-  // Ouvrir la nouvelle colonne dans l'accordéon
+  // Open the new column in the accordion
   if (newColumn) {
     openColumnId.value = newColumn.id
   }
 }
 
 /**
- * Met à jour une propriété d'une colonne
+ * Updates a column property
  */
 const updateColumn = (columnId: string, key: keyof Column, value: any) => {
   if (!table.value) return
   projectStore.updateColumn(table.value.id, columnId, { [key]: value })
 
-  // Mettre à jour le noeud dans le canvas
+  // Update node in canvas
   const updatedTable = projectStore.getTable(table.value.id)
   if (updatedTable) {
     canvasStore.updateNodeData(table.value.id, { columns: updatedTable.columns })
@@ -157,13 +157,13 @@ const updateColumn = (columnId: string, key: keyof Column, value: any) => {
 }
 
 /**
- * Supprime une colonne
+ * Deletes a column
  */
 const deleteColumn = (columnId: string) => {
   if (!table.value) return
   projectStore.deleteColumn(table.value.id, columnId)
 
-  // Mettre à jour le noeud dans le canvas
+  // Update node in canvas
   const updatedTable = projectStore.getTable(table.value.id)
   if (updatedTable) {
     canvasStore.updateNodeData(table.value.id, { columns: updatedTable.columns })
@@ -171,7 +171,7 @@ const deleteColumn = (columnId: string) => {
 }
 
 /**
- * Supprime la table entière (avec confirmation)
+ * Deletes the entire table (with confirmation)
  */
 const deleteTable = () => {
   if (!table.value) return
@@ -182,26 +182,26 @@ const deleteTable = () => {
     type: 'table',
     ids: [tableId],
     onConfirm: () => {
-      // Fermer l'éditeur d'abord
+      // Close editor first
       projectStore.closeTableEditor()
 
-      // Supprimer le noeud du canvas
+      // Remove node from canvas
       canvasStore.removeNode(tableId)
 
-      // Supprimer la table du projet
+      // Delete table from project
       projectStore.deleteTable(tableId)
     }
   })
 }
 
 /**
- * Gère le changement de clé primaire (une seule PK par table)
+ * Handles primary key change (only one PK per table)
  */
 const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
   if (!table.value) return
 
   if (isPrimary) {
-    // Retirer la PK des autres colonnes
+    // Remove PK from other columns
     table.value.columns.forEach(col => {
       if (col.id !== columnId && col.primaryKey) {
         updateColumn(col.id, 'primaryKey', false)
@@ -225,9 +225,9 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
         v-if="table"
         class="space-y-6"
       >
-        <!-- Section: Informations de la table -->
+        <!-- Section: Table information -->
         <div class="space-y-4">
-          <!-- Nom de la table -->
+          <!-- Table name -->
           <UFormField :label="t('table.name')">
             <UInput
               :model-value="table.name"
@@ -237,10 +237,10 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
             />
           </UFormField>
 
-          <!-- Couleur du header -->
+          <!-- Header color -->
           <UFormField :label="t('table.color')">
             <div class="flex items-center gap-2 flex-wrap">
-              <!-- Couleurs prédéfinies -->
+              <!-- Predefined colors -->
               <button
                 v-for="color in TABLE_COLORS"
                 :key="color.value"
@@ -251,7 +251,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                 :title="t(`colors.${color.label}`)"
                 @click="updateTableColor(color.value)"
               />
-              <!-- Bouton color picker personnalisé -->
+              <!-- Custom color picker button -->
               <button
                 type="button"
                 class="color-swatch color-swatch-custom"
@@ -264,7 +264,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                   class="size-3 text-white drop-shadow"
                 />
               </button>
-              <!-- Input color caché -->
+              <!-- Hidden color input -->
               <input
                 ref="colorPickerRef"
                 type="color"
@@ -278,7 +278,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
 
         <USeparator />
 
-        <!-- Section: Colonnes -->
+        <!-- Section: Columns -->
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <h3 class="font-semibold text-sm">{{ t('table.columns') }}</h3>
@@ -291,7 +291,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
             </UButton>
           </div>
 
-          <!-- Liste des colonnes (accordéon avec drag & drop) -->
+          <!-- Column list (accordion with drag & drop) -->
           <draggable
             v-model="localColumns"
             item-key="id"
@@ -305,9 +305,9 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
           >
             <template #item="{ element: column }">
               <div class="border border-default rounded-lg overflow-hidden">
-                <!-- Header de l'accordéon (toujours visible) -->
+                <!-- Accordion header (always visible) -->
                 <div class="flex items-center bg-elevated hover:bg-muted/50 transition-colors">
-                  <!-- Handle de drag -->
+                  <!-- Drag handle -->
                   <div
                     class="drag-handle flex items-center pl-3 pr-1 text-muted hover:text-default cursor-grab active:cursor-grabbing self-stretch"
                     :title="t('column.drag_to_reorder')"
@@ -348,7 +348,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                   </button>
                 </div>
 
-                <!-- Contenu de l'accordéon (conditionnel) -->
+                <!-- Accordion content (conditional) -->
                 <div
                   class="accordion-content"
                   :class="{ 'accordion-open': openColumnId === column.id }"
@@ -378,7 +378,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                         </UFormField>
                       </div>
 
-                      <!-- Longueur (pour CHAR, VARCHAR, BIT, VARBIT) -->
+                      <!-- Length (for CHAR, VARCHAR, BIT, VARBIT) -->
                       <UFormField
                         v-if="needsLength(column.type)"
                         :label="t('column.length')"
@@ -395,7 +395,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                         />
                       </UFormField>
 
-                      <!-- Precision et Scale (pour DECIMAL, NUMERIC) -->
+                      <!-- Precision and Scale (for DECIMAL, NUMERIC) -->
                       <div
                         v-if="needsPrecision(column.type)"
                         class="grid grid-cols-2 gap-2"
@@ -426,7 +426,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                         </UFormField>
                       </div>
 
-                      <!-- Dimension (pour VECTOR, HALFVEC, SPARSEVEC) -->
+                      <!-- Dimension (for VECTOR, HALFVEC, SPARSEVEC) -->
                       <UFormField
                         v-if="needsDimension(column.type)"
                         :label="t('column.dimension')"
@@ -442,7 +442,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                         />
                       </UFormField>
 
-                      <!-- Valeur par défaut -->
+                      <!-- Default value -->
                       <UFormField :label="t('column.default')">
                         <UInput
                           :model-value="column.default"
@@ -453,7 +453,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                         />
                       </UFormField>
 
-                      <!-- Options de contraintes -->
+                      <!-- Constraint options -->
                       <div class="flex flex-wrap gap-4">
                         <UCheckbox
                           :model-value="column.primaryKey"
@@ -474,7 +474,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
                         />
                       </div>
 
-                      <!-- Bouton supprimer -->
+                      <!-- Delete button -->
                       <UButton
                         color="error"
                         variant="ghost"
@@ -492,7 +492,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
             </template>
           </draggable>
 
-          <!-- Message si aucune colonne -->
+          <!-- Message if no columns -->
           <div
             v-if="localColumns.length === 0"
             class="text-center py-8 text-muted"
@@ -509,10 +509,10 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
 
         <USeparator />
 
-        <!-- Zone de danger -->
+        <!-- Danger zone -->
         <div class="space-y-4">
           <h3 class="font-semibold text-sm text-error">
-            Zone de danger
+            {{ t('common.danger_zone') }}
           </h3>
           <UButton
             color="error"
@@ -552,7 +552,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
   border: 2px dashed var(--color-border);
 }
 
-/* Animation accordéon */
+/* Accordion animation */
 .accordion-content {
   display: grid;
   grid-template-rows: 0fr;
@@ -568,7 +568,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
   grid-template-rows: 1fr;
 }
 
-/* Drag & drop styles - :deep car classes ajoutées par SortableJS */
+/* Drag & drop styles - :deep because classes are added by SortableJS */
 :deep(.sortable-ghost) {
   opacity: 0.4;
   background: var(--ui-bg-muted);

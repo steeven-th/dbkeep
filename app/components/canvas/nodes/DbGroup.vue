@@ -12,15 +12,15 @@ const { t } = useI18n()
 const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
 
-// Mode lecture seule injecté par le parent (page projet)
+// Read-only mode injected by parent (project page)
 const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
-// État pour l'édition du titre en ligne
+// State for inline title editing
 const isEditingTitle = ref(false)
 const editedTitle = ref('')
 const titleInput = ref<HTMLInputElement | null>(null)
 
-// Synchroniser editedTitle avec les props
+// Sync editedTitle with props
 watch(
   () => props.data.name,
   (newName) => {
@@ -32,7 +32,7 @@ watch(
 )
 
 /**
- * Démarre l'édition du titre en ligne (si pas en lecture seule)
+ * Starts inline title editing (if not read-only)
  */
 const startEditingTitle = () => {
   if (canvasReadOnly.value) return
@@ -45,7 +45,7 @@ const startEditingTitle = () => {
 }
 
 /**
- * Sauvegarde le titre édité
+ * Saves the edited title
  */
 const saveTitle = () => {
   if (editedTitle.value.trim()) {
@@ -58,7 +58,7 @@ const saveTitle = () => {
 }
 
 /**
- * Annule l'édition du titre
+ * Cancels title editing
  */
 const cancelEditing = () => {
   editedTitle.value = props.data.name
@@ -66,17 +66,17 @@ const cancelEditing = () => {
 }
 
 /**
- * Ouvre l'éditeur de groupe complet (Slideover) - si pas en lecture seule
+ * Opens full group editor (Slideover) - if not read-only
  */
 const openGroupEditor = () => {
   if (canvasReadOnly.value) return
   projectStore.openGroupEditor(props.id)
 }
 
-// Couleur de fond avec opacité
+// Background color with opacity
 const backgroundColor = computed(() => {
   const color = props.data.color || '#6b7280'
-  // Convertir hex en rgba avec opacité faible
+  // Convert hex to rgba with low opacity
   const r = parseInt(color.slice(1, 3), 16)
   const g = parseInt(color.slice(3, 5), 16)
   const b = parseInt(color.slice(5, 7), 16)
@@ -93,18 +93,18 @@ const backgroundColor = computed(() => {
     }"
     @dblclick="openGroupEditor"
   >
-    <!-- Composant de redimensionnement -->
+    <!-- Resize component -->
     <NodeResizer
       :min-width="250"
       :min-height="150"
     />
 
-    <!-- Header du groupe -->
+    <!-- Group header -->
     <div
       class="absolute -top-3 left-3 px-2 py-0.5 rounded text-xs font-medium bg-default border"
       :style="{ borderColor: data.color, color: data.color }"
     >
-      <!-- Mode édition -->
+      <!-- Edit mode -->
       <input
         v-if="isEditingTitle"
         ref="titleInput"
@@ -116,7 +116,7 @@ const backgroundColor = computed(() => {
         @keyup.enter="saveTitle"
         @keyup.escape="cancelEditing"
       >
-      <!-- Mode affichage -->
+      <!-- Display mode -->
       <span
         v-else
         class="cursor-pointer"
@@ -126,7 +126,7 @@ const backgroundColor = computed(() => {
       </span>
     </div>
 
-    <!-- Boutons d'action au survol (masqués en lecture seule) -->
+    <!-- Action buttons on hover (hidden in read-only mode) -->
     <div
       v-if="!canvasReadOnly"
       class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -141,25 +141,25 @@ const backgroundColor = computed(() => {
       />
     </div>
 
-    <!-- Contenu (espace pour les noeuds enfants) -->
+    <!-- Content (space for child nodes) -->
     <div class="w-full h-full p-4 pt-6">
-      <!-- Les noeuds enfants seront rendus ici par Vue Flow -->
+      <!-- Child nodes will be rendered here by Vue Flow -->
     </div>
   </div>
 </template>
 
 <style scoped>
 .db-group-node {
-  /* Position relative pour les éléments absolus enfants */
+  /* Relative position for absolute child elements */
   position: relative;
 }
 
-/* Afficher les boutons au survol */
+/* Show buttons on hover */
 .db-group-node:hover .opacity-0 {
   opacity: 1;
 }
 
-/* Styles pour le NodeResizer */
+/* NodeResizer styles */
 .db-group-node :deep(.vue-flow__resize-control) {
   opacity: 0;
   transition: opacity 0.2s ease;

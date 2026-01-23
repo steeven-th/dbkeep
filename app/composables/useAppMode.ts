@@ -1,39 +1,39 @@
 /**
- * Composable pour la gestion des modes de l'application
- * - Guest Mode: Permet d'utiliser l'app sans authentification
- * - Register Mode: Active/désactive l'inscription
+ * Composable for managing application modes
+ * - Guest Mode: Allows using the app without authentication
+ * - Register Mode: Enables/disables registration
  */
 export const useAppMode = () => {
   const runtimeConfig = useRuntimeConfig()
 
-  // === Configuration depuis les variables d'environnement ===
+  // === Configuration from environment variables ===
 
   /**
-   * Mode Invité activé
-   * Si true, l'utilisateur peut accéder à l'app sans authentification
+   * Guest Mode enabled
+   * If true, user can access the app without authentication
    */
   const isGuestModeEnabled = computed(() => {
     return runtimeConfig.public.guestMode === true
   })
 
   /**
-   * Inscription activée
-   * Si false, le lien d'inscription est masqué et l'API bloquée
+   * Registration enabled
+   * If false, registration link is hidden and API is blocked
    */
   const isRegisterEnabled = computed(() => {
     return runtimeConfig.public.enableRegister !== false
   })
 
-  // === État de l'utilisateur invité ===
+  // === Guest user state ===
 
   /**
-   * ID de l'utilisateur invité (utilisé pour les sauvegardes en BDD)
-   * Cet ID spécial permet d'attribuer les projets à un utilisateur "système"
+   * Guest user ID (used for database saves)
+   * This special ID allows assigning projects to a "system" user
    */
   const GUEST_USER_ID = 'guest-user'
 
   /**
-   * Données de l'utilisateur invité simulé
+   * Simulated guest user data
    */
   const guestUser = computed(() => ({
     id: GUEST_USER_ID,
@@ -45,14 +45,14 @@ export const useAppMode = () => {
   // === Helpers ===
 
   /**
-   * Vérifie si l'authentification est requise pour accéder à l'app
-   * En mode invité, l'auth n'est pas requise
+   * Checks if authentication is required to access the app
+   * In guest mode, auth is not required
    */
   const isAuthRequired = computed(() => !isGuestModeEnabled.value)
 
   /**
-   * Retourne l'ID utilisateur à utiliser pour les opérations
-   * En mode invité, retourne l'ID guest
+   * Returns the user ID to use for operations
+   * In guest mode, returns the guest ID
    */
   const getEffectiveUserId = (authenticatedUserId: string | null | undefined): string => {
     if (authenticatedUserId) {
@@ -70,10 +70,10 @@ export const useAppMode = () => {
     isRegisterEnabled,
     isAuthRequired,
 
-    // Constantes
+    // Constants
     GUEST_USER_ID,
 
-    // Données
+    // Data
     guestUser,
 
     // Helpers

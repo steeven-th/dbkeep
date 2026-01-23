@@ -48,7 +48,7 @@ export interface ProjectListItem {
   ownerType: string
   createdAt: Date
   updatedAt: Date
-  /** Nom de l'utilisateur qui a créé le projet */
+  /** Name of the user who created the project */
   createdByName: string | null
 }
 

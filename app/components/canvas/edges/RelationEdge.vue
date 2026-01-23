@@ -14,10 +14,10 @@ const props = defineProps<EdgeProps<Relation>>()
 const { t } = useI18n()
 const projectStore = useProjectStore()
 
-// Mode lecture seule injecté par le parent (page projet)
+// Read-only mode injected by parent (project page)
 const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
-// Calcul du chemin de l'edge
+// Edge path calculation
 const path = computed(() => {
   return getBezierPath({
     sourceX: props.sourceX,
@@ -29,14 +29,14 @@ const path = computed(() => {
   })
 })
 
-// Position du label au milieu de l'edge
+// Label position at the middle of the edge
 const labelPosition = computed(() => ({
   x: (props.sourceX + props.targetX) / 2,
   y: (props.sourceY + props.targetY) / 2
 }))
 
 /**
- * Retourne le texte du type de relation
+ * Returns the relation type text
  */
 const relationTypeLabel = computed(() => {
   if (!props.data) return ''
@@ -54,7 +54,7 @@ const relationTypeLabel = computed(() => {
 })
 
 /**
- * Retourne le style de l'edge selon le type de relation
+ * Returns edge style based on relation type
  */
 const edgeStyle = computed(() => {
   if (!props.data) return {}
@@ -65,18 +65,18 @@ const edgeStyle = computed(() => {
 
   switch (props.data.type) {
     case RelationType.ONE_TO_ONE:
-      return { ...baseStyle, stroke: '#3b82f6' } // bleu
+      return { ...baseStyle, stroke: '#3b82f6' } // blue
     case RelationType.ONE_TO_MANY:
-      return { ...baseStyle, stroke: '#22c55e' } // vert
+      return { ...baseStyle, stroke: '#22c55e' } // green
     case RelationType.MANY_TO_MANY:
-      return { ...baseStyle, stroke: '#a855f7' } // violet
+      return { ...baseStyle, stroke: '#a855f7' } // purple
     default:
       return { ...baseStyle, stroke: '#6b7280' }
   }
 })
 
 /**
- * Ouvre l'éditeur de relation (si pas en lecture seule)
+ * Opens relation editor (if not read-only)
  */
 const openRelationEditor = () => {
   if (canvasReadOnly.value) return
@@ -94,7 +94,7 @@ const openRelationEditor = () => {
     :marker-end="markerEnd"
   />
 
-  <!-- Label de la relation -->
+  <!-- Relation label -->
   <EdgeLabelRenderer>
     <div
       :style="{
@@ -120,7 +120,7 @@ const openRelationEditor = () => {
 </template>
 
 <style scoped>
-/* Animation au survol de l'edge */
+/* Edge hover animation */
 :deep(.vue-flow__edge-path) {
   transition: stroke 0.2s ease, stroke-width 0.2s ease;
 }

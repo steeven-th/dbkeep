@@ -14,18 +14,18 @@ const { t } = useI18n()
 const toast = useToast()
 const { user } = useAuth()
 
-// Onglet actif
+// Active tab
 const activeTab = ref('profile')
 
-// État de chargement
+// Loading state
 const isLoading = ref(false)
 
-// Schéma de validation pour le profil
+// Profile validation schema
 const profileSchema = z.object({
   name: z.string().min(2, t('auth.name_min_length'))
 })
 
-// Schéma de validation pour le mot de passe
+// Password validation schema
 const passwordSchema = z.object({
   currentPassword: z.string().min(1, t('auth.password_required')),
   newPassword: z.string().min(8, t('auth.password_min_length')),
@@ -38,26 +38,26 @@ const passwordSchema = z.object({
 type ProfileSchema = z.output<typeof profileSchema>
 type PasswordSchema = z.output<typeof passwordSchema>
 
-// État du formulaire profil
+// Profile form state
 const profileState = ref({
   name: user.value?.name || ''
 })
 
-// État du formulaire mot de passe
+// Password form state
 const passwordState = ref({
   currentPassword: '',
   newPassword: '',
   confirmPassword: ''
 })
 
-// Mettre à jour le nom quand l'utilisateur change
+// Update name when user changes
 watch(() => user.value, (newUser) => {
   if (newUser) {
     profileState.value.name = newUser.name || ''
   }
 }, { immediate: true })
 
-// Réinitialiser le formulaire mot de passe à l'ouverture
+// Reset password form on open
 watch(() => props.open, (isOpen) => {
   if (isOpen) {
     passwordState.value = {
@@ -68,7 +68,7 @@ watch(() => props.open, (isOpen) => {
   }
 })
 
-// Soumettre le profil
+// Submit profile
 const onProfileSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
   isLoading.value = true
   try {
@@ -92,7 +92,7 @@ const onProfileSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
   }
 }
 
-// Soumettre le changement de mot de passe
+// Submit password change
 const onPasswordSubmit = async (event: FormSubmitEvent<PasswordSchema>) => {
   isLoading.value = true
   try {
@@ -107,7 +107,7 @@ const onPasswordSubmit = async (event: FormSubmitEvent<PasswordSchema>) => {
       color: 'success'
     })
 
-    // Réinitialiser le formulaire
+    // Reset the form
     passwordState.value = {
       currentPassword: '',
       newPassword: '',
@@ -124,12 +124,12 @@ const onPasswordSubmit = async (event: FormSubmitEvent<PasswordSchema>) => {
   }
 }
 
-// Fermer le modal
+// Close the modal
 const closeModal = () => {
   emit('update:open', false)
 }
 
-// Onglets
+// Tabs
 const tabs = computed(() => [
   { label: t('profile.tab_profile'), value: 'profile', icon: 'i-lucide-user' },
   { label: t('profile.tab_security'), value: 'security', icon: 'i-lucide-shield' }
@@ -158,7 +158,7 @@ const tabs = computed(() => [
         class="w-full"
       />
 
-      <!-- Onglet Profil -->
+      <!-- Profile Tab -->
       <div
         v-if="activeTab === 'profile'"
         class="mt-4"
@@ -169,7 +169,7 @@ const tabs = computed(() => [
           class="space-y-4"
           @submit="onProfileSubmit"
         >
-          <!-- Email (lecture seule) -->
+          <!-- Email (read-only) -->
           <UFormField :label="t('auth.email')">
             <UInput
               :model-value="user?.email || ''"
@@ -182,7 +182,7 @@ const tabs = computed(() => [
             </template>
           </UFormField>
 
-          <!-- Nom -->
+          <!-- Name -->
           <UFormField
             :label="t('auth.name')"
             name="name"
@@ -211,7 +211,7 @@ const tabs = computed(() => [
         </UForm>
       </div>
 
-      <!-- Onglet Sécurité -->
+      <!-- Security Tab -->
       <div
         v-if="activeTab === 'security'"
         class="mt-4"
@@ -222,7 +222,7 @@ const tabs = computed(() => [
           class="space-y-4"
           @submit="onPasswordSubmit"
         >
-          <!-- Mot de passe actuel -->
+          <!-- Current password -->
           <UFormField
             :label="t('profile.current_password')"
             name="currentPassword"
@@ -236,7 +236,7 @@ const tabs = computed(() => [
             />
           </UFormField>
 
-          <!-- Nouveau mot de passe -->
+          <!-- New password -->
           <UFormField
             :label="t('profile.new_password')"
             name="newPassword"
@@ -250,7 +250,7 @@ const tabs = computed(() => [
             />
           </UFormField>
 
-          <!-- Confirmer le nouveau mot de passe -->
+          <!-- Confirm new password -->
           <UFormField
             :label="t('auth.confirm_password')"
             name="confirmPassword"

@@ -17,29 +17,29 @@ import {
 } from '~/types/database'
 
 /**
- * Store principal pour la gestion des projets DBKeep
- * Utilise useState() de Nuxt pour la réactivité
+ * Main store for DBKeep project management
+ * Uses Nuxt's useState() for reactivity
  */
 export const useProjectStore = () => {
-  // État du projet courant
+  // Current project state
   const currentProject = useState<Project | null>('currentProject', () => null)
 
-  // Table en cours d'édition (pour le Slideover)
+  // Table being edited (for Slideover)
   const editingTable = useState<TableData | null>('editingTable', () => null)
 
-  // Groupe en cours d'édition (pour le Slideover GroupEditor)
+  // Group being edited (for GroupEditor Slideover)
   const editingGroup = useState<GroupData | null>('editingGroup', () => null)
 
-  // Relation en cours d'édition (pour le modal RelationEditor)
+  // Relation being edited (for RelationEditor modal)
   const editingRelation = useState<Relation | null>('editingRelation', () => null)
 
-  // Note en cours d'édition (pour le Slideover NoteEditor)
+  // Note being edited (for NoteEditor Slideover)
   const editingNote = useState<NoteData | null>('editingNote', () => null)
 
-  // === Actions Projet ===
+  // === Project Actions ===
 
   /**
-   * Crée un nouveau projet
+   * Creates a new project
    */
   const createProject = (name: string, engine: DatabaseEngine): Project => {
     const project = createDefaultProject(name, engine)
@@ -48,7 +48,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Met à jour les métadonnées du projet
+   * Updates project metadata
    */
   const updateProject = (updates: Partial<Omit<Project, 'id' | 'createdAt'>>) => {
     if (!currentProject.value) return
@@ -61,7 +61,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Ferme le projet courant
+   * Closes the current project
    */
   const closeProject = () => {
     currentProject.value = null
@@ -69,22 +69,22 @@ export const useProjectStore = () => {
     editingRelation.value = null
   }
 
-  // === Actions Tables ===
+  // === Table Actions ===
 
   /**
-   * Génère un nom de table unique
+   * Generates a unique table name
    */
   const generateUniqueTableName = (baseName: string = 'new_table'): string => {
     if (!currentProject.value) return baseName
 
     const existingNames = currentProject.value.tables.map(t => t.name.toLowerCase())
 
-    // Si le nom de base n'existe pas, l'utiliser directement
+    // If base name doesn't exist, use it directly
     if (!existingNames.includes(baseName.toLowerCase())) {
       return baseName
     }
 
-    // Sinon, chercher le prochain numéro disponible
+    // Otherwise, find the next available number
     let counter = 1
     let candidateName = `${baseName}_${counter}`
     while (existingNames.includes(candidateName.toLowerCase())) {
@@ -96,8 +96,8 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Ajoute une nouvelle table au projet
-   * Le nom sera rendu unique automatiquement si nécessaire
+   * Adds a new table to the project
+   * Name will be made unique automatically if necessary
    */
   const addTable = (name?: string): TableData | null => {
     if (!currentProject.value) return null
@@ -112,7 +112,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Met à jour une table existante
+   * Updates an existing table
    */
   const updateTable = (tableId: string, updates: Partial<Omit<TableData, 'id'>>) => {
     if (!currentProject.value) return
@@ -126,43 +126,43 @@ export const useProjectStore = () => {
     }
     currentProject.value.updatedAt = new Date()
 
-    // Mettre à jour editingTable si c'est la même table
+    // Update editingTable if it's the same table
     if (editingTable.value?.id === tableId) {
       editingTable.value = currentProject.value.tables[tableIndex]
     }
   }
 
   /**
-   * Supprime une table et ses relations associées
+   * Deletes a table and its associated relations
    */
   const deleteTable = (tableId: string) => {
     if (!currentProject.value) return
 
-    // Supprimer la table
+    // Delete the table
     currentProject.value.tables = currentProject.value.tables.filter(t => t.id !== tableId)
 
-    // Supprimer les relations associées
+    // Delete associated relations
     currentProject.value.relations = currentProject.value.relations.filter(
       r => r.sourceTableId !== tableId && r.targetTableId !== tableId
     )
 
     currentProject.value.updatedAt = new Date()
 
-    // Fermer l'éditeur si c'était cette table
+    // Close editor if it was this table
     if (editingTable.value?.id === tableId) {
       editingTable.value = null
     }
   }
 
   /**
-   * Récupère une table par son ID
+   * Gets a table by its ID
    */
   const getTable = (tableId: string): TableData | undefined => {
     return currentProject.value?.tables.find(t => t.id === tableId)
   }
 
   /**
-   * Remplace toutes les tables du projet (utilisé par le parser SQL)
+   * Replaces all project tables (used by SQL parser)
    */
   const setTables = (tables: TableData[]) => {
     if (!currentProject.value) return
@@ -170,20 +170,20 @@ export const useProjectStore = () => {
     currentProject.value.updatedAt = new Date()
   }
 
-  // === Actions Colonnes ===
+  // === Column Actions ===
 
   /**
-   * Génère un nom de colonne unique pour une table
+   * Generates a unique column name for a table
    */
   const generateUniqueColumnName = (table: TableData, baseName: string = 'column'): string => {
     const existingNames = table.columns.map(c => c.name.toLowerCase())
 
-    // Si le nom de base n'existe pas, l'utiliser directement
+    // If base name doesn't exist, use it directly
     if (!existingNames.includes(baseName.toLowerCase())) {
       return baseName
     }
 
-    // Sinon, chercher le prochain numéro disponible
+    // Otherwise, find the next available number
     let counter = 1
     let candidateName = `${baseName}_${counter}`
     while (existingNames.includes(candidateName.toLowerCase())) {
@@ -195,7 +195,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Ajoute une colonne à une table
+   * Adds a column to a table
    */
   const addColumn = (tableId: string, column?: Partial<Column>): Column | null => {
     if (!currentProject.value) return null
@@ -203,14 +203,14 @@ export const useProjectStore = () => {
     const table = currentProject.value.tables.find(t => t.id === tableId)
     if (!table) return null
 
-    // Générer un nom unique si non fourni ou vide
+    // Generate unique name if not provided or empty
     const columnName = column?.name?.trim() || generateUniqueColumnName(table, 'column')
 
     const newColumn = createDefaultColumn({ ...column, name: columnName })
     table.columns.push(newColumn)
     currentProject.value.updatedAt = new Date()
 
-    // Mettre à jour editingTable si nécessaire
+    // Update editingTable if necessary
     if (editingTable.value?.id === tableId) {
       editingTable.value = { ...table }
     }
@@ -219,7 +219,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Met à jour une colonne
+   * Updates a column
    */
   const updateColumn = (tableId: string, columnId: string, updates: Partial<Omit<Column, 'id'>>) => {
     if (!currentProject.value) return
@@ -230,7 +230,7 @@ export const useProjectStore = () => {
     const columnIndex = table.columns.findIndex(c => c.id === columnId)
     if (columnIndex === -1) return
 
-    // Ne pas permettre de mettre un nom vide
+    // Don't allow setting an empty name
     if ('name' in updates && (!updates.name || updates.name.trim() === '')) {
       return
     }
@@ -241,14 +241,14 @@ export const useProjectStore = () => {
     }
     currentProject.value.updatedAt = new Date()
 
-    // Mettre à jour editingTable si nécessaire
+    // Update editingTable if necessary
     if (editingTable.value?.id === tableId) {
       editingTable.value = { ...table }
     }
   }
 
   /**
-   * Supprime une colonne et ses relations associées
+   * Deletes a column and its associated relations
    */
   const deleteColumn = (tableId: string, columnId: string) => {
     if (!currentProject.value) return
@@ -256,25 +256,25 @@ export const useProjectStore = () => {
     const table = currentProject.value.tables.find(t => t.id === tableId)
     if (!table) return
 
-    // Supprimer la colonne
+    // Delete the column
     table.columns = table.columns.filter(c => c.id !== columnId)
 
-    // Supprimer les relations associées à cette colonne
+    // Delete relations associated with this column
     currentProject.value.relations = currentProject.value.relations.filter(
       r => r.sourceColumnId !== columnId && r.targetColumnId !== columnId
     )
 
     currentProject.value.updatedAt = new Date()
 
-    // Mettre à jour editingTable si nécessaire
+    // Update editingTable if necessary
     if (editingTable.value?.id === tableId) {
       editingTable.value = { ...table }
     }
   }
 
   /**
-   * Réordonne les colonnes d'une table
-   * Les colonnes PRIMARY KEY sont automatiquement placées en premier
+   * Reorders columns in a table
+   * PRIMARY KEY columns are automatically placed first
    */
   const reorderColumns = (tableId: string, newOrder: Column[]) => {
     if (!currentProject.value) return
@@ -282,24 +282,24 @@ export const useProjectStore = () => {
     const table = currentProject.value.tables.find(t => t.id === tableId)
     if (!table) return
 
-    // Séparer les colonnes PK des autres
+    // Separate PK columns from others
     const pkColumns = newOrder.filter(c => c.primaryKey)
     const otherColumns = newOrder.filter(c => !c.primaryKey)
 
-    // Les PK en premier, puis le reste dans l'ordre choisi
+    // PK first, then the rest in chosen order
     table.columns = [...pkColumns, ...otherColumns]
     currentProject.value.updatedAt = new Date()
 
-    // Mettre à jour editingTable si nécessaire
+    // Update editingTable if necessary
     if (editingTable.value?.id === tableId) {
       editingTable.value = { ...table }
     }
   }
 
-  // === Actions Groupes ===
+  // === Group Actions ===
 
   /**
-   * Ajoute un nouveau groupe au projet
+   * Adds a new group to the project
    */
   const addGroup = (name?: string): GroupData | null => {
     if (!currentProject.value) return null
@@ -312,7 +312,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Met à jour un groupe existant
+   * Updates an existing group
    */
   const updateGroup = (groupId: string, updates: Partial<Omit<GroupData, 'id'>>) => {
     if (!currentProject.value) return
@@ -326,14 +326,14 @@ export const useProjectStore = () => {
     }
     currentProject.value.updatedAt = new Date()
 
-    // Mettre à jour editingGroup si c'est le même groupe
+    // Update editingGroup if it's the same group
     if (editingGroup.value?.id === groupId) {
       editingGroup.value = currentProject.value.groups[groupIndex]
     }
   }
 
   /**
-   * Supprime un groupe
+   * Deletes a group
    */
   const deleteGroup = (groupId: string) => {
     if (!currentProject.value) return
@@ -341,28 +341,28 @@ export const useProjectStore = () => {
     currentProject.value.groups = currentProject.value.groups.filter(g => g.id !== groupId)
     currentProject.value.updatedAt = new Date()
 
-    // Fermer l'éditeur si c'était ce groupe
+    // Close editor if it was this group
     if (editingGroup.value?.id === groupId) {
       editingGroup.value = null
     }
   }
 
   /**
-   * Récupère un groupe par son ID
+   * Gets a group by its ID
    */
   const getGroup = (groupId: string): GroupData | undefined => {
     return currentProject.value?.groups.find(g => g.id === groupId)
   }
 
-  // === Actions Notes ===
+  // === Note Actions ===
 
   /**
-   * Ajoute une nouvelle note au projet
+   * Adds a new note to the project
    */
   const addNote = (name?: string): NoteData | null => {
     if (!currentProject.value) return null
 
-    // Initialiser le tableau notes s'il n'existe pas (rétrocompatibilité)
+    // Initialize notes array if it doesn't exist (backward compatibility)
     if (!currentProject.value.notes) {
       currentProject.value.notes = []
     }
@@ -375,7 +375,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Met à jour une note existante
+   * Updates an existing note
    */
   const updateNote = (noteId: string, updates: Partial<Omit<NoteData, 'id'>>) => {
     if (!currentProject.value || !currentProject.value.notes) return
@@ -389,14 +389,14 @@ export const useProjectStore = () => {
     }
     currentProject.value.updatedAt = new Date()
 
-    // Mettre à jour editingNote si c'est la même note
+    // Update editingNote if it's the same note
     if (editingNote.value?.id === noteId) {
       editingNote.value = currentProject.value.notes[noteIndex]
     }
   }
 
   /**
-   * Supprime une note
+   * Deletes a note
    */
   const deleteNote = (noteId: string) => {
     if (!currentProject.value || !currentProject.value.notes) return
@@ -404,35 +404,35 @@ export const useProjectStore = () => {
     currentProject.value.notes = currentProject.value.notes.filter(n => n.id !== noteId)
     currentProject.value.updatedAt = new Date()
 
-    // Fermer l'éditeur si c'était cette note
+    // Close editor if it was this note
     if (editingNote.value?.id === noteId) {
       editingNote.value = null
     }
   }
 
   /**
-   * Récupère une note par son ID
+   * Gets a note by its ID
    */
   const getNote = (noteId: string): NoteData | undefined => {
     return currentProject.value?.notes?.find(n => n.id === noteId)
   }
 
-  // === Actions Relations ===
+  // === Relation Actions ===
 
   /**
-   * Vérifie si une relation identique existe déjà
-   * (même paire de colonnes, dans un sens ou dans l'autre)
+   * Checks if an identical relation already exists
+   * (same column pair, in either direction)
    */
   const relationExists = (relation: Partial<Relation>): boolean => {
     if (!currentProject.value) return false
 
     return currentProject.value.relations.some(r =>
-      // Même sens : source→target identique
+      // Same direction: source→target identical
       (r.sourceTableId === relation.sourceTableId
         && r.sourceColumnId === relation.sourceColumnId
         && r.targetTableId === relation.targetTableId
         && r.targetColumnId === relation.targetColumnId)
-      // Sens inverse : source↔target inversés
+      // Reverse direction: source↔target swapped
       || (r.sourceTableId === relation.targetTableId
         && r.sourceColumnId === relation.targetColumnId
         && r.targetTableId === relation.sourceTableId
@@ -441,15 +441,15 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Ajoute une nouvelle relation
-   * Retourne null si la relation existe déjà
+   * Adds a new relation
+   * Returns null if the relation already exists
    */
   const addRelation = (relation?: Partial<Relation>): Relation | null => {
     if (!currentProject.value) return null
 
-    // Vérifier si une relation identique existe déjà
+    // Check if an identical relation already exists
     if (relation && relationExists(relation)) {
-      console.warn('Une relation identique existe déjà entre ces colonnes')
+      console.warn('An identical relation already exists between these columns')
       return null
     }
 
@@ -461,7 +461,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Met à jour une relation existante
+   * Updates an existing relation
    */
   const updateRelation = (relationId: string, updates: Partial<Omit<Relation, 'id'>>) => {
     if (!currentProject.value) return
@@ -475,14 +475,14 @@ export const useProjectStore = () => {
     }
     currentProject.value.updatedAt = new Date()
 
-    // Mettre à jour editingRelation si nécessaire
+    // Update editingRelation if necessary
     if (editingRelation.value?.id === relationId) {
       editingRelation.value = currentProject.value.relations[relationIndex]
     }
   }
 
   /**
-   * Supprime une relation
+   * Deletes a relation
    */
   const deleteRelation = (relationId: string) => {
     if (!currentProject.value) return
@@ -490,21 +490,21 @@ export const useProjectStore = () => {
     currentProject.value.relations = currentProject.value.relations.filter(r => r.id !== relationId)
     currentProject.value.updatedAt = new Date()
 
-    // Fermer l'éditeur si c'était cette relation
+    // Close editor if it was this relation
     if (editingRelation.value?.id === relationId) {
       editingRelation.value = null
     }
   }
 
   /**
-   * Récupère une relation par son ID
+   * Gets a relation by its ID
    */
   const getRelation = (relationId: string): Relation | undefined => {
     return currentProject.value?.relations.find(r => r.id === relationId)
   }
 
   /**
-   * Remplace toutes les relations du projet (utilisé par le parser SQL)
+   * Replaces all project relations (used by SQL parser)
    */
   const setRelations = (relations: Relation[]) => {
     if (!currentProject.value) return
@@ -513,7 +513,7 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Récupère les relations d'une table (source ou target)
+   * Gets all relations for a table (as source or target)
    */
   const getTableRelations = (tableId: string): Relation[] => {
     if (!currentProject.value) return []
@@ -523,10 +523,10 @@ export const useProjectStore = () => {
     )
   }
 
-  // === Éditeurs ===
+  // === Editors ===
 
   /**
-   * Ouvre l'éditeur de table
+   * Opens the table editor
    */
   const openTableEditor = (tableId: string) => {
     const table = getTable(tableId)
@@ -536,14 +536,14 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Ferme l'éditeur de table
+   * Closes the table editor
    */
   const closeTableEditor = () => {
     editingTable.value = null
   }
 
   /**
-   * Ouvre l'éditeur de groupe
+   * Opens the group editor
    */
   const openGroupEditor = (groupId: string) => {
     const group = getGroup(groupId)
@@ -553,14 +553,14 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Ferme l'éditeur de groupe
+   * Closes the group editor
    */
   const closeGroupEditor = () => {
     editingGroup.value = null
   }
 
   /**
-   * Ouvre l'éditeur de relation
+   * Opens the relation editor
    */
   const openRelationEditor = (relationId: string) => {
     const relation = getRelation(relationId)
@@ -570,14 +570,14 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Ferme l'éditeur de relation
+   * Closes the relation editor
    */
   const closeRelationEditor = () => {
     editingRelation.value = null
   }
 
   /**
-   * Ouvre l'éditeur de note
+   * Opens the note editor
    */
   const openNoteEditor = (noteId: string) => {
     const note = getNote(noteId)
@@ -587,14 +587,14 @@ export const useProjectStore = () => {
   }
 
   /**
-   * Ferme l'éditeur de note
+   * Closes the note editor
    */
   const closeNoteEditor = () => {
     editingNote.value = null
   }
 
   return {
-    // État (readonly pour éviter les mutations directes)
+    // State (readonly to prevent direct mutations)
     currentProject: readonly(currentProject),
     editingTable,
     editingGroup,

@@ -1,6 +1,6 @@
 /**
- * Composable pour gérer les confirmations de suppression
- * Utilisé par le canvas et les éditeurs
+ * Composable for managing delete confirmations
+ * Used by canvas and editors
  */
 export type DeleteTargetType = 'table' | 'group' | 'note' | 'relation' | 'mixed'
 
@@ -11,14 +11,14 @@ export interface DeleteRequest {
 }
 
 export const useDeleteConfirm = () => {
-  // État global de la modal
+  // Global modal state
   const isOpen = useState<boolean>('deleteConfirmOpen', () => false)
   const targetType = useState<DeleteTargetType>('deleteConfirmType', () => 'table')
   const targetCount = useState<number>('deleteConfirmCount', () => 0)
   const onConfirmCallback = useState<(() => void) | null>('deleteConfirmCallback', () => null)
 
   /**
-   * Demande une confirmation de suppression
+   * Requests a delete confirmation
    */
   const requestDelete = (request: DeleteRequest) => {
     targetType.value = request.type
@@ -28,7 +28,7 @@ export const useDeleteConfirm = () => {
   }
 
   /**
-   * Confirme et exécute la suppression
+   * Confirms and executes the deletion
    */
   const confirm = () => {
     if (onConfirmCallback.value) {
@@ -38,14 +38,14 @@ export const useDeleteConfirm = () => {
   }
 
   /**
-   * Annule la suppression
+   * Cancels the deletion
    */
   const cancel = () => {
     close()
   }
 
   /**
-   * Ferme la modal et réinitialise l'état
+   * Closes the modal and resets state
    */
   const close = () => {
     isOpen.value = false
@@ -53,7 +53,7 @@ export const useDeleteConfirm = () => {
   }
 
   return {
-    // État
+    // State
     isOpen,
     targetType,
     targetCount,

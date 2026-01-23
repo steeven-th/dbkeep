@@ -10,15 +10,15 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n'
   ],
 
-  // Configuration runtime (variables d'environnement)
+  // Runtime configuration (environment variables)
   runtimeConfig: {
     public: {
-      // Mode Invité: permet d'utiliser l'app sans authentification
-      // Défini par NUXT_PUBLIC_GUEST_MODE=true
+      // Guest Mode: allows using the app without authentication
+      // Set via NUXT_PUBLIC_GUEST_MODE=true
       guestMode: false,
 
-      // Inscription: active/désactive l'inscription des utilisateurs
-      // Défini par NUXT_PUBLIC_ENABLE_REGISTER=false
+      // Registration: enables/disables user registration
+      // Set via NUXT_PUBLIC_ENABLE_REGISTER=false
       enableRegister: true
     }
   },
@@ -45,7 +45,7 @@ export default defineNuxtConfig({
 
   css: [fileURLToPath(new URL('./app/assets/css/main.css', import.meta.url))],
 
-  // Nuxt UI génère automatiquement les palettes nécessaires basées sur app.config.ts
+  // Nuxt UI automatically generates the required palettes based on app.config.ts
 
   routeRules: {
     '/': { prerender: true }

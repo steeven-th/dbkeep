@@ -6,7 +6,7 @@ const { t } = useI18n()
 const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
 
-// État d'ouverture basé sur editingRelation
+// Open state based on editingRelation
 const isOpen = computed({
   get: () => !!projectStore.editingRelation.value,
   set: (val) => {
@@ -16,10 +16,10 @@ const isOpen = computed({
   }
 })
 
-// Référence à la relation en cours d'édition
+// Reference to the relation being edited
 const relation = computed(() => projectStore.editingRelation.value)
 
-// Options pour les types de relations
+// Options for relation types
 const relationTypeOptions = computed(() => [
   {
     label: t('relation.one_to_one'),
@@ -38,7 +38,7 @@ const relationTypeOptions = computed(() => [
   }
 ])
 
-// Options pour les actions référentielles
+// Options for referential actions
 const referentialActionOptions = computed(() => [
   { label: t('relation.no_action'), value: 'NO ACTION' as ReferentialAction },
   { label: t('relation.cascade'), value: 'CASCADE' as ReferentialAction },
@@ -46,7 +46,7 @@ const referentialActionOptions = computed(() => [
   { label: t('relation.restrict'), value: 'RESTRICT' as ReferentialAction }
 ])
 
-// Liste des tables disponibles
+// List of available tables
 const tableOptions = computed(() => {
   if (!projectStore.currentProject.value) return []
 
@@ -56,7 +56,7 @@ const tableOptions = computed(() => {
   }))
 })
 
-// Colonnes de la table source
+// Source table columns
 const sourceColumnOptions = computed(() => {
   if (!relation.value || !projectStore.currentProject.value) return []
 
@@ -73,7 +73,7 @@ const sourceColumnOptions = computed(() => {
   }))
 })
 
-// Colonnes de la table cible
+// Target table columns
 const targetColumnOptions = computed(() => {
   if (!relation.value || !projectStore.currentProject.value) return []
 
@@ -90,7 +90,7 @@ const targetColumnOptions = computed(() => {
   }))
 })
 
-// Nom des tables pour l'affichage
+// Table names for display
 const sourceTableName = computed(() => {
   if (!relation.value) return ''
   const table = projectStore.getTable(relation.value.sourceTableId)
@@ -104,34 +104,34 @@ const targetTableName = computed(() => {
 })
 
 /**
- * Met à jour une propriété de la relation
+ * Updates a relation property
  */
 const updateRelation = (key: string, value: any) => {
   if (!relation.value) return
 
   projectStore.updateRelation(relation.value.id, { [key]: value })
 
-  // Mettre à jour l'edge dans le canvas
+  // Update edge in canvas
   canvasStore.updateEdge(relation.value.id, { [key]: value })
 }
 
 /**
- * Supprime la relation
+ * Deletes the relation
  */
 const deleteRelation = () => {
   if (!relation.value) return
 
   const relationId = relation.value.id
 
-  // Supprimer l'edge du canvas
+  // Remove edge from canvas
   canvasStore.removeEdge(relationId)
 
-  // Supprimer la relation du projet
+  // Delete relation from project
   projectStore.deleteRelation(relationId)
 }
 
 /**
- * Sauvegarde et ferme le modal
+ * Saves and closes the modal
  */
 const saveAndClose = () => {
   isOpen.value = false
@@ -150,7 +150,7 @@ const saveAndClose = () => {
         v-if="relation"
         class="space-y-6"
       >
-        <!-- Résumé visuel de la relation -->
+        <!-- Visual summary of the relation -->
         <div class="p-4 bg-elevated rounded-lg text-center">
           <div class="flex items-center justify-center gap-3">
             <span class="font-mono text-sm font-semibold">{{ sourceTableName }}</span>
@@ -162,7 +162,7 @@ const saveAndClose = () => {
           </div>
         </div>
 
-        <!-- Type de relation -->
+        <!-- Relation type -->
         <UFormField :label="t('relation.type')">
           <USelectMenu
             :model-value="relation.type"
@@ -179,7 +179,7 @@ const saveAndClose = () => {
 
         <USeparator />
 
-        <!-- Table et colonne source -->
+        <!-- Source table and column -->
         <div class="grid grid-cols-2 gap-4">
           <UFormField :label="t('relation.source_table')">
             <USelectMenu
@@ -206,7 +206,7 @@ const saveAndClose = () => {
           </UFormField>
         </div>
 
-        <!-- Table et colonne cible -->
+        <!-- Target table and column -->
         <div class="grid grid-cols-2 gap-4">
           <UFormField :label="t('relation.target_table')">
             <USelectMenu
@@ -235,7 +235,7 @@ const saveAndClose = () => {
 
         <USeparator />
 
-        <!-- Actions référentielles -->
+        <!-- Referential actions -->
         <div class="grid grid-cols-2 gap-4">
           <UFormField :label="t('relation.on_delete')">
             <USelectMenu
@@ -260,7 +260,7 @@ const saveAndClose = () => {
 
         <USeparator />
 
-        <!-- Zone de danger -->
+        <!-- Danger zone -->
         <div>
           <UButton
             color="error"

@@ -12,15 +12,15 @@ const { t } = useI18n()
 const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
 
-// Mode lecture seule injecté par le parent (page projet)
+// Read-only mode injected by parent (project page)
 const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
-// Etat pour l'edition du titre en ligne
+// State for inline title editing
 const isEditingTitle = ref(false)
 const editedTitle = ref('')
 const titleInput = ref<HTMLInputElement | null>(null)
 
-// Synchroniser editedTitle avec les props
+// Sync editedTitle with props
 watch(
   () => props.data.name,
   (newName) => {
@@ -32,7 +32,7 @@ watch(
 )
 
 /**
- * Demarre l'edition du titre en ligne (si pas en lecture seule)
+ * Starts inline title editing (if not read-only)
  */
 const startEditingTitle = () => {
   if (canvasReadOnly.value) return
@@ -45,7 +45,7 @@ const startEditingTitle = () => {
 }
 
 /**
- * Sauvegarde le titre edite
+ * Saves the edited title
  */
 const saveTitle = () => {
   if (editedTitle.value.trim()) {
@@ -58,7 +58,7 @@ const saveTitle = () => {
 }
 
 /**
- * Annule l'edition du titre
+ * Cancels title editing
  */
 const cancelEditing = () => {
   editedTitle.value = props.data.name
@@ -66,24 +66,24 @@ const cancelEditing = () => {
 }
 
 /**
- * Ouvre l'editeur de note complet (Slideover) - si pas en lecture seule
+ * Opens full note editor (Slideover) - if not read-only
  */
 const openNoteEditor = () => {
   if (canvasReadOnly.value) return
   projectStore.openNoteEditor(props.id)
 }
 
-// Couleur de fond avec opacite
+// Background color with opacity
 const backgroundColor = computed(() => {
   const color = props.data.color || '#fef3c7'
-  // Convertir hex en rgba avec opacite
+  // Convert hex to rgba with opacity
   const r = parseInt(color.slice(1, 3), 16)
   const g = parseInt(color.slice(3, 5), 16)
   const b = parseInt(color.slice(5, 7), 16)
   return `rgba(${r}, ${g}, ${b}, 0.9)`
 })
 
-// Couleur de bordure (plus foncee)
+// Border color (darker)
 const borderColor = computed(() => {
   const color = props.data.color || '#fef3c7'
   const r = Math.max(0, parseInt(color.slice(1, 3), 16) - 40)
@@ -92,7 +92,7 @@ const borderColor = computed(() => {
   return `rgb(${r}, ${g}, ${b})`
 })
 
-// Couleur du texte
+// Text color
 const textColor = computed(() => {
   return props.data.textColor === 'white' ? '#ffffff' : '#1f2937'
 })
@@ -108,15 +108,15 @@ const textColor = computed(() => {
     }"
     @dblclick="openNoteEditor"
   >
-    <!-- Composant de redimensionnement -->
+    <!-- Resize component -->
     <NodeResizer
       :min-width="150"
       :min-height="80"
     />
 
-    <!-- Header de la note -->
+    <!-- Note header -->
     <div class="px-3 py-2 border-b" :style="{ borderColor: borderColor }">
-      <!-- Mode edition -->
+      <!-- Edit mode -->
       <input
         v-if="isEditingTitle"
         ref="titleInput"
@@ -127,7 +127,7 @@ const textColor = computed(() => {
         @keyup.enter="saveTitle"
         @keyup.escape="cancelEditing"
       >
-      <!-- Mode affichage -->
+      <!-- Display mode -->
       <span
         v-else
         class="text-sm font-semibold cursor-pointer block truncate"
@@ -137,12 +137,12 @@ const textColor = computed(() => {
       </span>
     </div>
 
-    <!-- Contenu de la note -->
+    <!-- Note content -->
     <div class="px-3 py-2 text-xs overflow-hidden h-full">
       <p class="whitespace-pre-wrap line-clamp-6 opacity-90">{{ data.content || t('note.no_content') }}</p>
     </div>
 
-    <!-- Boutons d'action au survol (masqués en lecture seule) -->
+    <!-- Action buttons on hover (hidden in read-only mode) -->
     <div
       v-if="!canvasReadOnly"
       class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -161,16 +161,16 @@ const textColor = computed(() => {
 
 <style scoped>
 .db-note-node {
-  /* Position relative pour les elements absolus enfants */
+  /* Relative position for absolute child elements */
   position: relative;
 }
 
-/* Afficher les boutons au survol */
+/* Show buttons on hover */
 .db-note-node:hover .opacity-0 {
   opacity: 1;
 }
 
-/* Styles pour le NodeResizer */
+/* NodeResizer styles */
 .db-note-node :deep(.vue-flow__resize-control) {
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -188,7 +188,7 @@ const textColor = computed(() => {
   border: 2px solid white;
 }
 
-/* Limite le nombre de lignes affichees */
+/* Limit number of displayed lines */
 .line-clamp-6 {
   display: -webkit-box;
   -webkit-line-clamp: 6;

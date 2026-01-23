@@ -11,10 +11,10 @@ const { login, isLoading } = useAuth()
 const { isRegisterEnabled, isGuestModeEnabled } = useAppMode()
 const router = useRouter()
 
-// État du formulaire
+// Form state
 const formError = ref<string | null>(null)
 
-// Schéma de validation avec Zod
+// Zod validation schema
 const schema = z.object({
   email: z.string().email(t('auth.invalid_email')),
   password: z.string().min(1, t('auth.password_required'))
@@ -22,14 +22,14 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>
 
-// État initial du formulaire
+// Initial form state
 const state = reactive<Schema>({
   email: '',
   password: ''
 })
 
 /**
- * Soumission du formulaire de connexion
+ * Login form submission
  */
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   formError.value = null
@@ -48,7 +48,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 <template>
   <div class="min-h-screen bg-muted flex items-center justify-center px-4">
     <div class="w-full max-w-md">
-      <!-- Logo et titre -->
+      <!-- Logo and title -->
       <div class="text-center mb-8">
         <NuxtLink
           to="/"
@@ -64,7 +64,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         <p class="text-muted mt-2">{{ t('auth.login_subtitle') }}</p>
       </div>
 
-      <!-- Formulaire -->
+      <!-- Form -->
       <UCard>
         <UForm
           :schema="schema"
@@ -72,7 +72,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           class="space-y-4"
           @submit="onSubmit"
         >
-          <!-- Message d'erreur global -->
+          <!-- Global error message -->
           <UAlert
             v-if="formError"
             color="error"
@@ -112,7 +112,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             />
           </UFormField>
 
-          <!-- Bouton de connexion -->
+          <!-- Login button -->
           <UButton
             type="submit"
             block
@@ -123,10 +123,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           </UButton>
         </UForm>
 
-        <!-- Lien vers inscription (si activée) -->
+        <!-- Link to registration (if enabled) -->
         <template #footer>
           <div class="text-center text-sm space-y-3">
-            <!-- Lien inscription -->
+            <!-- Registration link -->
             <div v-if="isRegisterEnabled">
               <span class="text-muted">{{ t('auth.no_account') }}</span>
               {{ ' ' }}
@@ -138,7 +138,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               </NuxtLink>
             </div>
 
-            <!-- Option mode invité -->
+            <!-- Guest mode option -->
             <div v-if="isGuestModeEnabled">
               <UButton
                 variant="soft"
@@ -153,7 +153,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         </template>
       </UCard>
 
-      <!-- Retour à l'accueil -->
+      <!-- Back to home -->
       <div class="text-center mt-6">
         <NuxtLink
           to="/"

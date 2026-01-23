@@ -1,11 +1,11 @@
 <script setup lang="ts">
-// État du modal de nouveau projet
+// New project modal state
 const showNewProjectModal = ref(false)
 
-// État du modal de profil
+// Profile modal state
 const showProfileModal = ref(false)
 
-// Ouvre le modal de création de projet
+// Opens new project creation modal
 const openNewProjectModal = () => {
   showNewProjectModal.value = true
 }
@@ -20,16 +20,16 @@ const openNewProjectModal = () => {
         @open-profile="showProfileModal = true"
       />
 
-      <!-- Contenu principal -->
+      <!-- Main content -->
       <main class="flex-1 min-h-0 overflow-hidden">
         <slot />
       </main>
     </div>
 
-    <!-- Modal de création de projet -->
+    <!-- New project creation modal -->
     <CanvasNewProjectModal v-model:open="showNewProjectModal" />
 
-    <!-- Modal d'édition du profil -->
+    <!-- Profile edit modal -->
     <ProfileEditModal v-model:open="showProfileModal" />
   </UApp>
 </template>

@@ -6,7 +6,7 @@ const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
 const deleteConfirm = useDeleteConfirm()
 
-// Etat d'ouverture base sur editingNote
+// Open state based on editingNote
 const isOpen = computed({
   get: () => !!projectStore.editingNote.value,
   set: (val) => {
@@ -16,19 +16,19 @@ const isOpen = computed({
   }
 })
 
-// Reference a la note en cours d'edition
+// Reference to the note being edited
 const note = computed(() => projectStore.editingNote.value)
 
-// Reference au color picker
+// Reference to color picker
 const colorPickerRef = ref<HTMLInputElement | null>(null)
 
-// Ouvre le color picker natif
+// Opens native color picker
 const openColorPicker = () => {
   colorPickerRef.value?.click()
 }
 
 /**
- * Met a jour le nom de la note
+ * Updates note name
  */
 const updateNoteName = (name: string) => {
   if (!note.value) return
@@ -37,7 +37,7 @@ const updateNoteName = (name: string) => {
 }
 
 /**
- * Met a jour le contenu de la note
+ * Updates note content
  */
 const updateNoteContent = (content: string) => {
   if (!note.value) return
@@ -46,7 +46,7 @@ const updateNoteContent = (content: string) => {
 }
 
 /**
- * Met a jour la couleur de la note
+ * Updates note color
  */
 const updateNoteColor = (color: string) => {
   if (!note.value) return
@@ -55,7 +55,7 @@ const updateNoteColor = (color: string) => {
 }
 
 /**
- * Met a jour la couleur du texte
+ * Updates text color
  */
 const updateNoteTextColor = (textColor: 'black' | 'white') => {
   if (!note.value) return
@@ -64,7 +64,7 @@ const updateNoteTextColor = (textColor: 'black' | 'white') => {
 }
 
 /**
- * Supprime la note (avec confirmation)
+ * Deletes the note (with confirmation)
  */
 const deleteNote = () => {
   if (!note.value) return
@@ -75,19 +75,19 @@ const deleteNote = () => {
     type: 'note',
     ids: [noteId],
     onConfirm: () => {
-      // Fermer l'editeur d'abord
+      // Close editor first
       projectStore.closeNoteEditor()
 
-      // Supprimer le noeud du canvas
+      // Remove node from canvas
       canvasStore.removeNode(noteId)
 
-      // Supprimer la note du projet
+      // Delete note from project
       projectStore.deleteNote(noteId)
     }
   })
 }
 
-// Calculer les couleurs pour l'apercu
+// Calculate colors for preview
 const previewBackgroundColor = computed(() => {
   const color = note.value?.color || '#fef3c7'
   const r = parseInt(color.slice(1, 3), 16)
@@ -118,9 +118,9 @@ const previewTextColor = computed(() => {
   >
     <template #body>
       <div v-if="note" class="space-y-6">
-        <!-- Section: Informations de la note -->
+        <!-- Section: Note information -->
         <div class="space-y-4">
-          <!-- Nom de la note -->
+          <!-- Note name -->
           <UFormField :label="t('note.name')">
             <UInput
               :model-value="note.name"
@@ -129,7 +129,7 @@ const previewTextColor = computed(() => {
             />
           </UFormField>
 
-          <!-- Contenu de la note -->
+          <!-- Note content -->
           <UFormField :label="t('note.content')">
             <UTextarea
               :model-value="note.content"
@@ -139,10 +139,10 @@ const previewTextColor = computed(() => {
             />
           </UFormField>
 
-          <!-- Couleur de fond -->
+          <!-- Background color -->
           <UFormField :label="t('note.color')">
             <div class="flex items-center gap-2 flex-wrap">
-              <!-- Couleurs predefinies -->
+              <!-- Predefined colors -->
               <button
                 v-for="color in TABLE_COLORS"
                 :key="color.value"
@@ -153,7 +153,7 @@ const previewTextColor = computed(() => {
                 :title="t(`colors.${color.label}`)"
                 @click="updateNoteColor(color.value)"
               />
-              <!-- Bouton color picker personnalise -->
+              <!-- Custom color picker button -->
               <button
                 type="button"
                 class="color-swatch color-swatch-custom"
@@ -163,7 +163,7 @@ const previewTextColor = computed(() => {
               >
                 <UIcon name="i-lucide-pipette" class="size-3 text-white drop-shadow" />
               </button>
-              <!-- Input color cache -->
+              <!-- Hidden color input -->
               <input
                 ref="colorPickerRef"
                 type="color"
@@ -174,7 +174,7 @@ const previewTextColor = computed(() => {
             </div>
           </UFormField>
 
-          <!-- Couleur du texte -->
+          <!-- Text color -->
           <UFormField :label="t('note.text_color')">
             <div class="flex items-center gap-2">
               <button
@@ -197,7 +197,7 @@ const previewTextColor = computed(() => {
           </UFormField>
         </div>
 
-        <!-- Apercu de la note -->
+        <!-- Note preview -->
         <div class="space-y-2">
           <label class="text-sm font-medium text-muted">{{ t('note.preview') }}</label>
           <div
@@ -222,7 +222,7 @@ const previewTextColor = computed(() => {
 
         <USeparator />
 
-        <!-- Zone de danger -->
+        <!-- Danger zone -->
         <div class="space-y-4">
           <h3 class="font-semibold text-sm text-error">{{ t('common.danger_zone') }}</h3>
           <p class="text-sm text-muted">{{ t('note.delete_warning') }}</p>
@@ -290,7 +290,7 @@ const previewTextColor = computed(() => {
   transform: scale(1.1);
 }
 
-/* Limite le nombre de lignes affichees */
+/* Limit number of displayed lines */
 .line-clamp-4 {
   display: -webkit-box;
   -webkit-line-clamp: 4;

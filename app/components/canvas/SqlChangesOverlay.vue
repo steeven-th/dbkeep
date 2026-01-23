@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-// Formater l'erreur pour l'affichage
+// Format error for display
 const formatError = (error: SqlParseError): string => {
   if (error.line > 1 || error.column > 1) {
     return `Ligne ${error.line}, Col ${error.column}: ${error.message}`
@@ -30,7 +30,7 @@ const formatError = (error: SqlParseError): string => {
       class="sql-changes-overlay"
     >
       <div class="overlay-content">
-        <!-- Icône -->
+        <!-- Icon -->
         <div class="icon-wrapper" :class="{ 'has-errors': hasErrors }">
           <UIcon
             :name="hasErrors ? 'i-lucide-alert-triangle' : 'i-lucide-code-2'"
@@ -38,7 +38,7 @@ const formatError = (error: SqlParseError): string => {
           />
         </div>
 
-        <!-- Message -->
+        <!-- Message text -->
         <h3 class="text-lg font-semibold text-default">
           {{ hasErrors ? t('sql.has_errors') : t('sql.pending_changes') }}
         </h3>
@@ -47,7 +47,7 @@ const formatError = (error: SqlParseError): string => {
           {{ hasErrors ? t('sql.fix_errors_to_apply') : t('sql.apply_or_cancel') }}
         </p>
 
-        <!-- Liste des erreurs si présentes -->
+        <!-- Error list if present -->
         <div v-if="hasErrors && errors?.length" class="errors-list">
           <div
             v-for="(error, index) in errors"
@@ -59,7 +59,7 @@ const formatError = (error: SqlParseError): string => {
           </div>
         </div>
 
-        <!-- Boutons -->
+        <!-- Buttons -->
         <div class="flex items-center gap-3 mt-4">
           <UButton
             variant="soft"

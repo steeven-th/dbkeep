@@ -2,26 +2,26 @@ import type { Project, TableData, Column, Relation } from '~/types/database'
 import { DatabaseEngine, ColumnType } from '~/types/database'
 
 /**
- * Composable pour générer le SQL à partir d'un projet
+ * Composable for generating SQL from a project
  */
 export const useSqlGenerator = () => {
   const projectStore = useProjectStore()
 
   /**
-   * Mappe un type de colonne vers le type SQL du moteur
-   * Utilise les paramètres de la colonne (length, precision, scale, dimension) si définis
+   * Maps a column type to the SQL type for the engine
+   * Uses column parameters (length, precision, scale, dimension) if defined
    */
   const mapColumnType = (column: Column, engine: DatabaseEngine): string => {
     const { type, length, precision, scale, dimension } = column
 
-    // SQLite a des types très simplifiés
+    // SQLite has very simplified types
     if (engine === DatabaseEngine.SQLite) {
       return mapColumnTypeForSQLite(type)
     }
 
-    // PostgreSQL et MySQL
+    // PostgreSQL and MySQL
     switch (type) {
-      // === Types numériques ===
+      // === Numeric types ===
       case ColumnType.SMALLINT:
         return engine === DatabaseEngine.MySQL ? 'SMALLINT' : 'SMALLINT'
       case ColumnType.INT:
@@ -44,7 +44,7 @@ export const useSqlGenerator = () => {
       case ColumnType.MONEY:
         return engine === DatabaseEngine.MySQL ? 'DECIMAL(19,4)' : 'MONEY'
 
-      // === Types auto-incrémentation ===
+      // === Auto-increment types ===
       case ColumnType.SMALLSERIAL:
         return engine === DatabaseEngine.MySQL ? 'SMALLINT AUTO_INCREMENT' : 'SMALLSERIAL'
       case ColumnType.SERIAL:
@@ -52,7 +52,7 @@ export const useSqlGenerator = () => {
       case ColumnType.BIGSERIAL:
         return engine === DatabaseEngine.MySQL ? 'BIGINT AUTO_INCREMENT' : 'BIGSERIAL'
 
-      // === Types chaînes de caractères ===
+      // === Character string types ===
       case ColumnType.CHAR:
         return `CHAR(${length || 1})`
       case ColumnType.VARCHAR:
@@ -62,7 +62,7 @@ export const useSqlGenerator = () => {
       case ColumnType.BYTEA:
         return engine === DatabaseEngine.MySQL ? 'BLOB' : 'BYTEA'
 
-      // === Types date et heure ===
+      // === Date and time types ===
       case ColumnType.DATE:
         return 'DATE'
       case ColumnType.TIME:
@@ -76,11 +76,11 @@ export const useSqlGenerator = () => {
       case ColumnType.INTERVAL:
         return engine === DatabaseEngine.MySQL ? 'VARCHAR(255)' : 'INTERVAL'
 
-      // === Type booléen ===
+      // === Boolean type ===
       case ColumnType.BOOLEAN:
         return engine === DatabaseEngine.MySQL ? 'TINYINT(1)' : 'BOOLEAN'
 
-      // === Types géométriques (PostgreSQL uniquement) ===
+      // === Geometric types (PostgreSQL only) ===
       case ColumnType.POINT:
       case ColumnType.LINE:
       case ColumnType.LSEG:
@@ -90,7 +90,7 @@ export const useSqlGenerator = () => {
       case ColumnType.CIRCLE:
         return engine === DatabaseEngine.MySQL ? 'TEXT' : type
 
-      // === Types réseau (PostgreSQL uniquement) ===
+      // === Network types (PostgreSQL only) ===
       case ColumnType.CIDR:
       case ColumnType.INET:
         return engine === DatabaseEngine.MySQL ? 'VARCHAR(45)' : type
@@ -99,30 +99,30 @@ export const useSqlGenerator = () => {
       case ColumnType.MACADDR8:
         return engine === DatabaseEngine.MySQL ? 'VARCHAR(23)' : 'MACADDR8'
 
-      // === Types bits ===
+      // === Bit types ===
       case ColumnType.BIT:
         return `BIT(${length || 1})`
       case ColumnType.VARBIT:
         return engine === DatabaseEngine.MySQL ? `BIT(${length || 64})` : `VARBIT(${length || 64})`
 
-      // === Types recherche texte (PostgreSQL uniquement) ===
+      // === Text search types (PostgreSQL only) ===
       case ColumnType.TSVECTOR:
       case ColumnType.TSQUERY:
         return engine === DatabaseEngine.MySQL ? 'TEXT' : type
 
-      // === Types JSON ===
+      // === JSON types ===
       case ColumnType.JSON:
         return 'JSON'
       case ColumnType.JSONB:
         return engine === DatabaseEngine.MySQL ? 'JSON' : 'JSONB'
 
-      // === Autres types ===
+      // === Other types ===
       case ColumnType.UUID:
         return engine === DatabaseEngine.MySQL ? 'CHAR(36)' : 'UUID'
       case ColumnType.XML:
         return engine === DatabaseEngine.MySQL ? 'TEXT' : 'XML'
 
-      // === Types vecteurs (PostgreSQL pgvector) ===
+      // === Vector types (PostgreSQL pgvector) ===
       case ColumnType.VECTOR:
       case ColumnType.HALFVEC:
       case ColumnType.SPARSEVEC:
@@ -135,10 +135,10 @@ export const useSqlGenerator = () => {
   }
 
   /**
-   * Mapping simplifié pour SQLite (types très limités)
+   * Simplified mapping for SQLite (very limited types)
    */
   const mapColumnTypeForSQLite = (type: ColumnType): string => {
-    // SQLite n'a que 5 types : NULL, INTEGER, REAL, TEXT, BLOB
+    // SQLite only has 5 types: NULL, INTEGER, REAL, TEXT, BLOB
     switch (type) {
       case ColumnType.SMALLINT:
       case ColumnType.INT:
@@ -167,10 +167,10 @@ export const useSqlGenerator = () => {
   }
 
   /**
-   * Génère le SQL pour une colonne
-   * @param column La colonne à générer
-   * @param engine Le moteur de base de données
-   * @param isCompositePk True si la table a une PK composée (plusieurs colonnes PK)
+   * Generates SQL for a column
+   * @param column The column to generate
+   * @param engine The database engine
+   * @param isCompositePk True if the table has a composite PK (multiple PK columns)
    */
   const generateColumnSql = (
     column: Column,
@@ -179,13 +179,13 @@ export const useSqlGenerator = () => {
   ): string => {
     const parts: string[] = []
 
-    // Nom de la colonne
+    // Column name
     parts.push(`  ${column.name}`)
 
-    // Type (avec paramètres length, precision, scale)
+    // Type (with length, precision, scale parameters)
     parts.push(mapColumnType(column, engine))
 
-    // Contraintes PRIMARY KEY (seulement si PK simple, pas composite)
+    // PRIMARY KEY constraints (only for simple PK, not composite)
     if (column.primaryKey && !isCompositePk) {
       if (engine === DatabaseEngine.SQLite && column.type === ColumnType.SERIAL) {
         parts.push('PRIMARY KEY AUTOINCREMENT')
@@ -194,11 +194,11 @@ export const useSqlGenerator = () => {
       }
     }
 
-    // NOT NULL (si PK composée, les colonnes PK doivent être NOT NULL)
+    // NOT NULL (for composite PK, PK columns must be NOT NULL)
     if (!column.nullable && !column.primaryKey) {
       parts.push('NOT NULL')
     } else if (column.primaryKey && isCompositePk) {
-      // PK composée : les colonnes doivent être NOT NULL explicitement
+      // Composite PK: columns must be explicitly NOT NULL
       parts.push('NOT NULL')
     }
 
@@ -214,23 +214,23 @@ export const useSqlGenerator = () => {
   }
 
   /**
-   * Génère le SQL pour créer une table
+   * Generates SQL to create a table
    */
   const generateTableSql = (table: TableData, engine: DatabaseEngine): string => {
-    // Détecter si on a une PK composée (plusieurs colonnes PK)
+    // Detect if we have a composite PK (multiple PK columns)
     const pkColumns = table.columns.filter(c => c.primaryKey)
     const isCompositePk = pkColumns.length > 1
 
-    // Générer les colonnes avec le flag isCompositePk
+    // Generate columns with isCompositePk flag
     const columns = table.columns.map(col => generateColumnSql(col, engine, isCompositePk))
 
-    // Ajouter la contrainte PRIMARY KEY
+    // Add PRIMARY KEY constraint
     if (isCompositePk) {
-      // PK composée : une seule contrainte à la fin
+      // Composite PK: single constraint at the end
       const pkColumnNames = pkColumns.map(c => c.name).join(', ')
       columns.push(`  PRIMARY KEY (${pkColumnNames})`)
     } else if (engine === DatabaseEngine.PostgreSQL) {
-      // PostgreSQL avec SERIAL : ajouter la contrainte PK séparément
+      // PostgreSQL with SERIAL: add PK constraint separately
       const pkColumn = pkColumns.find(c => c.type === ColumnType.SERIAL)
       if (pkColumn) {
         columns.push(`  PRIMARY KEY (${pkColumn.name})`)
@@ -241,7 +241,7 @@ export const useSqlGenerator = () => {
   }
 
   /**
-   * Génère le SQL pour une clé étrangère
+   * Generates SQL for a foreign key
    */
   const generateForeignKeySql = (
     relation: Relation,
@@ -268,7 +268,7 @@ export const useSqlGenerator = () => {
   }
 
   /**
-   * Génère le SQL complet du projet
+   * Generates the complete SQL for the project
    */
   const generateSql = (project: Project | null = null): string => {
     const currentProject = project || projectStore.currentProject.value
@@ -313,7 +313,7 @@ export const useSqlGenerator = () => {
   }
 
   /**
-   * SQL réactif basé sur le projet courant
+   * Reactive SQL based on current project
    */
   const sql = computed(() => generateSql())
 

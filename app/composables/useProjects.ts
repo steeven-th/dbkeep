@@ -2,7 +2,7 @@ import type { Project } from '~/types/database'
 import { DatabaseEngine } from '~/types/database'
 
 /**
- * Type pour un projet dans la liste (sans les données complètes)
+ * Type for a project in the list (without full data)
  */
 export interface ProjectListItem {
   id: string
@@ -13,8 +13,8 @@ export interface ProjectListItem {
 }
 
 /**
- * Composable pour la gestion persistante des projets
- * Gère les appels API et la synchronisation avec le store local
+ * Composable for persistent project management
+ * Handles API calls and synchronization with local store
  */
 export const useProjects = () => {
   const projectStore = useProjectStore()
@@ -23,20 +23,20 @@ export const useProjects = () => {
   const { t } = useI18n()
   const { parseError } = useAppError()
 
-  // Liste des projets de l'utilisateur
+  // User's project list
   const projects = useState<ProjectListItem[]>('projects-list', () => [])
 
-  // États de chargement (useState pour partager entre composants)
+  // Loading states (useState to share between components)
   const isLoadingList = useState<boolean>('projects-loading-list', () => true)
   const isLoadingProject = useState<boolean>('projects-loading-project', () => false)
   const isSaving = useState<boolean>('projects-saving', () => false)
   const hasLoadedOnce = useState<boolean>('projects-loaded-once', () => false)
 
-  // Timestamp de la dernière sauvegarde (pour éviter les doubles saves)
+  // Last save timestamp (to avoid double saves)
   const lastSaveTime = useState<number>('projects-last-save-time', () => 0)
 
   /**
-   * Charge la liste des projets de l'utilisateur
+   * Loads the user's project list
    */
   const fetchProjects = async () => {
     isLoadingList.value = true
@@ -58,15 +58,15 @@ export const useProjects = () => {
   }
 
   /**
-   * Crée un nouveau projet et le sauvegarde en BDD
+   * Creates a new project and saves it to database
    */
   const createProject = async (name: string, engine: DatabaseEngine) => {
     isSaving.value = true
     try {
-      // Créer le projet localement d'abord
+      // Create project locally first
       const localProject = projectStore.createProject(name, engine)
 
-      // Préparer les données pour l'API
+      // Prepare data for API
       const projectData = {
         tables: localProject.tables,
         groups: localProject.groups,
@@ -74,7 +74,7 @@ export const useProjects = () => {
         relations: localProject.relations
       }
 
-      // Sauvegarder en BDD
+      // Save to database
       const savedProject = await $fetch<any>('/api/projects', {
         method: 'POST',
         body: {
@@ -84,17 +84,17 @@ export const useProjects = () => {
         }
       })
 
-      // Mettre à jour l'ID du projet local avec celui de la BDD
+      // Update local project ID with database ID
       projectStore.updateProject({
         id: savedProject.id,
         name: savedProject.name,
         engine: savedProject.engine as DatabaseEngine
       })
 
-      // Synchroniser le canvas
+      // Sync canvas
       await canvasStore.syncFromProject(projectStore.currentProject.value!)
 
-      // Rafraîchir la liste des projets
+      // Refresh project list
       await fetchProjects()
 
       toast.add({
@@ -104,7 +104,7 @@ export const useProjects = () => {
 
       return savedProject
     } catch (error: unknown) {
-      // En cas d'erreur, fermer le projet local
+      // On error, close local project
       projectStore.closeProject()
 
       toast.add({
@@ -119,14 +119,14 @@ export const useProjects = () => {
   }
 
   /**
-   * Charge un projet depuis la BDD
+   * Loads a project from database
    */
   const loadProject = async (projectId: string) => {
     isLoadingProject.value = true
     try {
       const data = await $fetch<any>(`/api/projects/${projectId}`)
 
-      // Reconstruire l'objet Project complet
+      // Rebuild complete Project object
       const project: Project = {
         id: data.id,
         name: data.name,
@@ -137,19 +137,19 @@ export const useProjects = () => {
         relations: data.data?.relations || [],
         createdAt: new Date(data.createdAt),
         updatedAt: new Date(data.updatedAt),
-        // Champs pour le cloud (ownership)
+        // Ownership fields (for multi-tenant deployments)
         ownerType: data.ownerType,
         ownerId: data.ownerId
       }
 
-      // Charger dans le store
+      // Load into store
       projectStore.updateProject(project)
 
-      // Forcer la mise à jour du currentProject
+      // Force currentProject update
       const currentProject = useState<Project | null>('currentProject')
       currentProject.value = project
 
-      // Synchroniser le canvas
+      // Sync canvas
       await canvasStore.syncFromProject(project)
 
       return project
@@ -166,8 +166,8 @@ export const useProjects = () => {
   }
 
   /**
-   * Sauvegarde le projet courant en BDD
-   * Enrichit les données avec les infos de présentation Vue Flow (positions, parentNode, style)
+   * Saves current project to database
+   * Enriches data with Vue Flow presentation info (positions, parentNode, style)
    */
   const saveProject = async () => {
     const currentProject = projectStore.currentProject.value
@@ -175,10 +175,10 @@ export const useProjects = () => {
 
     isSaving.value = true
     try {
-      // Récupérer les nodes Vue Flow pour enrichir les données
+      // Get Vue Flow nodes to enrich data
       const nodes = canvasStore.nodes.value
 
-      // Enrichir les tables avec leurs positions et parentNode depuis Vue Flow
+      // Enrich tables with their positions and parentNode from Vue Flow
       const tablesWithPositions = currentProject.tables.map((table) => {
         const node = nodes.find(n => n.id === table.id)
         return {
@@ -188,7 +188,7 @@ export const useProjects = () => {
         }
       })
 
-      // Enrichir les groupes avec leurs positions et styles depuis Vue Flow
+      // Enrich groups with their positions and styles from Vue Flow
       const groupsWithPositions = currentProject.groups.map((group) => {
         const node = nodes.find(n => n.id === group.id)
         return {
@@ -198,7 +198,7 @@ export const useProjects = () => {
         }
       })
 
-      // Enrichir les notes avec leurs positions et styles depuis Vue Flow
+      // Enrich notes with their positions and styles from Vue Flow
       const notesWithPositions = currentProject.notes.map((note) => {
         const node = nodes.find(n => n.id === note.id)
         return {
@@ -208,7 +208,7 @@ export const useProjects = () => {
         }
       })
 
-      // Préparer les données
+      // Prepare data
       const projectData = {
         tables: tablesWithPositions,
         groups: groupsWithPositions,
@@ -225,10 +225,10 @@ export const useProjects = () => {
         }
       })
 
-      // Rafraîchir la liste
+      // Refresh list
       await fetchProjects()
 
-      // Mettre à jour le timestamp de la dernière sauvegarde
+      // Update last save timestamp
       lastSaveTime.value = Date.now()
 
       return true
@@ -245,7 +245,7 @@ export const useProjects = () => {
   }
 
   /**
-   * Supprime un projet
+   * Deletes a project
    */
   const deleteProject = async (projectId: string) => {
     try {
@@ -253,13 +253,13 @@ export const useProjects = () => {
         method: 'DELETE'
       })
 
-      // Fermer le projet si c'est celui en cours
+      // Close project if it's the current one
       if (projectStore.currentProject.value?.id === projectId) {
         projectStore.closeProject()
         canvasStore.clearCanvas()
       }
 
-      // Rafraîchir la liste
+      // Refresh list
       await fetchProjects()
 
       toast.add({
@@ -279,7 +279,7 @@ export const useProjects = () => {
   }
 
   /**
-   * Ferme le projet courant (sans supprimer)
+   * Closes current project (without deleting)
    */
   const closeProject = () => {
     projectStore.closeProject()
@@ -287,7 +287,7 @@ export const useProjects = () => {
   }
 
   return {
-    // État
+    // State
     projects: readonly(projects),
     isLoadingList,
     isLoadingProject,

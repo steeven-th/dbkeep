@@ -17,19 +17,19 @@ const deleteConfirm = useDeleteConfirm()
 const { saveProject, isSaving, lastSaveTime } = useProjects()
 const toast = useToast()
 
-// Mode lecture seule injecté par le parent (page projet)
+// Read-only mode injected by parent (project page)
 const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
-// Clé pour forcer le re-render de Vue Flow
+// Key to force Vue Flow re-render
 const vueFlowKey = ref(0)
 
-// Flag pour éviter le fitView lors d'un refresh (ex: après application des changements SQL)
+// Flag to skip fitView on refresh (e.g., after applying SQL changes)
 const skipFitViewOnRefresh = ref(false)
 
-// Viewport à restaurer après un refresh
+// Viewport to restore after a refresh
 const viewportToRestore = ref<{ x: number; y: number; zoom: number } | null>(null)
 
-// Sauvegarde automatique avec debounce (2 secondes après la dernière modification)
+// Auto-save with debounce (2 seconds after last modification)
 const debouncedSave = useDebounceFn(async () => {
   if (projectStore.currentProject.value?.id) {
     const success = await saveProject()
@@ -43,13 +43,13 @@ const debouncedSave = useDebounceFn(async () => {
   }
 }, 2000)
 
-// Watcher pour détecter les modifications du projet et sauvegarder automatiquement
+// Watcher to detect project modifications and auto-save
 watch(
   () => projectStore.currentProject.value?.updatedAt,
   () => {
     if (projectStore.currentProject.value?.id) {
-      // Ignorer si une sauvegarde a été effectuée dans les 3 dernières secondes
-      // (évite les doubles saves après application des changements SQL)
+      // Skip if a save was performed in the last 3 seconds
+      // (avoids double saves after applying SQL changes)
       const timeSinceLastSave = Date.now() - lastSaveTime.value
       if (timeSinceLastSave < 3000) {
         return
@@ -59,7 +59,7 @@ watch(
   }
 )
 
-// Configuration de Vue Flow
+// Vue Flow configuration
 const {
   onConnect,
   onNodeDragStop,
@@ -74,13 +74,13 @@ const {
   setViewport
 } = useVueFlow()
 
-// Ajuster la vue quand les nodes sont initialisés par Vue Flow
+// Adjust view when nodes are initialized by Vue Flow
 onNodesInitialized(() => {
-  // Restaurer le viewport si c'est un refresh (ex: après application des changements SQL)
+  // Restore viewport if this is a refresh (e.g., after applying SQL changes)
   if (skipFitViewOnRefresh.value) {
     skipFitViewOnRefresh.value = false
     if (viewportToRestore.value) {
-      // Petit délai pour s'assurer que Vue Flow est prêt
+      // Small delay to ensure Vue Flow is ready
       setTimeout(() => {
         setViewport(viewportToRestore.value!)
         viewportToRestore.value = null
@@ -89,43 +89,43 @@ onNodesInitialized(() => {
     return
   }
 
-  // Petit délai pour s'assurer que les dimensions des nodes sont calculées
+  // Small delay to ensure node dimensions are calculated
   setTimeout(() => {
     fitView({ padding: 0.3, maxZoom: 1 })
   }, 50)
 })
 
-// Types de noeuds personnalisés (markRaw pour éviter la réactivité)
+// Custom node types (markRaw to avoid reactivity)
 const nodeTypes = {
   dbTable: markRaw(DbTable),
   dbGroup: markRaw(DbGroup),
   dbNote: markRaw(DbNote)
 }
 
-// Types d'edges personnalisés (markRaw pour éviter la réactivité)
+// Custom edge types (markRaw to avoid reactivity)
 const edgeTypes = {
   relation: markRaw(RelationEdge)
 }
 
-// État pour le modal de création de relation
+// State for relation creation modal
 const showRelationEditor = ref(false)
 const pendingConnection = ref<Connection | null>(null)
 
 /**
- * Gestion d'une nouvelle connexion entre deux colonnes
+ * Handles a new connection between two columns
  */
 onConnect((connection: Connection) => {
-  // Bloquer en mode lecture seule
+  // Block in read-only mode
   if (canvasReadOnly.value) return
 
-  // Extraire les IDs de table et colonne depuis les handles
-  // On retire le suffixe -source ou -target (peu importe le type de handle utilisé)
+  // Extract table and column IDs from handles
+  // Remove -source or -target suffix (regardless of handle type used)
   const sourceColumnId = connection.sourceHandle?.replace(/-(source|target)$/, '')
   const targetColumnId = connection.targetHandle?.replace(/-(source|target)$/, '')
 
   if (!sourceColumnId || !targetColumnId) return
 
-  // Créer une nouvelle relation
+  // Create a new relation
   const relation = projectStore.addRelation({
     sourceTableId: connection.source,
     sourceColumnId,
@@ -135,13 +135,13 @@ onConnect((connection: Connection) => {
   })
 
   if (relation) {
-    // Ajouter l'edge au canvas
+    // Add edge to canvas
     canvasStore.addEdge(relation)
 
-    // Ouvrir l'éditeur de relation pour configurer les détails
+    // Open relation editor to configure details
     projectStore.openRelationEditor(relation.id)
   } else {
-    // La relation existe déjà, informer l'utilisateur
+    // Relation already exists, notify user
     toast.add({
       title: t('relation.already_exists'),
       description: t('relation.already_exists_description'),
@@ -152,7 +152,7 @@ onConnect((connection: Connection) => {
 })
 
 /**
- * Vérifie si un point est dans les limites d'un groupe
+ * Checks if a point is within the bounds of a group
  */
 const isInsideGroup = (
   nodePosition: { x: number; y: number },
@@ -163,11 +163,11 @@ const isInsideGroup = (
   const groupWidth = parseFloat(group.style?.width as string) || 400
   const groupHeight = parseFloat(group.style?.height as string) || 300
 
-  // Calculer le centre du node
+  // Calculate node center
   const nodeCenterX = nodePosition.x + nodeWidth / 2
   const nodeCenterY = nodePosition.y + nodeHeight / 2
 
-  // Vérifier si le centre du node est dans le groupe
+  // Check if node center is within the group
   return (
     nodeCenterX >= group.position.x &&
     nodeCenterX <= group.position.x + groupWidth &&
@@ -177,7 +177,7 @@ const isInsideGroup = (
 }
 
 /**
- * Trouve le groupe contenant une position donnée
+ * Finds the group containing a given position
  */
 const findContainingGroup = (
   nodePosition: { x: number; y: number },
@@ -198,22 +198,22 @@ const findContainingGroup = (
 }
 
 /**
- * Mise à jour des positions des noeuds après un drag
- * Gère aussi l'assignation automatique aux groupes (Nested Nodes)
+ * Updates node positions after drag
+ * Also handles automatic group assignment (Nested Nodes)
  */
 onNodeDragStop((event) => {
   event.nodes.forEach((node) => {
-    // Ne pas traiter les groupes
+    // Don't process groups
     if (node.type === 'dbGroup') {
       canvasStore.updateNodePosition(node.id, node.position)
       return
     }
 
-    // Pour les tables, vérifier si elles sont dans un groupe
+    // For tables, check if they are inside a group
     const nodeWidth = node.dimensions?.width || 200
     const nodeHeight = node.dimensions?.height || 100
 
-    // Calculer la position absolue (si la table est déjà dans un groupe, sa position est relative)
+    // Calculate absolute position (if table is already in a group, its position is relative)
     let absolutePosition = { ...node.position }
     if (node.parentNode) {
       const parentGroup = getNodes.value.find(n => n.id === node.parentNode)
@@ -225,14 +225,14 @@ onNodeDragStop((event) => {
       }
     }
 
-    // Trouver le groupe qui contient cette position
+    // Find the group containing this position
     const containingGroup = findContainingGroup(absolutePosition, nodeWidth, nodeHeight, node.id)
 
     if (containingGroup) {
-      // La table est dans un groupe
+      // Table is inside a group
       if (node.parentNode !== containingGroup.id) {
-        // Nouveau groupe ou changement de groupe
-        // Convertir la position absolue en position relative au groupe
+        // New group or group change
+        // Convert absolute position to relative position within group
         const relativePosition = {
           x: absolutePosition.x - containingGroup.position.x,
           y: absolutePosition.y - containingGroup.position.y
@@ -241,17 +241,17 @@ onNodeDragStop((event) => {
         canvasStore.assignToGroup(node.id, containingGroup.id)
         canvasStore.updateNodePosition(node.id, relativePosition)
       } else {
-        // Même groupe, juste mettre à jour la position
+        // Same group, just update position
         canvasStore.updateNodePosition(node.id, node.position)
       }
     } else {
-      // La table n'est dans aucun groupe
+      // Table is not in any group
       if (node.parentNode) {
-        // Elle était dans un groupe, la retirer
+        // It was in a group, remove it
         canvasStore.assignToGroup(node.id, null)
         canvasStore.updateNodePosition(node.id, absolutePosition)
       } else {
-        // Pas de changement de groupe
+        // No group change
         canvasStore.updateNodePosition(node.id, node.position)
       }
     }
@@ -259,11 +259,11 @@ onNodeDragStop((event) => {
 })
 
 /**
- * Gère la suppression des éléments sélectionnés avec confirmation
- * Appelé quand l'utilisateur appuie sur Delete ou Backspace
+ * Handles deletion of selected elements with confirmation
+ * Called when user presses Delete or Backspace
  */
 const handleDeleteSelected = () => {
-  // Bloquer en mode lecture seule
+  // Block in read-only mode
   if (canvasReadOnly.value) return
 
   const selectedNodes = getSelectedNodes.value
@@ -271,7 +271,7 @@ const handleDeleteSelected = () => {
 
   if (selectedNodes.length === 0 && selectedEdges.length === 0) return
 
-  // Prioriser les nodes sur les edges
+  // Prioritize nodes over edges
   if (selectedNodes.length > 0) {
     const nodeIds = selectedNodes.map(n => n.id)
     const types = selectedNodes.map(n => n.type)
@@ -291,12 +291,12 @@ const handleDeleteSelected = () => {
       type: targetType,
       ids: nodeIds,
       onConfirm: () => {
-        // Supprimer dans le store projet
+        // Delete from project store
         selectedNodes.forEach((node) => {
           if (node.type === 'dbTable') {
             projectStore.deleteTable(node.id)
           } else if (node.type === 'dbGroup') {
-            // Désassigner les enfants d'abord
+            // Unassign children first
             const children = canvasStore.getGroupChildren(node.id)
             children.forEach(child => {
               canvasStore.assignToGroup(child.id, null)
@@ -306,7 +306,7 @@ const handleDeleteSelected = () => {
             projectStore.deleteNote(node.id)
           }
         })
-        // Supprimer du canvas
+        // Remove from canvas
         removeNodes(nodeIds)
       }
     })
@@ -317,11 +317,11 @@ const handleDeleteSelected = () => {
       type: 'relation',
       ids: edgeIds,
       onConfirm: () => {
-        // Supprimer dans le store projet
+        // Delete from project store
         selectedEdges.forEach((edge) => {
           projectStore.deleteRelation(edge.id)
         })
-        // Supprimer du canvas
+        // Remove from canvas
         removeEdges(edgeIds)
       }
     })
@@ -329,10 +329,10 @@ const handleDeleteSelected = () => {
 }
 
 /**
- * Handler de clavier pour intercepter Delete/Backspace
+ * Keyboard handler to intercept Delete/Backspace
  */
 const handleKeyDown = (event: KeyboardEvent) => {
-  // Ne pas intercepter si on est dans un input
+  // Don't intercept if inside an input
   if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
     return
   }
@@ -344,23 +344,23 @@ const handleKeyDown = (event: KeyboardEvent) => {
 }
 
 /**
- * Ajuste la vue pour afficher tous les éléments
- * padding: 0.5 = 50% d'espace vide autour des éléments
- * maxZoom: 1 = ne pas zoomer plus que 100%
+ * Adjusts view to display all elements
+ * padding: 0.5 = 50% empty space around elements
+ * maxZoom: 1 = don't zoom more than 100%
  */
 const handleFitView = () => {
   fitView({ padding: 0.5, maxZoom: 1 })
 }
 
-// Force le re-render complet de Vue Flow en préservant le viewport
+// Forces complete re-render of Vue Flow while preserving viewport
 const forceRefresh = () => {
-  // Sauvegarder le viewport actuel pour le restaurer après le refresh
+  // Save current viewport to restore after refresh
   viewportToRestore.value = getViewport()
   skipFitViewOnRefresh.value = true
   vueFlowKey.value++
 }
 
-// Exposer les méthodes pour les composants parents
+// Expose methods for parent components
 defineExpose({
   fitView: handleFitView,
   forceRefresh
@@ -392,14 +392,14 @@ defineExpose({
       class="bg-muted"
       @keydown="handleKeyDown"
     >
-      <!-- Fond avec grille -->
+      <!-- Background with grid -->
       <Background
         :gap="20"
         :size="1"
         pattern-color="var(--vue-flow-grid-color)"
       />
 
-      <!-- Contrôles de zoom/pan -->
+      <!-- Zoom/pan controls -->
       <Controls
         :show-zoom="true"
         :show-fit-view="true"
@@ -407,30 +407,30 @@ defineExpose({
         position="bottom-right"
       />
 
-      <!-- Toolbar flottante -->
+      <!-- Floating toolbar -->
       <CanvasToolbar />
     </VueFlow>
 
-    <!-- Slideover pour l'édition des tables -->
+    <!-- Slideover for table editing -->
     <CanvasTableEditor />
 
-    <!-- Slideover pour l'édition des groupes -->
+    <!-- Slideover for group editing -->
     <CanvasGroupEditor />
 
-    <!-- Slideover pour l'édition des notes -->
+    <!-- Slideover for note editing -->
     <CanvasNoteEditor />
 
-    <!-- Modal pour l'édition des relations -->
+    <!-- Modal for relation editing -->
     <CanvasRelationEditor />
 
-    <!-- Modal de confirmation de suppression (global) -->
+    <!-- Delete confirmation modal (global) -->
     <DeleteConfirmModal />
   </div>
 </template>
 
 <style scoped>
 .database-canvas {
-  /* Assure que le canvas prend toute la hauteur disponible */
+  /* Ensures canvas takes full available height */
   min-height: 100%;
 }
 </style>

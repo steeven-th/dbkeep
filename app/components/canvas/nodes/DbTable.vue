@@ -11,11 +11,11 @@ const props = defineProps<{
 const { t } = useI18n()
 const projectStore = useProjectStore()
 
-// Mode lecture seule injecté par le parent (page projet)
+// Read-only mode injected by parent (project page)
 const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
 /**
- * Ouvre l'éditeur de table dans le Slideover (si pas en lecture seule)
+ * Opens table editor in Slideover (if not read-only)
  */
 const openEditor = () => {
   if (canvasReadOnly.value) return
@@ -23,7 +23,7 @@ const openEditor = () => {
 }
 
 /**
- * Retourne l'icône appropriée pour une colonne selon ses contraintes
+ * Returns appropriate icon for a column based on its constraints
  */
 const getColumnIcon = (column: Column): string => {
   if (column.primaryKey) return 'i-lucide-key-round'
@@ -32,7 +32,7 @@ const getColumnIcon = (column: Column): string => {
 }
 
 /**
- * Retourne la classe de couleur pour l'icône selon le type de contrainte
+ * Returns icon color class based on constraint type
  */
 const getColumnIconClass = (column: Column): string => {
   if (column.primaryKey) return 'text-amber-500'
@@ -41,14 +41,14 @@ const getColumnIconClass = (column: Column): string => {
 }
 
 /**
- * Génère un texte de type condensé pour l'affichage
+ * Generates condensed type text for display
  */
 const getTypeDisplay = (column: Column): string => {
   return column.type
 }
 
 /**
- * Vérifie si une colonne est source d'une relation (côté droit)
+ * Checks if a column is the source of a relation (right side)
  */
 const isSourceConnected = (columnId: string): boolean => {
   const relations = projectStore.currentProject.value?.relations || []
@@ -56,7 +56,7 @@ const isSourceConnected = (columnId: string): boolean => {
 }
 
 /**
- * Vérifie si une colonne est cible d'une relation (côté gauche)
+ * Checks if a column is the target of a relation (left side)
  */
 const isTargetConnected = (columnId: string): boolean => {
   const relations = projectStore.currentProject.value?.relations || []
@@ -69,7 +69,7 @@ const isTargetConnected = (columnId: string): boolean => {
     class="db-table-node min-w-[220px] max-w-[350px] rounded-lg shadow-lg border border-default bg-default cursor-pointer"
     @dblclick="openEditor"
   >
-    <!-- Header avec couleur dynamique -->
+    <!-- Header with dynamic color -->
     <div
       class="px-3 py-2 flex items-center justify-between gap-2"
       :style="{ backgroundColor: data.color }"
@@ -89,14 +89,14 @@ const isTargetConnected = (columnId: string): boolean => {
       />
     </div>
 
-    <!-- Liste des colonnes -->
+    <!-- Column list -->
     <div class="divide-y divide-default">
       <div
         v-for="column in data.columns"
         :key="column.id"
         class="column-row relative px-3 py-2 flex items-center gap-2 text-sm hover:bg-elevated transition-colors"
       >
-        <!-- Handle target (entrée - côté gauche) -->
+        <!-- Target handle (input - left side) -->
         <Handle
           :id="`${column.id}-target`"
           type="target"
@@ -105,22 +105,22 @@ const isTargetConnected = (columnId: string): boolean => {
           :class="{ 'is-connected': isTargetConnected(column.id) }"
         />
 
-        <!-- Icône de contrainte -->
+        <!-- Constraint icon -->
         <UIcon
           :name="getColumnIcon(column)"
           class="size-4 shrink-0"
           :class="getColumnIconClass(column)"
         />
 
-        <!-- Nom de la colonne -->
+        <!-- Column name -->
         <span class="flex-1 truncate font-medium">{{ column.name }}</span>
 
-        <!-- Type SQL -->
+        <!-- SQL type -->
         <span class="text-muted text-xs font-mono shrink-0">
           {{ getTypeDisplay(column) }}
         </span>
 
-        <!-- Indicateurs -->
+        <!-- Indicators -->
         <div class="flex items-center gap-1 shrink-0">
           <UTooltip v-if="column.nullable" :text="t('column.nullable')">
             <span class="text-muted text-xs">?</span>
@@ -130,7 +130,7 @@ const isTargetConnected = (columnId: string): boolean => {
           </UTooltip>
         </div>
 
-        <!-- Handle source (sortie - côté droit) -->
+        <!-- Source handle (output - right side) -->
         <Handle
           :id="`${column.id}-source`"
           type="source"
@@ -140,7 +140,7 @@ const isTargetConnected = (columnId: string): boolean => {
         />
       </div>
 
-      <!-- Message si aucune colonne -->
+      <!-- Message if no columns -->
       <div
         v-if="data.columns.length === 0"
         class="px-3 py-4 text-center text-muted text-sm"
@@ -153,20 +153,20 @@ const isTargetConnected = (columnId: string): boolean => {
 
 <style scoped>
 /* ============================================
-   Styles des handles de connexion (relation)
+   Connection handle styles (relation)
    ============================================ */
 
-/* Permettre aux handles de dépasser */
+/* Allow handles to overflow */
 .db-table-node {
   overflow: visible !important;
 }
 
-/* Header avec coins arrondis en haut */
+/* Header with rounded corners at top */
 .db-table-node > div:first-child {
   border-radius: 0.5rem 0.5rem 0 0;
 }
 
-/* Style de base des handles */
+/* Base handle styles */
 .db-table-node :deep(.connection-handle) {
   width: 12px;
   height: 12px;
@@ -178,7 +178,7 @@ const isTargetConnected = (columnId: string): boolean => {
   cursor: crosshair;
 }
 
-/* Zone de survol élargie pour éviter le "sursaut" entre la ligne et le handle */
+/* Enlarged hover zone to prevent "jump" between row and handle */
 .db-table-node :deep(.connection-handle)::before {
   content: '';
   position: absolute;
@@ -190,7 +190,7 @@ const isTargetConnected = (columnId: string): boolean => {
   border-radius: 50%;
 }
 
-/* Position des handles */
+/* Handle positions */
 .db-table-node :deep(.vue-flow__handle-left) {
   left: -8px;
 }
@@ -199,22 +199,22 @@ const isTargetConnected = (columnId: string): boolean => {
   right: -8px;
 }
 
-/* === Handles connectés : toujours visibles === */
+/* === Connected handles: always visible === */
 .db-table-node :deep(.connection-handle.is-connected) {
   opacity: 1;
 }
 
-/* Afficher les handles au survol de la table */
+/* Show handles on table hover */
 .db-table-node:hover :deep(.connection-handle) {
   opacity: 0.5;
 }
 
-/* Les handles connectés restent à opacity 1 même au survol de la table */
+/* Connected handles stay at opacity 1 even on table hover */
 .db-table-node:hover :deep(.connection-handle.is-connected) {
   opacity: 1;
 }
 
-/* Highlight plus fort au survol de la ligne de colonne */
+/* Stronger highlight on column row hover */
 .column-row:hover :deep(.connection-handle) {
   opacity: 1;
   width: 16px;
@@ -222,17 +222,17 @@ const isTargetConnected = (columnId: string): boolean => {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
-/* Handle source (côté droit) - bleu */
+/* Source handle (right side) - blue */
 .db-table-node :deep(.source-handle) {
   background: var(--ui-color-primary-500);
 }
 
-/* Handle target (côté gauche) - vert */
+/* Target handle (left side) - green */
 .db-table-node :deep(.target-handle) {
   background: var(--ui-color-success-500, #22c55e);
 }
 
-/* Effet au survol direct du handle (via la zone élargie) */
+/* Effect on direct handle hover (via enlarged zone) */
 .db-table-node :deep(.connection-handle:hover) {
   opacity: 1;
   width: 18px;
@@ -241,7 +241,7 @@ const isTargetConnected = (columnId: string): boolean => {
   cursor: grab;
 }
 
-/* Quand une connexion est en cours de création */
+/* When a connection is being created */
 .db-table-node :deep(.vue-flow__handle.connecting) {
   opacity: 1;
   animation: pulse-handle 0.8s ease-in-out infinite;
@@ -256,13 +256,13 @@ const isTargetConnected = (columnId: string): boolean => {
   }
 }
 
-/* État valid pendant le drag */
+/* Valid state during drag */
 .db-table-node :deep(.vue-flow__handle.valid) {
   background: var(--ui-color-success-500, #22c55e) !important;
   opacity: 1 !important;
 }
 
-/* État invalid pendant le drag */
+/* Invalid state during drag */
 .db-table-node :deep(.vue-flow__handle.invalid) {
   background: var(--ui-color-error-500, #ef4444) !important;
   opacity: 0.5 !important;

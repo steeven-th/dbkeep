@@ -1,25 +1,25 @@
 import { getSession } from '~/utils/auth-client'
 
 /**
- * Middleware de protection des routes
- * - En mode normal: redirige vers /login si non authentifié
- * - En mode invité: laisse passer sans vérification
+ * Route protection middleware
+ * - In normal mode: redirects to /login if not authenticated
+ * - In guest mode: allows access without verification
  */
 export default defineNuxtRouteMiddleware(async (to) => {
   const runtimeConfig = useRuntimeConfig()
 
-  // Mode invité activé = pas de vérification d'auth
+  // Guest mode enabled = no auth verification
   if (runtimeConfig.public.guestMode === true) {
     return
   }
 
-  // Ne pas vérifier sur les routes publiques
+  // Don't check on public routes
   const publicRoutes = ['/', '/login', '/register']
   if (publicRoutes.includes(to.path)) {
     return
   }
 
-  // Vérifier la session côté client
+  // Check session on client side
   if (import.meta.client) {
     const session = await getSession()
 

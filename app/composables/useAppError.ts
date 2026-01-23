@@ -1,14 +1,14 @@
 /**
- * Composable pour la gestion des erreurs de l'application
+ * Composable for application error handling
  *
- * Permet de :
- * - Parser les erreurs API standardisées
- * - Traduire les codes d'erreur
- * - Afficher des toasts d'erreur
+ * Allows:
+ * - Parsing standardized API errors
+ * - Translating error codes
+ * - Displaying error toasts
  */
 
 /**
- * Interface pour les erreurs capturées
+ * Interface for captured errors
  */
 export interface CapturedError {
   code: string
@@ -22,7 +22,7 @@ export const useAppError = () => {
   const toast = useToast()
 
   /**
-   * Extrait le code d'erreur d'une erreur API
+   * Extracts error code from an API error
    */
   const getErrorCode = (error: unknown): string => {
     if (!error || typeof error !== 'object') {
@@ -31,7 +31,7 @@ export const useAppError = () => {
 
     const err = error as Record<string, unknown>
 
-    // Format $fetch error: error.data.code
+    // $fetch error format: error.data.code
     if (err.data && typeof err.data === 'object') {
       const data = err.data as Record<string, unknown>
       if (data.code && typeof data.code === 'string') {
@@ -39,7 +39,7 @@ export const useAppError = () => {
       }
     }
 
-    // Format direct: error.code
+    // Direct format: error.code
     if (err.code && typeof err.code === 'string') {
       return err.code
     }
@@ -48,7 +48,7 @@ export const useAppError = () => {
   }
 
   /**
-   * Extrait les détails d'une erreur API
+   * Extracts details from an API error
    */
   const getErrorDetails = (error: unknown): Record<string, unknown> | undefined => {
     if (!error || typeof error !== 'object') {
@@ -57,7 +57,7 @@ export const useAppError = () => {
 
     const err = error as Record<string, unknown>
 
-    // Format $fetch error: error.data.details
+    // $fetch error format: error.data.details
     if (err.data && typeof err.data === 'object') {
       const data = err.data as Record<string, unknown>
       if (data.details && typeof data.details === 'object') {
@@ -69,20 +69,20 @@ export const useAppError = () => {
   }
 
   /**
-   * Traduit un code d'erreur
-   * Retourne le message traduit ou le code si pas de traduction
+   * Translates an error code
+   * Returns translated message or code if no translation exists
    */
   const translateErrorCode = (code: string): string => {
     const key = `errors.${code}`
     if (te(key)) {
       return t(key)
     }
-    // Fallback : retourner le code formaté
+    // Fallback: return formatted code
     return code.replace(/_/g, ' ').toLowerCase()
   }
 
   /**
-   * Parse une erreur et retourne les informations structurées
+   * Parses an error and returns structured information
    */
   const parseError = (error: unknown): CapturedError => {
     const code = getErrorCode(error)
@@ -106,7 +106,7 @@ export const useAppError = () => {
   }
 
   /**
-   * Affiche une erreur dans un toast
+   * Displays an error in a toast
    */
   const showErrorToast = (error: unknown, title?: string) => {
     const parsed = parseError(error)
@@ -121,7 +121,7 @@ export const useAppError = () => {
   }
 
   /**
-   * Vérifie si l'erreur correspond à un code spécifique
+   * Checks if error matches a specific code
    */
   const isErrorCode = (error: unknown, code: string): boolean => {
     return getErrorCode(error) === code

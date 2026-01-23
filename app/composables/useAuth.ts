@@ -1,21 +1,21 @@
 import { signIn, signUp, signOut, useSession, getSession } from '~/utils/auth-client'
 
 /**
- * Composable pour l'authentification
- * Wrapper autour du client Better Auth
+ * Composable for authentication
+ * Wrapper around Better Auth client
  */
 export const useAuth = () => {
   const router = useRouter()
 
-  // Session réactive depuis Better Auth (côté client uniquement)
+  // Reactive session from Better Auth (client side only)
   const sessionQuery = import.meta.client ? useSession() : null
 
-  // État partagé pour la session (useState pour partager entre composants)
+  // Shared session state (useState to share between components)
   const sessionData = useState<any>('auth-session', () => null)
   const isLoading = useState<boolean>('auth-loading', () => false)
   const error = useState<Error | null>('auth-error', () => null)
 
-  // Synchroniser la session de Better Auth avec notre état
+  // Sync Better Auth session with our state
   if (import.meta.client && sessionQuery) {
     watch(
       () => sessionQuery.data?.value,
@@ -27,7 +27,7 @@ export const useAuth = () => {
     )
   }
 
-  // Charger la session au montage côté client
+  // Load session on client mount
   onMounted(async () => {
     if (import.meta.client) {
       try {
@@ -43,12 +43,12 @@ export const useAuth = () => {
     }
   })
 
-  // Computed pour l'état de l'authentification
+  // Computed for authentication state
   const isAuthenticated = computed(() => !!sessionData.value?.user)
   const user = computed(() => sessionData.value?.user || null)
 
   /**
-   * Inscription avec email/password
+   * Register with email/password
    */
   const register = async (data: {
     email: string
@@ -66,7 +66,7 @@ export const useAuth = () => {
         throw new Error(result.error.message)
       }
 
-      // Redirection vers l'app après inscription
+      // Redirect to app after registration
       await router.push('/app')
       return { success: true }
     } catch (err: any) {
@@ -78,7 +78,7 @@ export const useAuth = () => {
   }
 
   /**
-   * Connexion avec email/password
+   * Login with email/password
    */
   const login = async (data: {
     email: string
@@ -94,7 +94,7 @@ export const useAuth = () => {
         throw new Error(result.error.message)
       }
 
-      // Redirection vers l'app après connexion
+      // Redirect to app after login
       await router.push('/app')
       return { success: true }
     } catch (err: any) {
@@ -106,12 +106,12 @@ export const useAuth = () => {
   }
 
   /**
-   * Déconnexion
+   * Logout
    */
   const logout = async () => {
     try {
       await signOut()
-      // Redirection vers la page d'accueil
+      // Redirect to homepage
       await router.push('/')
       return { success: true }
     } catch (err: any) {
@@ -123,7 +123,7 @@ export const useAuth = () => {
   }
 
   return {
-    // État
+    // State
     session: sessionData,
     user,
     isAuthenticated,

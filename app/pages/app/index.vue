@@ -8,14 +8,14 @@ const { t } = useI18n()
 const toast = useToast()
 const { projects, isLoadingList, hasLoadedOnce, fetchProjects, deleteProject, closeProject } = useProjects()
 
-// État du modal de nouveau projet
+// New project modal state
 const showNewProjectModal = ref(false)
 
-// État de la recherche et des filtres
+// Search and filter state
 const searchQuery = ref('')
 const selectedEngine = ref<string | null>(null)
 
-// Options de filtre par moteur
+// Engine filter options
 const engineOptions = computed(() => [
   { label: t('project.all_engines'), value: null },
   { label: 'PostgreSQL', value: 'PostgreSQL' },
@@ -23,17 +23,17 @@ const engineOptions = computed(() => [
   { label: 'SQLite', value: 'SQLite' }
 ])
 
-// Projets filtrés
+// Filtered projects
 const filteredProjects = computed(() => {
   let result = projects.value
 
-  // Filtre par recherche textuelle
+  // Filter by text search
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim()
     result = result.filter(p => p.name.toLowerCase().includes(query))
   }
 
-  // Filtre par moteur
+  // Filter by engine
   if (selectedEngine.value) {
     result = result.filter(p => p.engine === selectedEngine.value)
   }
@@ -41,7 +41,7 @@ const filteredProjects = computed(() => {
   return result
 })
 
-// État du modal de confirmation de suppression
+// Delete confirmation modal state
 const projectToDelete = ref<string | null>(null)
 const showDeleteModal = computed({
   get: () => !!projectToDelete.value,
@@ -50,7 +50,7 @@ const showDeleteModal = computed({
   }
 })
 
-// État du modal de renommage
+// Rename modal state
 const projectToRename = ref<{ id: string; name: string } | null>(null)
 const newProjectName = ref('')
 const isRenaming = ref(false)
@@ -64,35 +64,35 @@ const showRenameModal = computed({
   }
 })
 
-// Ferme tout projet ouvert et charge la liste au montage
+// Close any open project and load list on mount
 onMounted(() => {
   closeProject()
   fetchProjects()
 })
 
 /**
- * Ouvre le modal de création de projet
+ * Opens the new project modal
  */
 const openNewProjectModal = () => {
   showNewProjectModal.value = true
 }
 
 /**
- * Navigue vers un projet
+ * Navigates to a project
  */
 const openProject = (projectId: string) => {
   router.push(`/app/project/${projectId}`)
 }
 
 /**
- * Demande confirmation avant suppression
+ * Requests confirmation before deletion
  */
 const confirmDelete = (projectId: string) => {
   projectToDelete.value = projectId
 }
 
 /**
- * Supprime le projet après confirmation
+ * Deletes the project after confirmation
  */
 const handleDeleteProject = async () => {
   if (projectToDelete.value) {
@@ -102,7 +102,7 @@ const handleDeleteProject = async () => {
 }
 
 /**
- * Ouvre le modal de renommage
+ * Opens the rename modal
  */
 const openRenameModal = (projectId: string, currentName: string) => {
   projectToRename.value = { id: projectId, name: currentName }
@@ -110,7 +110,7 @@ const openRenameModal = (projectId: string, currentName: string) => {
 }
 
 /**
- * Renomme le projet
+ * Renames the project
  */
 const handleRenameProject = async () => {
   if (!projectToRename.value || !newProjectName.value.trim()) return
@@ -127,10 +127,10 @@ const handleRenameProject = async () => {
       color: 'success'
     })
 
-    // Rafraîchir la liste
+    // Refresh the list
     await fetchProjects()
 
-    // Fermer le modal
+    // Close the modal
     showRenameModal.value = false
   } catch (error: any) {
     toast.add({
@@ -144,7 +144,7 @@ const handleRenameProject = async () => {
 }
 
 /**
- * Formate une date relative
+ * Formats a relative date
  */
 const formatDate = (date: Date | string) => {
   const d = new Date(date)
@@ -158,7 +158,7 @@ const formatDate = (date: Date | string) => {
 }
 
 /**
- * Retourne l'icône du moteur de BDD
+ * Returns the database engine icon
  */
 const getEngineIcon = (engine: string) => {
   switch (engine) {
@@ -218,7 +218,7 @@ const getEngineIcon = (engine: string) => {
           />
         </div>
 
-        <!-- Barre de recherche et filtres -->
+        <!-- Search bar and filters -->
         <div
           v-if="hasLoadedOnce && projects.length > 0"
           class="flex flex-col sm:flex-row gap-3"
@@ -237,7 +237,7 @@ const getEngineIcon = (engine: string) => {
           />
         </div>
 
-        <!-- Loading state avec skeletons de cartes -->
+        <!-- Loading state with card skeletons -->
         <div
           v-if="isLoadingList"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
@@ -260,7 +260,7 @@ const getEngineIcon = (engine: string) => {
           </div>
         </div>
 
-        <!-- Liste vide (seulement après le premier chargement) -->
+        <!-- Empty list (only after first load) -->
         <div
           v-else-if="hasLoadedOnce && projects.length === 0"
           class="text-center py-12 bg-default rounded-lg border border-default"
@@ -277,7 +277,7 @@ const getEngineIcon = (engine: string) => {
           </p>
         </div>
 
-        <!-- Aucun résultat de recherche -->
+        <!-- No search results -->
         <div
           v-else-if="hasLoadedOnce && projects.length > 0 && filteredProjects.length === 0"
           class="text-center py-12 bg-default rounded-lg border border-default"
@@ -301,7 +301,7 @@ const getEngineIcon = (engine: string) => {
           </UButton>
         </div>
 
-        <!-- Grille de projets -->
+        <!-- Projects grid -->
         <div
           v-else
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
@@ -360,7 +360,7 @@ const getEngineIcon = (engine: string) => {
               </div>
             </div>
 
-            <!-- Bouton ouvrir en bas -->
+            <!-- Open button at bottom -->
             <UButton
               class="w-full mt-4"
               variant="soft"
@@ -373,10 +373,10 @@ const getEngineIcon = (engine: string) => {
       </div>
     </div>
 
-    <!-- Modal de création de projet -->
+    <!-- New project creation modal -->
     <CanvasNewProjectModal v-model:open="showNewProjectModal" />
 
-    <!-- Modal de confirmation de suppression -->
+    <!-- Delete confirmation modal -->
     <UModal v-model:open="showDeleteModal">
       <template #header>
         <div class="flex items-center gap-2 text-error">
@@ -410,7 +410,7 @@ const getEngineIcon = (engine: string) => {
       </template>
     </UModal>
 
-    <!-- Modal de renommage -->
+    <!-- Rename modal -->
     <UModal
       v-model:open="showRenameModal"
       :title="t('project.rename')"
@@ -450,6 +450,6 @@ const getEngineIcon = (engine: string) => {
 
 <style scoped>
 .welcome-screen {
-  height: calc(100vh - 3.5rem); /* 3.5rem = h-14 de la navbar */
+  height: calc(100vh - 3.5rem); /* 3.5rem = h-14 of the navbar */
 }
 </style>

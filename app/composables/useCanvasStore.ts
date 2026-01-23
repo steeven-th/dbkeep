@@ -10,23 +10,23 @@ import type {
 import { DEFAULT_TABLE_COLOR, DEFAULT_GROUP_COLOR, DEFAULT_NOTE_COLOR } from '~/types/database'
 
 /**
- * Store pour la gestion de l'état du canvas Vue Flow
- * Gère les nodes (tables, groupes) et edges (relations)
+ * Store for managing Vue Flow canvas state
+ * Manages nodes (tables, groups) and edges (relations)
  */
 export const useCanvasStore = () => {
-  // État des noeuds Vue Flow
+  // Vue Flow nodes state
   const nodes = useState<Node[]>('canvasNodes', () => [])
 
-  // État des edges Vue Flow
+  // Vue Flow edges state
   const edges = useState<Edge[]>('canvasEdges', () => [])
 
-  // Compteur pour les positions par défaut
+  // Counter for default positions
   const nodeCounter = useState<number>('nodeCounter', () => 0)
 
   // === Helpers ===
 
   /**
-   * Calcule la prochaine position pour un nouveau noeud
+   * Calculates the next position for a new node
    */
   const getNextNodePosition = (): NodePosition => {
     const offset = nodeCounter.value * 30
@@ -37,19 +37,19 @@ export const useCanvasStore = () => {
     }
   }
 
-  // === Synchronisation avec le Project Store ===
+  // === Project Store Synchronization ===
 
   /**
-   * Synchronise l'état du canvas depuis un projet
-   * Restaure les positions, parentNode et styles sauvegardés
+   * Synchronizes canvas state from a project
+   * Restores saved positions, parentNode and styles
    */
   const syncFromProject = async (project: Project) => {
     nodeCounter.value = 0
 
-    // Construire tous les nodes avec parentNode directement inclus
+    // Build all nodes with parentNode directly included
     const allNodes: Node[] = []
 
-    // Ajouter les groupes d'abord
+    // Add groups first
     project.groups.forEach((group, index) => {
       const position = group.position || {
         x: 50 + index * 450,
@@ -64,7 +64,7 @@ export const useCanvasStore = () => {
       allNodes.push(node)
     })
 
-    // Ajouter les notes (zIndex 500 : entre groupes et tables)
+    // Add notes (zIndex 500: between groups and tables)
     if (project.notes) {
       project.notes.forEach((note, index) => {
         const position = note.position || {
@@ -81,14 +81,14 @@ export const useCanvasStore = () => {
       })
     }
 
-    // Ajouter les tables avec parentNode
+    // Add tables with parentNode
     project.tables.forEach((table, index) => {
       const position = table.position || {
         x: 100 + index * 300,
         y: 150
       }
 
-      // Créer le node avec parentNode directement dans l'objet
+      // Create node with parentNode directly in the object
       const node: Node = {
         id: table.id,
         type: 'dbTable',
@@ -101,7 +101,7 @@ export const useCanvasStore = () => {
       allNodes.push(node)
     })
 
-    // Créer les edges
+    // Create edges
     const newEdges: Edge[] = []
     project.relations.forEach((relation) => {
       const sourceNode = allNodes.find(n => n.id === relation.sourceTableId)
@@ -120,23 +120,23 @@ export const useCanvasStore = () => {
       }
     })
 
-    // Assigner en une seule fois
+    // Assign all at once
     nodes.value = allNodes
     edges.value = newEdges
   }
 
   /**
-   * Met à jour uniquement les données des tables sans recréer les nodes
-   * Préserve les positions et parentNode existants
+   * Updates only table data without recreating nodes
+   * Preserves existing positions and parentNode
    */
   const updateTablesData = (tables: TableData[]) => {
-    // Modifier directement les propriétés data des nodes existants
-    // Sans toucher au tableau lui-même pour éviter que Vue Flow réagisse
+    // Directly modify data properties of existing nodes
+    // Without touching the array itself to prevent Vue Flow from reacting
     for (const node of nodes.value) {
       if (node.type === 'dbTable') {
         const updatedTable = tables.find(t => t.id === node.id)
         if (updatedTable) {
-          // Mettre à jour les propriétés de data une par une
+          // Update data properties one by one
           Object.assign(node.data, updatedTable)
         }
       }
@@ -144,7 +144,7 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Met à jour les edges depuis les relations
+   * Updates edges from relations
    */
   const updateEdgesFromRelations = (relations: import('~/types/database').Relation[]) => {
     const newEdges: Edge[] = relations.map(relation => ({
@@ -156,7 +156,7 @@ export const useCanvasStore = () => {
       targetHandle: `${relation.targetColumnId}-target`,
       data: relation
     })).filter(edge => {
-      // Vérifier que les nodes source et target existent
+      // Verify that source and target nodes exist
       return nodes.value.some(n => n.id === edge.source) &&
              nodes.value.some(n => n.id === edge.target)
     })
@@ -164,11 +164,11 @@ export const useCanvasStore = () => {
     edges.value = newEdges
   }
 
-  // === Actions Nodes ===
+  // === Node Actions ===
 
   /**
-   * Crée un noeud table Vue Flow
-   * zIndex élevé pour que les tables soient toujours au-dessus des groupes
+   * Creates a Vue Flow table node
+   * High zIndex so tables are always above groups
    */
   const createTableNode = (table: TableData, position?: NodePosition): Node => ({
     id: table.id,
@@ -179,8 +179,8 @@ export const useCanvasStore = () => {
   })
 
   /**
-   * Crée un noeud groupe Vue Flow
-   * zIndex bas pour que les groupes soient toujours derrière les tables
+   * Creates a Vue Flow group node
+   * Low zIndex so groups are always behind tables
    */
   const createGroupNode = (group: GroupData, position?: NodePosition): Node => ({
     id: group.id,
@@ -195,8 +195,8 @@ export const useCanvasStore = () => {
   })
 
   /**
-   * Crée un noeud note Vue Flow
-   * zIndex intermédiaire (500) pour être devant les groupes mais derrière les tables
+   * Creates a Vue Flow note node
+   * Intermediate zIndex (500) to be in front of groups but behind tables
    */
   const createNoteNode = (note: NoteData, position?: NodePosition): Node => ({
     id: note.id,
@@ -211,7 +211,7 @@ export const useCanvasStore = () => {
   })
 
   /**
-   * Ajoute un noeud table au canvas
+   * Adds a table node to the canvas
    */
   const addTableNode = (table: TableData, position?: NodePosition): Node => {
     const node = createTableNode(table, position)
@@ -220,7 +220,7 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Ajoute un noeud groupe au canvas
+   * Adds a group node to the canvas
    */
   const addGroupNode = (group: GroupData, position?: NodePosition): Node => {
     const node = createGroupNode(group, position)
@@ -229,7 +229,7 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Ajoute un noeud note au canvas
+   * Adds a note node to the canvas
    */
   const addNoteNode = (note: NoteData, position?: NodePosition): Node => {
     const node = createNoteNode(note, position)
@@ -238,8 +238,8 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Met à jour la position d'un noeud
-   * Force la réactivité en réassignant le tableau pour que Vue Flow détecte le changement
+   * Updates a node's position
+   * Forces reactivity by reassigning the array so Vue Flow detects the change
    */
   const updateNodePosition = (nodeId: string, position: NodePosition) => {
     nodes.value = nodes.value.map((node) => {
@@ -254,13 +254,13 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Met à jour les données d'un noeud
-   * Force la réactivité en réassignant le tableau pour que Vue Flow détecte le changement
+   * Updates a node's data
+   * Forces reactivity by reassigning the array so Vue Flow detects the change
    */
   const updateNodeData = (nodeId: string, data: Partial<TableData | GroupData>) => {
     const nodeIndex = nodes.value.findIndex(n => n.id === nodeId)
     if (nodeIndex !== -1) {
-      // Créer un nouveau tableau pour forcer Vue Flow à détecter le changement
+      // Create a new array to force Vue Flow to detect the change
       nodes.value = nodes.value.map((node, index) => {
         if (index === nodeIndex) {
           return {
@@ -277,8 +277,8 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Met à jour le style d'un noeud (pour les groupes redimensionnés)
-   * Force la réactivité en réassignant le tableau pour que Vue Flow détecte le changement
+   * Updates a node's style (for resized groups)
+   * Forces reactivity by reassigning the array so Vue Flow detects the change
    */
   const updateNodeStyle = (nodeId: string, style: Record<string, string>) => {
     nodes.value = nodes.value.map((node) => {
@@ -296,21 +296,21 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Supprime un noeud du canvas
+   * Removes a node from the canvas
    */
   const removeNode = (nodeId: string) => {
     nodes.value = nodes.value.filter(n => n.id !== nodeId)
 
-    // Supprimer aussi les edges connectés à ce noeud
+    // Also remove edges connected to this node
     edges.value = edges.value.filter(
       e => e.source !== nodeId && e.target !== nodeId
     )
   }
 
   /**
-   * Assigne un noeud à un groupe (nested nodes)
-   * Force la réactivité en réassignant le tableau pour que Vue Flow détecte le changement
-   * Note: On n'utilise pas extent: 'parent' pour permettre de sortir la table du groupe en la déplaçant
+   * Assigns a node to a group (nested nodes)
+   * Forces reactivity by reassigning the array so Vue Flow detects the change
+   * Note: We don't use extent: 'parent' to allow moving the table out of the group by dragging
    */
   const assignToGroup = (nodeId: string, groupId: string | null) => {
     nodes.value = nodes.value.map((node) => {
@@ -321,7 +321,7 @@ export const useCanvasStore = () => {
             parentNode: groupId
           }
         } else {
-          // Retirer du groupe
+          // Remove from group
           const { parentNode, extent, ...rest } = node
           return rest as Node
         }
@@ -331,26 +331,26 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Récupère un noeud par son ID
+   * Gets a node by its ID
    */
   const getNode = (nodeId: string): Node | undefined => {
     return nodes.value.find(n => n.id === nodeId)
   }
 
   /**
-   * Récupère tous les noeuds enfants d'un groupe
+   * Gets all child nodes of a group
    */
   const getGroupChildren = (groupId: string): Node[] => {
     return nodes.value.filter(n => n.parentNode === groupId)
   }
 
-  // === Actions Edges ===
+  // === Edge Actions ===
 
   /**
-   * Crée un edge relation Vue Flow
+   * Creates a Vue Flow relation edge
    */
   const createRelationEdge = (relation: Relation): Edge | null => {
-    // Vérifier que les tables existent
+    // Verify that tables exist
     const sourceNode = nodes.value.find(n => n.id === relation.sourceTableId)
     const targetNode = nodes.value.find(n => n.id === relation.targetTableId)
 
@@ -368,7 +368,7 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Ajoute un edge au canvas
+   * Adds an edge to the canvas
    */
   const addEdge = (relation: Relation): Edge | null => {
     const edge = createRelationEdge(relation)
@@ -379,8 +379,8 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Met à jour un edge existant
-   * Force la réactivité en réassignant le tableau pour que Vue Flow détecte le changement
+   * Updates an existing edge
+   * Forces reactivity by reassigning the array so Vue Flow detects the change
    */
   const updateEdge = (edgeId: string, updates: Partial<Relation>) => {
     edges.value = edges.value.map((edge) => {
@@ -398,23 +398,23 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Supprime un edge du canvas
+   * Removes an edge from the canvas
    */
   const removeEdge = (edgeId: string) => {
     edges.value = edges.value.filter(e => e.id !== edgeId)
   }
 
   /**
-   * Récupère un edge par son ID
+   * Gets an edge by its ID
    */
   const getEdge = (edgeId: string): Edge | undefined => {
     return edges.value.find(e => e.id === edgeId)
   }
 
-  // === Actions Batch ===
+  // === Batch Actions ===
 
   /**
-   * Réinitialise complètement le canvas
+   * Completely resets the canvas
    */
   const clearCanvas = () => {
     nodes.value = []
@@ -423,30 +423,30 @@ export const useCanvasStore = () => {
   }
 
   /**
-   * Applique les changements de nodes depuis Vue Flow
+   * Applies node changes from Vue Flow
    */
   const applyNodeChanges = (changes: Node[]) => {
     nodes.value = changes
   }
 
   /**
-   * Applique les changements d'edges depuis Vue Flow
+   * Applies edge changes from Vue Flow
    */
   const applyEdgeChanges = (changes: Edge[]) => {
     edges.value = changes
   }
 
   return {
-    // État
+    // State
     nodes,
     edges,
 
-    // Synchronisation
+    // Synchronization
     syncFromProject,
     updateTablesData,
     updateEdgesFromRelations,
 
-    // Actions Nodes
+    // Node Actions
     addTableNode,
     addGroupNode,
     addNoteNode,
@@ -458,13 +458,13 @@ export const useCanvasStore = () => {
     getNode,
     getGroupChildren,
 
-    // Actions Edges
+    // Edge Actions
     addEdge,
     updateEdge,
     removeEdge,
     getEdge,
 
-    // Actions Batch
+    // Batch Actions
     clearCanvas,
     applyNodeChanges,
     applyEdgeChanges,
