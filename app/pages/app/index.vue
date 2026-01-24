@@ -11,6 +11,9 @@ const { projects, isLoadingList, hasLoadedOnce, fetchProjects, deleteProject, cl
 // New project modal state
 const showNewProjectModal = ref(false)
 
+// Import modal state
+const showImportModal = ref(false)
+
 // Search and filter state
 const searchQuery = ref('')
 const selectedEngine = ref<string | null>(null)
@@ -142,36 +145,6 @@ const handleRenameProject = async () => {
     isRenaming.value = false
   }
 }
-
-/**
- * Formats a relative date
- */
-const formatDate = (date: Date | string) => {
-  const d = new Date(date)
-  return d.toLocaleDateString(undefined, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-/**
- * Returns the database engine icon
- */
-const getEngineIcon = (engine: string) => {
-  switch (engine) {
-    case 'PostgreSQL':
-      return 'i-simple-icons-postgresql'
-    case 'MySQL':
-      return 'i-simple-icons-mysql'
-    case 'SQLite':
-      return 'i-simple-icons-sqlite'
-    default:
-      return 'i-lucide-database'
-  }
-}
 </script>
 
 <template>
@@ -193,13 +166,23 @@ const getEngineIcon = (engine: string) => {
         <p class="text-muted text-lg">
           {{ t('project.welcome_message') }}
         </p>
-        <UButton
-          size="lg"
-          icon="i-lucide-plus"
-          @click="openNewProjectModal"
-        >
-          {{ t('sidebar.new_project') }}
-        </UButton>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <UButton
+            size="lg"
+            icon="i-lucide-plus"
+            @click="openNewProjectModal"
+          >
+            {{ t('sidebar.new_project') }}
+          </UButton>
+          <UButton
+            size="lg"
+            variant="outline"
+            icon="i-lucide-upload"
+            @click="showImportModal = true"
+          >
+            {{ t('import.button') }}
+          </UButton>
+        </div>
       </div>
 
       <!-- Liste des projets -->
@@ -219,10 +202,7 @@ const getEngineIcon = (engine: string) => {
         </div>
 
         <!-- Search bar and filters -->
-        <div
-          v-if="hasLoadedOnce && projects.length > 0"
-          class="flex flex-col sm:flex-row gap-3"
-        >
+        <div class="flex flex-col sm:flex-row gap-3">
           <UInput
             v-model="searchQuery"
             :placeholder="t('project.search_placeholder')"
@@ -237,9 +217,9 @@ const getEngineIcon = (engine: string) => {
           />
         </div>
 
-        <!-- Loading state with card skeletons -->
+        <!-- Loading state with card skeletons (only when no projects yet) -->
         <div
-          v-if="isLoadingList"
+          v-if="isLoadingList && projects.length === 0"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           <div
@@ -306,69 +286,15 @@ const getEngineIcon = (engine: string) => {
           v-else
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
-          <div
+          <ProjectCard
             v-for="project in filteredProjects"
             :key="project.id"
-            class="bg-default rounded-lg border border-default p-4 hover:border-primary transition-colors group"
-          >
-            <div class="flex items-start justify-between mb-3">
-              <div class="flex items-center gap-2">
-                <UIcon
-                  :name="getEngineIcon(project.engine)"
-                  class="w-5 h-5 text-muted"
-                />
-                <h3 class="font-medium truncate">
-                  {{ project.name }}
-                </h3>
-              </div>
-              <UDropdownMenu
-                :items="[
-                  [{
-                    label: t('project.open'),
-                    icon: 'i-lucide-folder-open',
-                    onSelect: () => openProject(project.id)
-                  },
-                  {
-                    label: t('project.rename'),
-                    icon: 'i-lucide-pencil',
-                    onSelect: () => openRenameModal(project.id, project.name)
-                  }],
-                  [{
-                    label: t('project.delete'),
-                    icon: 'i-lucide-trash-2',
-                    color: 'error',
-                    onSelect: () => confirmDelete(project.id)
-                  }]
-                ]"
-              >
-                <UButton
-                  icon="i-lucide-more-vertical"
-                  variant="ghost"
-                  size="xs"
-                  class="opacity-0 group-hover:opacity-100 transition-opacity"
-                />
-              </UDropdownMenu>
-            </div>
-
-            <div class="text-xs text-muted space-y-1">
-              <div class="flex items-center gap-1">
-                <UIcon
-                  name="i-lucide-clock"
-                  class="w-3 h-3"
-                />
-                <span>{{ t('project.last_modified') }}: {{ formatDate(project.updatedAt) }}</span>
-              </div>
-            </div>
-
-            <!-- Open button at bottom -->
-            <UButton
-              class="w-full mt-4"
-              variant="soft"
-              @click="openProject(project.id)"
-            >
-              {{ t('project.open') }}
-            </UButton>
-          </div>
+            :project="project"
+            :always-show-menu="true"
+            @open="openProject"
+            @rename="openRenameModal"
+            @delete="confirmDelete"
+          />
         </div>
       </div>
     </div>
@@ -376,22 +302,16 @@ const getEngineIcon = (engine: string) => {
     <!-- New project creation modal -->
     <CanvasNewProjectModal v-model:open="showNewProjectModal" />
 
+    <!-- Import project modal -->
+    <ImportProjectModal v-model:open="showImportModal" />
+
     <!-- Delete confirmation modal -->
-    <UModal v-model:open="showDeleteModal">
-      <template #header>
-        <div class="flex items-center gap-2 text-error">
-          <UIcon
-            name="i-lucide-alert-triangle"
-            class="w-5 h-5"
-          />
-          <span class="font-semibold">{{ t('project.confirm_delete') }}</span>
-        </div>
-      </template>
-      <template #body>
-        <p class="text-muted">
-          {{ t('project.confirm_delete_description') }}
-        </p>
-      </template>
+    <UModal
+      v-model:open="showDeleteModal"
+      :title="t('project.confirm_delete')"
+      :description="t('project.confirm_delete_description')"
+      :icon="{ name: 'i-lucide-alert-triangle', class: 'text-error' }"
+    >
       <template #footer>
         <div class="flex justify-end gap-2">
           <UButton

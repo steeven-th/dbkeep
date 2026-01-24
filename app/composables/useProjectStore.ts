@@ -49,8 +49,9 @@ export const useProjectStore = () => {
 
   /**
    * Updates project metadata
+   * Note: id can be updated (e.g., after saving to database)
    */
-  const updateProject = (updates: Partial<Omit<Project, 'id' | 'createdAt'>>) => {
+  const updateProject = (updates: Partial<Omit<Project, 'createdAt'>>) => {
     if (!currentProject.value) return
 
     currentProject.value = {

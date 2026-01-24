@@ -79,7 +79,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
         class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
       >
         <img
-          src="/logo.svg"
+          src="/dbkeep-light.svg"
           alt="DBKeep"
           class="size-8"
         >

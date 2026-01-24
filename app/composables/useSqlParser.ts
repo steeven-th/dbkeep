@@ -776,14 +776,31 @@ export const useSqlParser = () => {
 
         const alterSpecs = Array.isArray(stmt.expr) ? stmt.expr : [stmt.expr]
         for (const spec of alterSpecs) {
-          if (spec?.action !== 'add') continue
+          // Check for ADD CONSTRAINT action
+          const action = String(spec?.action || spec?.keyword || '').toLowerCase()
+          if (action !== 'add') continue
 
-          const constraintType = String(spec?.constraint_type || '').toUpperCase()
+          // Check constraint type - could be in different properties
+          const constraintType = String(
+            spec?.constraint_type
+            || spec?.create_definitions?.constraint_type
+            || spec?.constraint?.type
+            || ''
+          ).toUpperCase()
+
           if (!constraintType.includes('FOREIGN')) continue
 
-          const sourceColName = extractStringValue(spec.definition?.[0])
-          const targetTableName = extractStringValue(spec.reference?.table?.[0] || spec.reference?.table)
-          const targetColName = extractStringValue(spec.reference?.definition?.[0])
+          // Extract source column - could be in different locations
+          const sourceColName = extractStringValue(
+            spec.definition?.[0]
+            || spec.create_definitions?.definition?.[0]
+            || spec.constraint?.definition?.[0]
+          )
+
+          // Extract reference info
+          const refDef = spec.reference_definition || spec.reference || spec.create_definitions?.reference_definition
+          const targetTableName = extractStringValue(refDef?.table?.[0] || refDef?.table)
+          const targetColName = extractStringValue(refDef?.definition?.[0] || refDef?.columns?.[0])
 
           if (!sourceColName || !targetTableName || !targetColName) continue
 
@@ -800,15 +817,34 @@ export const useSqlParser = () => {
           let onDelete: 'CASCADE' | 'SET NULL' | 'RESTRICT' | 'NO ACTION' = 'NO ACTION'
           let onUpdate: 'CASCADE' | 'SET NULL' | 'RESTRICT' | 'NO ACTION' = 'NO ACTION'
 
-          if (spec.reference?.on_delete) {
-            const action = spec.reference.on_delete.toUpperCase()
+          // Extract ON DELETE and ON UPDATE from on_action array (PostgreSQL format)
+          if (refDef?.on_action && Array.isArray(refDef.on_action)) {
+            for (const action of refDef.on_action) {
+              const actionType = String(action.type || '').toLowerCase()
+              const actionValue = extractStringValue(action.value)?.toUpperCase()
+
+              if (actionType.includes('delete') && actionValue) {
+                if (actionValue === 'CASCADE') onDelete = 'CASCADE'
+                else if (actionValue === 'SET NULL') onDelete = 'SET NULL'
+                else if (actionValue === 'RESTRICT') onDelete = 'RESTRICT'
+              } else if (actionType.includes('update') && actionValue) {
+                if (actionValue === 'CASCADE') onUpdate = 'CASCADE'
+                else if (actionValue === 'SET NULL') onUpdate = 'SET NULL'
+                else if (actionValue === 'RESTRICT') onUpdate = 'RESTRICT'
+              }
+            }
+          }
+
+          // Fallback to legacy properties
+          if (onDelete === 'NO ACTION' && refDef?.on_delete) {
+            const action = refDef.on_delete.toUpperCase()
             if (action === 'CASCADE') onDelete = 'CASCADE'
             else if (action === 'SET NULL') onDelete = 'SET NULL'
             else if (action === 'RESTRICT') onDelete = 'RESTRICT'
           }
 
-          if (spec.reference?.on_update) {
-            const action = spec.reference.on_update.toUpperCase()
+          if (onUpdate === 'NO ACTION' && refDef?.on_update) {
+            const action = refDef.on_update.toUpperCase()
             if (action === 'CASCADE') onUpdate = 'CASCADE'
             else if (action === 'SET NULL') onUpdate = 'SET NULL'
             else if (action === 'RESTRICT') onUpdate = 'RESTRICT'

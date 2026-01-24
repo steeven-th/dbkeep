@@ -77,7 +77,12 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: 'dbkeep',
     useSecureCookies: process.env.NODE_ENV === 'production'
-  }
+  },
+
+  // Trusted origins (for development with multiple ports)
+  trustedOrigins: process.env.NODE_ENV !== 'production'
+    ? ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002']
+    : undefined
 })
 
 // Session type

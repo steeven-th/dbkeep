@@ -59,19 +59,31 @@ export const useProjects = () => {
 
   /**
    * Creates a new project and saves it to database
+   * @param name Project name
+   * @param engine Database engine
+   * @param initialData Optional initial data for import
    */
-  const createProject = async (name: string, engine: DatabaseEngine) => {
+  const createProject = async (
+    name: string,
+    engine: DatabaseEngine,
+    initialData?: {
+      tables?: Project['tables']
+      groups?: Project['groups']
+      notes?: Project['notes']
+      relations?: Project['relations']
+    }
+  ) => {
     isSaving.value = true
     try {
       // Create project locally first
       const localProject = projectStore.createProject(name, engine)
 
-      // Prepare data for API
+      // Use initial data if provided (for import), otherwise use local project data
       const projectData = {
-        tables: localProject.tables,
-        groups: localProject.groups,
-        notes: localProject.notes,
-        relations: localProject.relations
+        tables: initialData?.tables ?? localProject.tables,
+        groups: initialData?.groups ?? localProject.groups,
+        notes: initialData?.notes ?? localProject.notes,
+        relations: initialData?.relations ?? localProject.relations
       }
 
       // Save to database
@@ -84,14 +96,18 @@ export const useProjects = () => {
         }
       })
 
-      // Update local project ID with database ID
+      // Update local project with database ID and imported data
       projectStore.updateProject({
         id: savedProject.id,
         name: savedProject.name,
-        engine: savedProject.engine as DatabaseEngine
+        engine: savedProject.engine as DatabaseEngine,
+        tables: projectData.tables,
+        groups: projectData.groups,
+        notes: projectData.notes,
+        relations: projectData.relations
       })
 
-      // Sync canvas
+      // Sync canvas with the updated project
       await canvasStore.syncFromProject(projectStore.currentProject.value!)
 
       // Refresh project list

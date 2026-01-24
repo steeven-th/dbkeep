@@ -20,6 +20,7 @@ const { t } = useI18n()
 const toast = useToast()
 const colorMode = useColorMode()
 const { validateSql } = useSqlParser()
+const projectStore = useProjectStore()
 
 // Local SQL state (allows tracking manual modifications)
 const localSql = ref(props.modelValue)
@@ -37,7 +38,7 @@ const exportFormats = computed(() => [
     label: t('export.format_sql'),
     description: t('export.format_sql_description'),
     extension: '.sql',
-    available: false
+    available: true
   },
   {
     id: 'json',
@@ -45,7 +46,7 @@ const exportFormats = computed(() => [
     label: t('export.format_json'),
     description: t('export.format_json_description'),
     extension: '.json',
-    available: false
+    available: true
   },
   {
     id: 'pdf',
@@ -66,11 +67,96 @@ const exportFormats = computed(() => [
 ])
 
 /**
+ * Generates a safe filename from project name
+ */
+const getSafeFilename = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    || 'schema'
+}
+
+/**
+ * Downloads a file with the given content
+ */
+const downloadFile = (content: string, filename: string, mimeType: string) => {
+  const blob = new Blob([content], { type: mimeType })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+/**
  * Handles export for the selected format
  */
 const handleExport = (formatId: string) => {
-  // TODO: Implement export logic for each format
-  console.log('Export format:', formatId)
+  const projectName = projectStore.currentProject.value?.name || 'schema'
+  const safeFilename = getSafeFilename(projectName)
+
+  switch (formatId) {
+    case 'sql':
+      exportSql(safeFilename)
+      break
+    case 'json':
+      exportJson(safeFilename)
+      break
+  }
+
+  showExportModal.value = false
+}
+
+/**
+ * Exports the schema as SQL file
+ */
+const exportSql = (filename: string) => {
+  const projectName = projectStore.currentProject.value?.name
+  const header = projectName ? `-- ${projectName}\n\n` : ''
+  const content = header + localSql.value
+
+  downloadFile(content, `${filename}.sql`, 'application/sql')
+
+  toast.add({
+    title: t('export.success'),
+    color: 'success',
+    icon: 'i-lucide-check'
+  })
+}
+
+/**
+ * Exports the schema as JSON file
+ */
+const exportJson = (filename: string) => {
+  const project = projectStore.currentProject.value
+  if (!project) return
+
+  // Build export object with version for future compatibility
+  const exportData = {
+    version: '1.0',
+    exportedAt: new Date().toISOString(),
+    project: {
+      name: project.name,
+      engine: project.engine,
+      tables: project.tables,
+      groups: project.groups,
+      notes: project.notes,
+      relations: project.relations
+    }
+  }
+
+  const content = JSON.stringify(exportData, null, 2)
+  downloadFile(content, `${filename}.json`, 'application/json')
+
+  toast.add({
+    title: t('export.success'),
+    color: 'success',
+    icon: 'i-lucide-check'
+  })
 }
 
 // Reference to Monaco editor and model
