@@ -97,6 +97,8 @@ const openRenameModal = (projectId: string, currentName: string) => {
  * Renames the project
  */
 const handleRenameProject = async () => {
+  // Guard against double call (Enter triggers keyup then blur/click)
+  if (isRenaming.value) return
   if (!projectToRename.value || !newProjectName.value.trim()) return
 
   isRenaming.value = true

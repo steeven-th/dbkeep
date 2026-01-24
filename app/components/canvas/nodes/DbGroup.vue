@@ -48,6 +48,9 @@ const startEditingTitle = () => {
  * Saves the edited title
  */
 const saveTitle = () => {
+  // Guard against double call (Enter triggers keyup then blur)
+  if (!isEditingTitle.value) return
+
   if (editedTitle.value.trim()) {
     projectStore.updateGroup(props.id, { name: editedTitle.value.trim() })
     canvasStore.updateNodeData(props.id, { name: editedTitle.value.trim() })
