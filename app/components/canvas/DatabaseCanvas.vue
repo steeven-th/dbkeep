@@ -35,8 +35,8 @@ const viewportToRestore = ref<{ x: number; y: number; zoom: number } | null>(nul
 
 // Auto-save with debounce (2 seconds after last modification)
 const debouncedSave = useDebounceFn(async () => {
-  // Don't save if in preview mode (temporary data)
-  if (previewMode.value) {
+  // Don't save if in read-only mode (viewer role) or preview mode (temporary data)
+  if (canvasReadOnly.value || previewMode.value) {
     return
   }
   if (projectStore.currentProject.value?.id) {
@@ -56,8 +56,8 @@ watch(
   () => projectStore.currentProject.value?.updatedAt,
   () => {
     if (projectStore.currentProject.value?.id) {
-      // Skip if in preview mode (temporary data should not be saved)
-      if (previewMode.value) {
+      // Skip if in read-only mode (viewer role) or preview mode (temporary data)
+      if (canvasReadOnly.value || previewMode.value) {
         return
       }
       // Skip if a save was performed in the last 3 seconds
