@@ -22,6 +22,7 @@ export const useProjects = () => {
   const toast = useToast()
   const { t } = useI18n()
   const { parseError } = useAppError()
+  const { user } = useAuth()
 
   // User's project list
   const projects = useState<ProjectListItem[]>('projects-list', () => [])
@@ -301,6 +302,31 @@ export const useProjects = () => {
     projectStore.closeProject()
     canvasStore.clearCanvas()
   }
+
+  /**
+   * Resets the project list (used when user changes)
+   */
+  const resetProjectsList = () => {
+    projects.value = []
+    hasLoadedOnce.value = false
+  }
+
+  // Reset projects when user changes or logs out
+  watch(
+    () => user.value,
+    (newUser, oldUser) => {
+      // Logout: clear everything
+      if (!newUser) {
+        resetProjectsList()
+        return
+      }
+
+      // User changed: reset and let the page reload
+      if (oldUser && oldUser.id !== newUser.id) {
+        resetProjectsList()
+      }
+    }
+  )
 
   return {
     // State
