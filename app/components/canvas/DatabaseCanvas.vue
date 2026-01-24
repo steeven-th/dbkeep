@@ -20,6 +20,10 @@ const toast = useToast()
 // Read-only mode injected by parent (project page)
 const canvasReadOnly = inject<Ref<boolean>>('canvasReadOnly', ref(false))
 
+// Preview mode injected by parent - when true, auto-save is disabled
+// Useful when displaying temporary data that should not be persisted
+const previewMode = inject<Ref<boolean>>('versionPreviewMode', ref(false))
+
 // Key to force Vue Flow re-render
 const vueFlowKey = ref(0)
 
@@ -31,6 +35,10 @@ const viewportToRestore = ref<{ x: number; y: number; zoom: number } | null>(nul
 
 // Auto-save with debounce (2 seconds after last modification)
 const debouncedSave = useDebounceFn(async () => {
+  // Don't save if in preview mode (temporary data)
+  if (previewMode.value) {
+    return
+  }
   if (projectStore.currentProject.value?.id) {
     const success = await saveProject()
     if (success) {
@@ -48,6 +56,10 @@ watch(
   () => projectStore.currentProject.value?.updatedAt,
   () => {
     if (projectStore.currentProject.value?.id) {
+      // Skip if in preview mode (temporary data should not be saved)
+      if (previewMode.value) {
+        return
+      }
       // Skip if a save was performed in the last 3 seconds
       // (avoids double saves after applying SQL changes)
       const timeSinceLastSave = Date.now() - lastSaveTime.value
@@ -389,6 +401,9 @@ defineExpose({
       :delete-key-code="null"
       :elements-selectable="true"
       :selection-mode="SelectionMode.Partial"
+      :nodes-draggable="!canvasReadOnly"
+      :nodes-connectable="!canvasReadOnly"
+      :edges-updatable="!canvasReadOnly"
       class="bg-muted"
       @keydown="handleKeyDown"
     >

@@ -93,8 +93,9 @@ const backgroundColor = computed(() => {
     }"
     @dblclick="openGroupEditor"
   >
-    <!-- Resize component -->
+    <!-- Resize component (hidden in read-only mode) -->
     <NodeResizer
+      v-if="!canvasReadOnly"
       :min-width="250"
       :min-height="150"
     />

@@ -108,8 +108,9 @@ const textColor = computed(() => {
     }"
     @dblclick="openNoteEditor"
   >
-    <!-- Resize component -->
+    <!-- Resize component (hidden in read-only mode) -->
     <NodeResizer
+      v-if="!canvasReadOnly"
       :min-width="150"
       :min-height="80"
     />
