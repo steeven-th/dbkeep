@@ -219,7 +219,7 @@ const handleRenameProject = async () => {
         <!-- Empty list (only after first load) -->
         <div
           v-else-if="hasLoadedOnce && projects.length === 0"
-          class="text-center py-12 bg-default rounded-lg border border-default"
+          class="text-center py-12 px-4 bg-default rounded-lg border border-default"
         >
           <UIcon
             name="i-lucide-folder-open"

@@ -2,12 +2,12 @@
 import type { DropdownMenuItem } from '@nuxt/ui'
 
 const emit = defineEmits<{
-  'open-new-project': []
   'open-profile': []
 }>()
 
 const router = useRouter()
-const { t } = useI18n()
+const colorMode = useColorMode()
+const { t, locale, setLocale } = useI18n()
 const { user, logout, isAuthenticated, isLoading: isAuthLoading } = useAuth()
 const { isGuestModeEnabled, guestUser } = useAppMode()
 
@@ -28,6 +28,26 @@ const isEffectivelyAuthenticated = computed(() => {
 const goToProjectList = () => {
   router.push('/app')
 }
+
+// Toggle theme (light/dark)
+const toggleTheme = () => {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
+
+// Toggle language (fr/en)
+const toggleLanguage = () => {
+  setLocale(locale.value === 'fr' ? 'en' : 'fr')
+}
+
+// Flag icon for target language (the one we'll switch TO)
+const targetLanguageFlag = computed(() => {
+  return locale.value === 'fr' ? '🇺🇸' : '🇫🇷'
+})
+
+// Theme icon based on current mode
+const themeIcon = computed(() => {
+  return colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'
+})
 
 // User dropdown menu items (adapted based on mode)
 const userMenuItems = computed<DropdownMenuItem[][]>(() => {
@@ -72,68 +92,42 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
 
 <template>
   <header class="h-14 border-b border-default bg-default flex items-center px-4 shrink-0">
-    <!-- Logo on the left -->
+    <!-- Logo and navigation on the left -->
     <div class="flex items-center gap-2">
       <NuxtLink
         to="/"
-        class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+        class="flex items-center cursor-pointer hover:opacity-80 transition-opacity pe-1.5"
       >
         <img
           src="/dbkeep-light.svg"
           alt="DBKeep"
           class="size-8"
         >
-        <span class="font-bold text-lg hidden sm:inline">
-          {{ $t('app_name') }}
-        </span>
       </NuxtLink>
 
-      <!-- Slot for additional elements (e.g., WorkspaceSwitcher) -->
-      <slot name="after-logo" />
-    </div>
-
-    <!-- Center actions -->
-    <div class="flex-1 flex items-center justify-center gap-2">
+      <!-- Home button -->
       <ClientOnly>
         <UButton
           icon="i-lucide-home"
           variant="ghost"
           color="neutral"
+          size="sm"
           @click="goToProjectList"
         />
-        <UButton
-          icon="i-lucide-plus"
-          variant="soft"
-          color="primary"
-          @click="$emit('open-new-project')"
-        />
         <template #fallback>
-          <div class="flex gap-2">
-            <div class="size-8 rounded bg-muted" />
-            <div class="size-8 rounded bg-muted" />
-          </div>
+          <div class="size-8 rounded bg-muted" />
         </template>
       </ClientOnly>
+
+      <!-- Slot for additional elements (e.g., WorkspaceSwitcher) -->
+      <slot name="after-logo" />
     </div>
+
+    <!-- Spacer -->
+    <div class="flex-1" />
 
     <!-- Right actions -->
     <div class="flex items-center gap-2">
-      <!-- Theme selector -->
-      <ClientOnly>
-        <UColorModeButton />
-        <template #fallback>
-          <div class="size-8" />
-        </template>
-      </ClientOnly>
-
-      <!-- Language selector -->
-      <ClientOnly>
-        <LanguageSwitcher />
-        <template #fallback>
-          <div class="size-8" />
-        </template>
-      </ClientOnly>
-
       <!-- User menu -->
       <ClientOnly>
         <!-- Skeleton during loading (except in guest mode) -->
@@ -154,6 +148,29 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
               :ui="{ fallback: 'text-white' }"
             />
           </button>
+
+          <!-- Theme and language toggles at the top of the dropdown -->
+          <template #header>
+            <div class="flex items-center justify-center gap-2 px-2 py-1.5 border-b border-default">
+              <!-- Theme toggle -->
+              <UButton
+                :icon="themeIcon"
+                variant="ghost"
+                color="neutral"
+                size="sm"
+                @click="toggleTheme"
+              />
+              <!-- Language toggle (flag of target language) -->
+              <UButton
+                variant="ghost"
+                color="neutral"
+                size="sm"
+                @click="toggleLanguage"
+              >
+                <span class="text-base">{{ targetLanguageFlag }}</span>
+              </UButton>
+            </div>
+          </template>
         </UDropdownMenu>
 
         <!-- SSR Fallback -->
