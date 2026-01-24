@@ -76,6 +76,7 @@ const {
   onConnect,
   onNodeDragStop,
   onNodesInitialized,
+  onNodesChange,
   fitView,
   getNodes,
   getSelectedNodes,
@@ -105,6 +106,33 @@ onNodesInitialized(() => {
   setTimeout(() => {
     fitView({ padding: 0.3, maxZoom: 1 })
   }, 50)
+})
+
+// Timers for debouncing auto-assignment after resize
+const resizeDebounceTimers = ref<Map<string, ReturnType<typeof setTimeout>>>(new Map())
+
+// Handle node changes (dimensions, position, etc.)
+onNodesChange((changes) => {
+  for (const change of changes) {
+    // Handle dimension changes (resize) for groups
+    // Check for 'resizing' property which is set by NodeResizer
+    if (change.type === 'dimensions' && 'resizing' in change && change.resizing === false) {
+      // Resize just ended (resizing changed from true to false)
+      const node = getNodes.value.find(n => n.id === change.id)
+      if (node?.type === 'dbGroup') {
+        // Debounce auto-assignment to avoid multiple calls
+        const existingTimer = resizeDebounceTimers.value.get(change.id)
+        if (existingTimer) {
+          clearTimeout(existingTimer)
+        }
+        const timer = setTimeout(() => {
+          autoAssignNodesToGroup(change.id)
+          resizeDebounceTimers.value.delete(change.id)
+        }, 100)
+        resizeDebounceTimers.value.set(change.id, timer)
+      }
+    }
+  }
 })
 
 // Custom node types (markRaw to avoid reactivity)
@@ -164,7 +192,28 @@ onConnect((connection: Connection) => {
 })
 
 /**
- * Checks if a point is within the bounds of a group
+ * Checks if a node is completely within the bounds of a group
+ */
+const isCompletelyInsideGroup = (
+  nodePosition: { x: number; y: number },
+  nodeWidth: number,
+  nodeHeight: number,
+  group: GraphNode
+): boolean => {
+  const groupWidth = parseFloat(group.style?.width as string) || 400
+  const groupHeight = parseFloat(group.style?.height as string) || 300
+
+  // Check if all 4 corners of the node are within the group bounds
+  return (
+    nodePosition.x >= group.position.x &&
+    nodePosition.y >= group.position.y &&
+    nodePosition.x + nodeWidth <= group.position.x + groupWidth &&
+    nodePosition.y + nodeHeight <= group.position.y + groupHeight
+  )
+}
+
+/**
+ * Checks if a point is within the bounds of a group (center-based)
  */
 const isInsideGroup = (
   nodePosition: { x: number; y: number },
@@ -210,14 +259,73 @@ const findContainingGroup = (
 }
 
 /**
+ * Automatically assigns nodes (tables, notes) that are completely inside a group
+ * Called after a group is moved or resized
+ */
+const autoAssignNodesToGroup = (groupId: string) => {
+  const allNodes = getNodes.value
+  const group = allNodes.find(n => n.id === groupId && n.type === 'dbGroup')
+  if (!group) return
+
+  // Get all non-group nodes (tables and notes)
+  const assignableNodes = allNodes.filter(n =>
+    n.type === 'dbTable' || n.type === 'dbNote'
+  )
+
+  for (const node of assignableNodes) {
+    const nodeWidth = node.dimensions?.width || 200
+    const nodeHeight = node.dimensions?.height || 100
+
+    // Calculate absolute position of the node
+    let absolutePosition = { ...node.position }
+    if (node.parentNode && node.parentNode !== groupId) {
+      // Node is in another group, calculate its absolute position
+      const parentGroup = allNodes.find(n => n.id === node.parentNode)
+      if (parentGroup) {
+        absolutePosition = {
+          x: parentGroup.position.x + node.position.x,
+          y: parentGroup.position.y + node.position.y
+        }
+      }
+    } else if (node.parentNode === groupId) {
+      // Node is already in this group, calculate its absolute position
+      absolutePosition = {
+        x: group.position.x + node.position.x,
+        y: group.position.y + node.position.y
+      }
+    }
+
+    // Check if the node is completely inside this group
+    const isInside = isCompletelyInsideGroup(absolutePosition, nodeWidth, nodeHeight, group)
+
+    if (isInside && node.parentNode !== groupId) {
+      // Node should be assigned to this group
+      // Convert absolute position to relative position within group
+      const relativePosition = {
+        x: absolutePosition.x - group.position.x,
+        y: absolutePosition.y - group.position.y
+      }
+      canvasStore.assignToGroup(node.id, groupId)
+      canvasStore.updateNodePosition(node.id, relativePosition)
+    } else if (!isInside && node.parentNode === groupId) {
+      // Node is no longer inside this group, unassign it
+      canvasStore.assignToGroup(node.id, null)
+      canvasStore.updateNodePosition(node.id, absolutePosition)
+    }
+  }
+}
+
+/**
  * Updates node positions after drag
  * Also handles automatic group assignment (Nested Nodes)
  */
 onNodeDragStop((event) => {
   event.nodes.forEach((node) => {
-    // Don't process groups
+    // For groups, update position and auto-assign contained nodes
     if (node.type === 'dbGroup') {
       canvasStore.updateNodePosition(node.id, node.position)
+      // Auto-assign nodes that are now inside this group
+      autoAssignNodesToGroup(node.id)
       return
     }
 
