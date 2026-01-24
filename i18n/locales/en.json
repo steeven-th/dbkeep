@@ -84,7 +84,13 @@
     "last_modified": "Last modified",
     "created_by": "Created by",
     "back_to_list": "Back to project list",
-    "active_project": "Active project"
+    "active_project": "Active project",
+    "sort_updated_desc": "Recently modified",
+    "sort_updated_asc": "Oldest modified",
+    "sort_created_desc": "Recently created",
+    "sort_created_asc": "Oldest created",
+    "sort_name_asc": "Name A → Z",
+    "sort_name_desc": "Name Z → A"
   },
   "table": {
     "name": "Table name",

@@ -84,7 +84,13 @@
     "last_modified": "Dernière modification",
     "created_by": "Créé par",
     "back_to_list": "Retour à la liste des projets",
-    "active_project": "Projet actif"
+    "active_project": "Projet actif",
+    "sort_updated_desc": "Modifiés récemment",
+    "sort_updated_asc": "Modifiés anciens",
+    "sort_created_desc": "Créés récemment",
+    "sort_created_asc": "Créés anciens",
+    "sort_name_asc": "Nom A → Z",
+    "sort_name_desc": "Nom Z → A"
   },
   "table": {
     "name": "Nom de la table",

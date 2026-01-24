@@ -14,35 +14,16 @@ const showNewProjectModal = ref(false)
 // Import modal state
 const showImportModal = ref(false)
 
-// Search and filter state
-const searchQuery = ref('')
-const selectedEngine = ref<string | null>(null)
-
-// Engine filter options
-const engineOptions = computed(() => [
-  { label: t('project.all_engines'), value: null },
-  { label: 'PostgreSQL', value: 'PostgreSQL' },
-  { label: 'MySQL', value: 'MySQL' },
-  { label: 'SQLite', value: 'SQLite' }
-])
-
-// Filtered projects
-const filteredProjects = computed(() => {
-  let result = projects.value
-
-  // Filter by text search
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase().trim()
-    result = result.filter(p => p.name.toLowerCase().includes(query))
-  }
-
-  // Filter by engine
-  if (selectedEngine.value) {
-    result = result.filter(p => p.engine === selectedEngine.value)
-  }
-
-  return result
-})
+// Project filters (search, engine, sort)
+const {
+  searchQuery,
+  selectedEngine,
+  selectedSort,
+  sortOptions,
+  engineOptions,
+  filteredProjects,
+  clearFilters
+} = useProjectFilters(projects)
 
 // Delete confirmation modal state
 const projectToDelete = ref<string | null>(null)
@@ -202,20 +183,13 @@ const handleRenameProject = async () => {
         </div>
 
         <!-- Search bar and filters -->
-        <div class="flex flex-col sm:flex-row gap-3">
-          <UInput
-            v-model="searchQuery"
-            :placeholder="t('project.search_placeholder')"
-            icon="i-lucide-search"
-            class="flex-1"
-          />
-          <USelect
-            v-model="selectedEngine"
-            :items="engineOptions"
-            value-key="value"
-            class="w-full sm:w-48"
-          />
-        </div>
+        <ProjectFiltersBar
+          v-model:search="searchQuery"
+          v-model:engine="selectedEngine"
+          v-model:sort="selectedSort"
+          :sort-options="sortOptions"
+          :engine-options="engineOptions"
+        />
 
         <!-- Loading state with card skeletons (only when no projects yet) -->
         <div
@@ -275,7 +249,7 @@ const handleRenameProject = async () => {
           <UButton
             variant="soft"
             class="mt-4"
-            @click="searchQuery = ''; selectedEngine = null"
+            @click="clearFilters"
           >
             {{ t('project.clear_filters') }}
           </UButton>
