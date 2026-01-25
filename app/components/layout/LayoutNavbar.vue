@@ -39,14 +39,19 @@ const toggleLanguage = () => {
   setLocale(locale.value === 'fr' ? 'en' : 'fr')
 }
 
-// Flag icon for target language (the one we'll switch TO)
-const targetLanguageFlag = computed(() => {
-  return locale.value === 'fr' ? '🇺🇸' : '🇫🇷'
-})
-
-// Theme icon based on current mode
+// Theme icon based on current mode (shows icon for target mode)
 const themeIcon = computed(() => {
   return colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'
+})
+
+// Logo based on current theme (light logo on dark background and vice versa)
+const logoSrc = computed(() => {
+  return colorMode.value === 'dark' ? '/dbkeep-light.svg' : '/dbkeep-dark.svg'
+})
+
+// Target language icon (the one we'll switch TO)
+const targetLanguageIcon = computed(() => {
+  return locale.value === 'fr' ? 'i-circle-flags-us' : 'i-circle-flags-fr'
 })
 
 // User dropdown menu items (adapted based on mode)
@@ -99,7 +104,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
         class="flex items-center cursor-pointer hover:opacity-80 transition-opacity pe-1.5"
       >
         <img
-          src="/dbkeep-light.svg"
+          :src="logoSrc"
           alt="DBKeep"
           class="size-8"
         >
@@ -136,9 +141,27 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
           class="size-8 rounded-full"
         />
 
+        <!-- Theme toggle -->
+        <UButton
+          :icon="themeIcon"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          @click="toggleTheme"
+        />
+
+        <!-- Language toggle -->
+        <UButton
+          :icon="targetLanguageIcon"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          @click="toggleLanguage"
+        />
+
         <!-- Logged in user (real auth or guest mode) -->
         <UDropdownMenu
-          v-else-if="isEffectivelyAuthenticated"
+          v-if="isEffectivelyAuthenticated"
           :items="userMenuItems"
         >
           <button class="p-1 rounded-full hover:bg-elevated transition-colors cursor-pointer">
@@ -148,29 +171,6 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => {
               :ui="{ fallback: 'text-white' }"
             />
           </button>
-
-          <!-- Theme and language toggles at the top of the dropdown -->
-          <template #header>
-            <div class="flex items-center justify-center gap-2 px-2 py-1.5 border-b border-default">
-              <!-- Theme toggle -->
-              <UButton
-                :icon="themeIcon"
-                variant="ghost"
-                color="neutral"
-                size="sm"
-                @click="toggleTheme"
-              />
-              <!-- Language toggle (flag of target language) -->
-              <UButton
-                variant="ghost"
-                color="neutral"
-                size="sm"
-                @click="toggleLanguage"
-              >
-                <span class="text-base">{{ targetLanguageFlag }}</span>
-              </UButton>
-            </div>
-          </template>
         </UDropdownMenu>
 
         <!-- SSR Fallback -->
