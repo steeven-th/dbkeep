@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
+import { t, getValidLocale } from '../utils/i18n'
+import type { SupportedLocale } from '../utils/i18n'
 
 /**
  * Email sending service via SMTP
@@ -166,10 +168,10 @@ export async function testEmailConfiguration(): Promise<boolean> {
 /**
  * Generates the HTML wrapper for all emails
  */
-function emailWrapper(content: string, title: string): string {
+function emailWrapper(content: string, title: string, locale: SupportedLocale = 'en'): string {
   return `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="${locale}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -204,7 +206,7 @@ function emailWrapper(content: string, title: string): string {
           <tr>
             <td align="center">
               <p style="margin: 0; font-size: 13px; color: #a1a1aa;">
-                © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+                © ${new Date().getFullYear()} ${APP_NAME}. ${t(locale, 'email.footer')}
               </p>
             </td>
           </tr>
@@ -255,27 +257,29 @@ interface PasswordResetEmailData {
   to: string
   resetUrl: string
   expiresInMinutes?: number
+  locale?: string
 }
 
 /**
  * Sends a password reset email
  */
 export async function sendPasswordResetEmail(data: PasswordResetEmailData): Promise<SendEmailResult> {
+  const locale = getValidLocale(data.locale)
   const expiresIn = data.expiresInMinutes || 60
 
   const content = `
 <h2 style="margin: 0 0 16px; font-size: 20px; font-weight: 600; color: #18181b;">
-  Réinitialisation de votre mot de passe
+  ${t(locale, 'email.password_reset.title')}
 </h2>
 
 <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: #52525b;">
-  Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.
+  ${t(locale, 'email.password_reset.description')}
 </p>
 
-${emailButton(data.resetUrl, 'Réinitialiser mon mot de passe')}
+${emailButton(data.resetUrl, t(locale, 'email.password_reset.button'))}
 
 <p style="margin: 0 0 8px; font-size: 14px; color: #71717a;">
-  Ou copiez ce lien dans votre navigateur :
+  ${t(locale, 'email.link_fallback')}
 </p>
 <p style="margin: 0 0 24px; font-size: 14px; color: #2563eb; word-break: break-all;">
   ${data.resetUrl}
@@ -284,15 +288,15 @@ ${emailButton(data.resetUrl, 'Réinitialiser mon mot de passe')}
 <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 24px 0;">
 
 <p style="margin: 0; font-size: 13px; color: #a1a1aa;">
-  Ce lien expire dans ${expiresIn} minutes.
-  Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email.
+  ${t(locale, 'email.password_reset.expires_in', { minutes: expiresIn })}
+  ${t(locale, 'email.password_reset.ignore_notice')}
 </p>
 `
 
   return sendEmail({
     to: data.to,
-    subject: `Réinitialisation de votre mot de passe ${APP_NAME}`,
-    html: emailWrapper(content, 'Réinitialisation de mot de passe')
+    subject: t(locale, 'email.password_reset.subject', { app_name: APP_NAME }),
+    html: emailWrapper(content, t(locale, 'email.password_reset.title'), locale)
   })
 }
 
@@ -300,28 +304,32 @@ interface EmailVerificationData {
   to: string
   verifyUrl: string
   userName?: string
+  locale?: string
 }
 
 /**
  * Sends an email verification email
  */
 export async function sendEmailVerification(data: EmailVerificationData): Promise<SendEmailResult> {
-  const greeting = data.userName ? `Bonjour ${data.userName},` : 'Bonjour,'
+  const locale = getValidLocale(data.locale)
+  const greeting = data.userName
+    ? t(locale, 'email.email_verification.greeting', { name: data.userName })
+    : t(locale, 'email.email_verification.greeting_anonymous')
 
   const content = `
 <h2 style="margin: 0 0 16px; font-size: 20px; font-weight: 600; color: #18181b;">
-  Vérifiez votre adresse email
+  ${t(locale, 'email.email_verification.title')}
 </h2>
 
 <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: #52525b;">
   ${greeting}<br><br>
-  Merci de vous être inscrit sur ${APP_NAME} ! Veuillez cliquer sur le bouton ci-dessous pour vérifier votre adresse email.
+  ${t(locale, 'email.email_verification.description', { app_name: APP_NAME })}
 </p>
 
-${emailButton(data.verifyUrl, 'Vérifier mon email')}
+${emailButton(data.verifyUrl, t(locale, 'email.email_verification.button'))}
 
 <p style="margin: 0 0 8px; font-size: 14px; color: #71717a;">
-  Ou copiez ce lien dans votre navigateur :
+  ${t(locale, 'email.link_fallback')}
 </p>
 <p style="margin: 0 0 24px; font-size: 14px; color: #2563eb; word-break: break-all;">
   ${data.verifyUrl}
@@ -330,14 +338,14 @@ ${emailButton(data.verifyUrl, 'Vérifier mon email')}
 <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 24px 0;">
 
 <p style="margin: 0; font-size: 13px; color: #a1a1aa;">
-  Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.
+  ${t(locale, 'email.email_verification.ignore_notice')}
 </p>
 `
 
   return sendEmail({
     to: data.to,
-    subject: `Vérifiez votre adresse email - ${APP_NAME}`,
-    html: emailWrapper(content, 'Vérification email')
+    subject: t(locale, 'email.email_verification.subject', { app_name: APP_NAME }),
+    html: emailWrapper(content, t(locale, 'email.email_verification.title'), locale)
   })
 }
 
@@ -351,5 +359,9 @@ export {
   stripHtml,
   APP_URL,
   APP_NAME,
-  FROM_EMAIL
+  FROM_EMAIL,
+  t,
+  getValidLocale
 }
+
+export type { SupportedLocale }

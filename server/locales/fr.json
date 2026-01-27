@@ -1,0 +1,23 @@
+{
+  "email": {
+    "footer": "Tous droits réservés.",
+    "link_fallback": "Ou copiez ce lien dans votre navigateur :",
+    "password_reset": {
+      "subject": "Réinitialisation de votre mot de passe {app_name}",
+      "title": "Réinitialisation de votre mot de passe",
+      "description": "Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.",
+      "button": "Réinitialiser mon mot de passe",
+      "expires_in": "Ce lien expire dans {minutes} minutes.",
+      "ignore_notice": "Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email."
+    },
+    "email_verification": {
+      "subject": "Vérifiez votre adresse email - {app_name}",
+      "title": "Vérifiez votre adresse email",
+      "greeting": "Bonjour {name},",
+      "greeting_anonymous": "Bonjour,",
+      "description": "Merci de vous être inscrit sur {app_name} ! Veuillez cliquer sur le bouton ci-dessous pour vérifier votre adresse email.",
+      "button": "Vérifier mon email",
+      "ignore_notice": "Si vous n'avez pas créé de compte, vous pouvez ignorer cet email."
+    }
+  }
+}
