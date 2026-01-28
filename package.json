@@ -42,7 +42,7 @@
     "node-sql-parser": "^5.3.13",
     "nodemailer": "^7.0.12",
     "nuxt": "^4.2.2",
-    "pg": "^8.16.3",
+    "pg": "^8.17.2",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
