@@ -39,7 +39,7 @@
     "@vueuse/nuxt": "^14.1.0",
     "better-auth": "^1.4.10",
     "drizzle-orm": "^0.45.1",
-    "node-sql-parser": "^5.3.13",
+    "node-sql-parser": "^5.4.0",
     "nodemailer": "^7.0.12",
     "nuxt": "^4.2.2",
     "pg": "^8.16.3",
