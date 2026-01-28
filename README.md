@@ -27,7 +27,7 @@
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/your-username/dbkeep.git
+git clone https://github.com/steeven-th/dbkeep.git
 cd dbkeep
 pnpm install
 
@@ -47,16 +47,12 @@ The application is available at [http://localhost:3000](http://localhost:3000)
 
 ## Documentation
 
-**[Full documentation](./docs/README.md)**
+📚 **[Full documentation on dbkeep.com/docs](https://dbkeep.com/docs)**
 
-- [Installation](./docs/installation.md) - Detailed installation guide
-- [Configuration](./docs/configuration.md) - Environment variables
-- [Database](./docs/database.md) - Drizzle ORM and Drizzle Studio
-- [Authentication](./docs/authentication.md) - Better Auth
-- [Email Configuration](./docs/email-configuration.md) - SMTP setup for password reset
-- [Project Structure](./docs/structure.md) - File organization
-- [Commands](./docs/commands.md) - All available commands
-- [Contributing](./docs/contributing.md) - Contribution guide
+- [Getting Started](https://dbkeep.com/docs/getting-started/introduction) - Introduction and quick start
+- [Configuration](https://dbkeep.com/docs/self-hosting/configuration) - Environment variables
+- [Docker Deployment](https://dbkeep.com/docs/self-hosting/docker) - Deploy with Docker
+- [Email Configuration](https://dbkeep.com/docs/self-hosting/email) - SMTP setup for password reset
 
 ## Main Commands
 
@@ -69,16 +65,6 @@ The application is available at [http://localhost:3000](http://localhost:3000)
 | `pnpm test` | Run tests |
 | `pnpm lint` | Lint code |
 
-## Drizzle Studio
-
-Visualize and manage your database with Drizzle Studio (similar to Prisma Studio):
-
-```bash
-pnpm db:studio
-```
-
-Opens [https://local.drizzle.studio](https://local.drizzle.studio)
-
 ## Deployment Modes
 
 DBKeep supports different deployment modes:
@@ -89,11 +75,17 @@ DBKeep supports different deployment modes:
 | **Private** | Authentication, registration disabled | Private team |
 | **Guest Mode** | No authentication required | Personal self-hosting |
 
-See [Configuration](./docs/configuration.md) for details.
+See [Configuration](https://dbkeep.com/docs/self-hosting/configuration) for details.
 
 ## Contributing
 
-Contributions are welcome! Check the [contributing guide](./docs/contributing.md).
+Contributions are welcome! Please read the contribution guidelines before submitting a PR.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
@@ -101,4 +93,4 @@ Contributions are welcome! Check the [contributing guide](./docs/contributing.md
 
 ---
 
-Made with love by the open-source community
+Made with ❤️ by the open-source community
