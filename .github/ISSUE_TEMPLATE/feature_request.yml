@@ -1,0 +1,128 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for DBKeep
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Your ideas help make DBKeep better for everyone.
+
+  - type: checkboxes
+    id: existing-issue
+    attributes:
+      label: Is there an existing request for this feature?
+      description: Please search existing issues to avoid duplicates.
+      options:
+        - label: I have searched the existing issues and found no duplicate
+          required: true
+
+  - type: dropdown
+    id: feature-area
+    attributes:
+      label: Feature Area
+      description: Which area of DBKeep does this feature relate to?
+      options:
+        - Canvas / Diagram Editor
+        - Table Editor
+        - Column Editor
+        - Relationships / Foreign Keys
+        - SQL Generation / Export
+        - Import Functionality
+        - User Interface / UX
+        - Authentication / User Management
+        - API
+        - Performance
+        - Internationalization (i18n)
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: "A clear and concise description of what the problem is. Ex: I'm always frustrated when..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like.
+      placeholder: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: What other approaches could solve this problem?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: database-engines
+    attributes:
+      label: Applicable Database Engines
+      description: Which database engines should this feature support?
+      multiple: true
+      options:
+        - PostgreSQL
+        - MySQL
+        - SQLite
+        - All engines
+        - Not database-specific
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (from your perspective)
+      description: How important is this feature to you?
+      options:
+        - Nice to have
+        - Would improve my workflow
+        - Important for my use case
+        - Critical / Blocking
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be willing to contribute to this feature?
+      options:
+        - label: I would be willing to submit a PR for this feature
+          required: false
+        - label: I can help with testing
+          required: false
+        - label: I can help with documentation
+          required: false
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups / Examples
+      description: If applicable, add mockups, wireframes, or examples from other tools. You can drag and drop images here.
+      placeholder: Drag and drop images or paste links to examples...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or references about the feature request here.
+      placeholder: Any additional information...
+    validations:
+      required: false

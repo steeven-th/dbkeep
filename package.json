@@ -1,5 +1,7 @@
 {
   "name": "dbkeep",
+  "version": "0.1.0",
+  "description": "Open-source visual database schema editor. Design PostgreSQL, MySQL, and SQLite schemas with an intuitive drag-and-drop interface.",
   "private": true,
   "type": "module",
   "scripts": {
