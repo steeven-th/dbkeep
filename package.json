@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@guolao/vue-monaco-editor": "^1.6.0",
-    "@iconify-json/lucide": "^1.2.82",
+    "@iconify-json/lucide": "^1.2.87",
     "@iconify-json/simple-icons": "^1.2.63",
     "@nuxt/fonts": "^0.13.0",
     "@nuxt/scripts": "0.13.2",
