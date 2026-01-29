@@ -4,23 +4,24 @@ FROM node:22-alpine AS builder
 # Build tools for native dependencies
 RUN apk add --no-cache libc6-compat openssl
 
-# Enable pnpm via corepack
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable pnpm via corepack (version fixe pour cohérence)
+RUN corepack enable && corepack prepare pnpm@10.26.1 --activate
 
 WORKDIR /app
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies (--no-frozen-lockfile pour les dépendances transitives)
-RUN pnpm install --no-frozen-lockfile
+# Install dependencies
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
+# Prepare Nuxt (génère les fichiers nécessaires pour Tailwind/Vite)
+RUN pnpm exec nuxt prepare
+
 # Build Nuxt
-# tailwindcss est une dépendance transitive de @nuxt/ui mais doit être explicite pour le build Docker
-RUN pnpm add -D tailwindcss
 ENV NITRO_PRESET=node-server
 RUN pnpm build
 
@@ -28,7 +29,7 @@ RUN pnpm build
 FROM node:22-alpine AS runner
 
 RUN apk add --no-cache libc6-compat openssl
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.26.1 --activate
 
 WORKDIR /app
 
@@ -48,4 +49,4 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Run database migrations and start server
-CMD sh -c "pnpm db:push && node .output/server/index.mjs"
+CMD ["sh", "-c", "pnpm db:push && node .output/server/index.mjs"]
