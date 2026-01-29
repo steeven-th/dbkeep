@@ -51,6 +51,8 @@
     "@types/nodemailer": "^7.0.5",
     "@types/pg": "^8.16.0",
     "@vue/test-utils": "^2.4.6",
+    "conventional-changelog-angular": "^8.1.0",
+    "conventional-changelog-cli": "^5.0.0",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.2",
     "happy-dom": "^20.4.0",
