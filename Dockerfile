@@ -12,7 +12,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
+# Install dependencies (shamefully-hoist pour résoudre Tailwind/Vite dans Docker)
+RUN pnpm config set shamefully-hoist true
 RUN pnpm install --frozen-lockfile
 
 # Copy source code
