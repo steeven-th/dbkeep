@@ -18,8 +18,7 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build Nuxt
-ENV NODE_ENV=production
+# Build Nuxt (NODE_ENV doit rester en dev pour que tailwindcss soit disponible)
 ENV NITRO_PRESET=node-server
 RUN pnpm build
 
