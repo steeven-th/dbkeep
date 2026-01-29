@@ -29,11 +29,18 @@ jobs:
       (github.event_name == 'workflow_dispatch')
 
     steps:
+      - name: Generate GitHub App Token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -138,6 +145,8 @@ jobs:
           npx conventional-changelog -p angular -i CHANGELOG.md -s
 
       - name: Commit and push changes
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -209,10 +218,11 @@ jobs:
           draft: false
           prerelease: ${{ contains(env.VERSION, '-') }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
 
       - name: Merge main into dev
-        # Only if we're on main and dev branch exists
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           if git show-ref --verify --quiet refs/remotes/origin/dev; then
             echo "🔄 Synchronizing dev branch..."
