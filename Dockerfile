@@ -18,7 +18,9 @@ RUN pnpm install --no-frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build Nuxt (NODE_ENV doit rester en dev pour que tailwindcss soit disponible)
+# Build Nuxt
+# tailwindcss est une dépendance transitive de @nuxt/ui mais doit être explicite pour le build Docker
+RUN pnpm add -D tailwindcss
 ENV NITRO_PRESET=node-server
 RUN pnpm build
 
