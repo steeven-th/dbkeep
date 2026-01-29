@@ -1,5 +1,4 @@
-import type { Project } from '~/types/database'
-import { DatabaseEngine } from '~/types/database'
+import type { Project, DatabaseEngine } from '~/types/database'
 
 /**
  * Type for a project in the list (without full data)
@@ -88,7 +87,7 @@ export const useProjects = () => {
       }
 
       // Save to database
-      const savedProject = await $fetch<any>('/api/projects', {
+      const savedProject = await $fetch<{ id: string, name: string, engine: string }>('/api/projects', {
         method: 'POST',
         body: {
           name,
@@ -141,7 +140,21 @@ export const useProjects = () => {
   const loadProject = async (projectId: string) => {
     isLoadingProject.value = true
     try {
-      const data = await $fetch<any>(`/api/projects/${projectId}`)
+      const data = await $fetch<{
+        id: string
+        name: string
+        engine: string
+        data?: {
+          tables?: Project['tables']
+          groups?: Project['groups']
+          notes?: Project['notes']
+          relations?: Project['relations']
+        }
+        createdAt: string
+        updatedAt: string
+        ownerType?: string
+        ownerId?: string
+      }>(`/api/projects/${projectId}`)
 
       // Rebuild complete Project object
       const project: Project = {
@@ -211,7 +224,7 @@ export const useProjects = () => {
         return {
           ...group,
           position: node?.position,
-          style: node?.style as { width: string; height: string } | undefined
+          style: node?.style as { width: string, height: string } | undefined
         }
       })
 
@@ -221,7 +234,7 @@ export const useProjects = () => {
         return {
           ...note,
           position: node?.position,
-          style: node?.style as { width: string; height: string } | undefined
+          style: node?.style as { width: string, height: string } | undefined
         }
       })
 

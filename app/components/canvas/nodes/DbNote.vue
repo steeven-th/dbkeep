@@ -119,7 +119,10 @@ const textColor = computed(() => {
     />
 
     <!-- Note header -->
-    <div class="px-3 py-2 border-b" :style="{ borderColor: borderColor }">
+    <div
+      class="px-3 py-2 border-b"
+      :style="{ borderColor: borderColor }"
+    >
       <!-- Edit mode -->
       <input
         v-if="isEditingTitle"
@@ -143,7 +146,9 @@ const textColor = computed(() => {
 
     <!-- Note content -->
     <div class="px-3 py-2 text-xs overflow-hidden h-full">
-      <p class="whitespace-pre-wrap line-clamp-6 opacity-90">{{ data.content || t('note.no_content') }}</p>
+      <p class="whitespace-pre-wrap line-clamp-6 opacity-90">
+        {{ data.content || t('note.no_content') }}
+      </p>
     </div>
 
     <!-- Action buttons on hover (hidden in read-only mode) -->

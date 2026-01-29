@@ -101,35 +101,59 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
           <!-- Feature 1 -->
           <div class="bg-default p-6 rounded-xl border border-default">
             <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-              <UIcon name="i-lucide-mouse-pointer-click" class="size-6 text-primary" />
+              <UIcon
+                name="i-lucide-mouse-pointer-click"
+                class="size-6 text-primary"
+              />
             </div>
-            <h3 class="font-semibold text-lg mb-2">{{ t('landing.feature_visual_title') }}</h3>
-            <p class="text-muted">{{ t('landing.feature_visual_description') }}</p>
+            <h3 class="font-semibold text-lg mb-2">
+              {{ t('landing.feature_visual_title') }}
+            </h3>
+            <p class="text-muted">
+              {{ t('landing.feature_visual_description') }}
+            </p>
           </div>
 
           <!-- Feature 2 -->
           <div class="bg-default p-6 rounded-xl border border-default">
             <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-              <UIcon name="i-lucide-code" class="size-6 text-primary" />
+              <UIcon
+                name="i-lucide-code"
+                class="size-6 text-primary"
+              />
             </div>
-            <h3 class="font-semibold text-lg mb-2">{{ t('landing.feature_export_title') }}</h3>
-            <p class="text-muted">{{ t('landing.feature_export_description') }}</p>
+            <h3 class="font-semibold text-lg mb-2">
+              {{ t('landing.feature_export_title') }}
+            </h3>
+            <p class="text-muted">
+              {{ t('landing.feature_export_description') }}
+            </p>
           </div>
 
           <!-- Feature 3 -->
           <div class="bg-default p-6 rounded-xl border border-default">
             <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-              <UIcon name="i-lucide-users" class="size-6 text-primary" />
+              <UIcon
+                name="i-lucide-users"
+                class="size-6 text-primary"
+              />
             </div>
-            <h3 class="font-semibold text-lg mb-2">{{ t('landing.feature_opensource_title') }}</h3>
-            <p class="text-muted">{{ t('landing.feature_opensource_description') }}</p>
+            <h3 class="font-semibold text-lg mb-2">
+              {{ t('landing.feature_opensource_title') }}
+            </h3>
+            <p class="text-muted">
+              {{ t('landing.feature_opensource_description') }}
+            </p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CTA Section (hidden in guest mode or if logged in) -->
-    <section v-if="!canAccessApp" class="py-24 px-4">
+    <section
+      v-if="!canAccessApp"
+      class="py-24 px-4"
+    >
       <div class="container mx-auto text-center max-w-2xl">
         <h2 class="text-3xl font-bold mb-4">
           {{ t('landing.cta_title') }}
@@ -163,7 +187,9 @@ const primaryActionLabel = computed(() => canAccessApp.value ? t('landing.open_a
     <footer class="border-t border-default py-8 px-4">
       <div class="container mx-auto text-center text-muted text-sm">
         <p>{{ t('app_name') }} - Open Source Database Designer</p>
-        <p class="mt-2">MIT License</p>
+        <p class="mt-2">
+          MIT License
+        </p>
       </div>
     </footer>
   </div>

@@ -10,8 +10,8 @@ const selectedSort = defineModel<SortOption>('sort', { default: 'updated_desc' }
 
 // Options passed from parent (from useProjectFilters)
 defineProps<{
-  sortOptions: { label: string; value: string }[]
-  engineOptions: { label: string; value: string | null }[]
+  sortOptions: { label: string, value: string }[]
+  engineOptions: { label: string, value: string | null }[]
 }>()
 </script>
 

@@ -30,7 +30,7 @@ const passwordSchema = z.object({
   currentPassword: z.string().min(1, t('auth.password_required')),
   newPassword: z.string().min(8, t('auth.password_min_length')),
   confirmPassword: z.string().min(1, t('auth.password_required'))
-}).refine((data) => data.newPassword === data.confirmPassword, {
+}).refine(data => data.newPassword === data.confirmPassword, {
   message: t('auth.passwords_not_match'),
   path: ['confirmPassword']
 })
@@ -81,10 +81,10 @@ const onProfileSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
       title: t('profile.update_success'),
       color: 'success'
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast.add({
       title: t('profile.update_error'),
-      description: error.message,
+      description: error instanceof Error ? error.message : String(error),
       color: 'error'
     })
   } finally {
@@ -113,10 +113,10 @@ const onPasswordSubmit = async (event: FormSubmitEvent<PasswordSchema>) => {
       newPassword: '',
       confirmPassword: ''
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast.add({
       title: t('profile.password_error'),
-      description: error.message,
+      description: error instanceof Error ? error.message : String(error),
       color: 'error'
     })
   } finally {

@@ -35,8 +35,12 @@ const { t } = useI18n()
           <!-- Theme -->
           <div class="flex items-center justify-between">
             <div>
-              <p class="font-medium">{{ t('settings.theme') }}</p>
-              <p class="text-sm text-muted">{{ t('settings.theme_description') }}</p>
+              <p class="font-medium">
+                {{ t('settings.theme') }}
+              </p>
+              <p class="text-sm text-muted">
+                {{ t('settings.theme_description') }}
+              </p>
             </div>
             <UColorModeSelect />
           </div>
@@ -44,8 +48,12 @@ const { t } = useI18n()
           <!-- Language -->
           <div class="flex items-center justify-between">
             <div>
-              <p class="font-medium">{{ t('settings.language') }}</p>
-              <p class="text-sm text-muted">{{ t('settings.language_description') }}</p>
+              <p class="font-medium">
+                {{ t('settings.language') }}
+              </p>
+              <p class="text-sm text-muted">
+                {{ t('settings.language_description') }}
+              </p>
             </div>
             <LanguageSelect />
           </div>

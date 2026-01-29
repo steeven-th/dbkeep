@@ -12,8 +12,13 @@ const translations: Record<SupportedLocale, typeof frTranslations> = {
  * Get a nested value from an object using dot notation
  * Example: getNestedValue(obj, 'email.password_reset.title')
  */
-function getNestedValue(obj: any, path: string): string | undefined {
-  return path.split('.').reduce((current, key) => current?.[key], obj)
+function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
+  return path.split('.').reduce<unknown>((current, key) => {
+    if (current && typeof current === 'object' && key in current) {
+      return (current as Record<string, unknown>)[key]
+    }
+    return undefined
+  }, obj) as string | undefined
 }
 
 /**

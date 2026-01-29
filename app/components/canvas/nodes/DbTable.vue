@@ -75,7 +75,10 @@ const isTargetConnected = (columnId: string): boolean => {
       :style="{ backgroundColor: data.color }"
     >
       <div class="flex items-center gap-2 min-w-0 flex-1">
-        <UIcon name="i-lucide-table" class="size-4 text-white shrink-0" />
+        <UIcon
+          name="i-lucide-table"
+          class="size-4 text-white shrink-0"
+        />
         <span class="font-semibold text-white truncate">{{ data.name }}</span>
       </div>
       <UButton
@@ -122,11 +125,20 @@ const isTargetConnected = (columnId: string): boolean => {
 
         <!-- Indicators -->
         <div class="flex items-center gap-1 shrink-0">
-          <UTooltip v-if="column.nullable" :text="t('column.nullable')">
+          <UTooltip
+            v-if="column.nullable"
+            :text="t('column.nullable')"
+          >
             <span class="text-muted text-xs">?</span>
           </UTooltip>
-          <UTooltip v-if="column.unique && !column.primaryKey" :text="t('column.unique')">
-            <UIcon name="i-lucide-badge-check" class="size-3 text-purple-500" />
+          <UTooltip
+            v-if="column.unique && !column.primaryKey"
+            :text="t('column.unique')"
+          >
+            <UIcon
+              name="i-lucide-badge-check"
+              class="size-3 text-purple-500"
+            />
           </UTooltip>
         </div>
 

@@ -27,7 +27,7 @@ const schema = z.object({
   email: z.string().email(t('auth.invalid_email')),
   password: z.string().min(8, t('auth.password_min_length')),
   confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
+}).refine(data => data.password === data.confirmPassword, {
   message: t('auth.passwords_not_match'),
   path: ['confirmPassword']
 })
@@ -70,8 +70,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             name="i-lucide-user-x"
             class="size-16 text-muted mx-auto mb-4"
           />
-          <h1 class="text-2xl font-bold mb-2">{{ t('register_disabled.title') }}</h1>
-          <p class="text-muted mb-6">{{ t('register_disabled.description') }}</p>
+          <h1 class="text-2xl font-bold mb-2">
+            {{ t('register_disabled.title') }}
+          </h1>
+          <p class="text-muted mb-6">
+            {{ t('register_disabled.description') }}
+          </p>
           <UButton
             to="/login"
             icon="i-lucide-arrow-left"
@@ -95,8 +99,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             />
             <span class="font-bold text-2xl">{{ t('app_name') }}</span>
           </NuxtLink>
-          <h1 class="text-2xl font-bold">{{ t('auth.register_title') }}</h1>
-          <p class="text-muted mt-2">{{ t('auth.register_subtitle') }}</p>
+          <h1 class="text-2xl font-bold">
+            {{ t('auth.register_title') }}
+          </h1>
+          <p class="text-muted mt-2">
+            {{ t('auth.register_subtitle') }}
+          </p>
         </div>
 
         <!-- Form -->
