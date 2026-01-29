@@ -3,15 +3,9 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { locale, locales, setLocale } = useI18n()
 
-// Current locale with its name
-const currentLocale = computed(() => {
-  const loc = (locales.value as { code: string; name: string }[]).find(l => l.code === locale.value)
-  return loc?.name || locale.value
-})
-
 // Dropdown items for languages
 const localeItems = computed<DropdownMenuItem[][]>(() => [
-  (locales.value as { code: string; name: string }[]).map(loc => ({
+  (locales.value as { code: string, name: string }[]).map(loc => ({
     label: loc.name,
     icon: locale.value === loc.code ? 'i-lucide-check' : undefined,
     onSelect: () => setLocale(loc.code)

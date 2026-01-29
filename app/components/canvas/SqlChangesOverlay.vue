@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SqlParseError } from '~/composables/useSqlParser'
 
-const props = defineProps<{
+defineProps<{
   show: boolean
   hasErrors: boolean
   errors?: SqlParseError[]
@@ -31,7 +31,10 @@ const formatError = (error: SqlParseError): string => {
     >
       <div class="overlay-content">
         <!-- Icon -->
-        <div class="icon-wrapper" :class="{ 'has-errors': hasErrors }">
+        <div
+          class="icon-wrapper"
+          :class="{ 'has-errors': hasErrors }"
+        >
           <UIcon
             :name="hasErrors ? 'i-lucide-alert-triangle' : 'i-lucide-code-2'"
             class="w-8 h-8"
@@ -48,13 +51,19 @@ const formatError = (error: SqlParseError): string => {
         </p>
 
         <!-- Error list if present -->
-        <div v-if="hasErrors && errors?.length" class="errors-list">
+        <div
+          v-if="hasErrors && errors?.length"
+          class="errors-list"
+        >
           <div
             v-for="(error, index) in errors"
             :key="index"
             class="error-item"
           >
-            <UIcon name="i-lucide-x-circle" class="w-4 h-4 text-error shrink-0" />
+            <UIcon
+              name="i-lucide-x-circle"
+              class="w-4 h-4 text-error shrink-0"
+            />
             <span class="text-sm">{{ formatError(error) }}</span>
           </div>
         </div>

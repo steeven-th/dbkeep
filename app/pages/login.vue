@@ -60,8 +60,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           />
           <span class="font-bold text-2xl">{{ t('app_name') }}</span>
         </NuxtLink>
-        <h1 class="text-2xl font-bold">{{ t('auth.login_title') }}</h1>
-        <p class="text-muted mt-2">{{ t('auth.login_subtitle') }}</p>
+        <h1 class="text-2xl font-bold">
+          {{ t('auth.login_title') }}
+        </h1>
+        <p class="text-muted mt-2">
+          {{ t('auth.login_subtitle') }}
+        </p>
       </div>
 
       <!-- Form -->

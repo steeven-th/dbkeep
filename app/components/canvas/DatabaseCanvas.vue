@@ -8,13 +8,13 @@ import DbTable from './nodes/DbTable.vue'
 import DbGroup from './nodes/DbGroup.vue'
 import DbNote from './nodes/DbNote.vue'
 import RelationEdge from './edges/RelationEdge.vue'
-import { RelationType, generateId } from '~/types/database'
+import { RelationType } from '~/types/database'
 
 const { t } = useI18n()
 const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
 const deleteConfirm = useDeleteConfirm()
-const { saveProject, isSaving, lastSaveTime } = useProjects()
+const { saveProject, lastSaveTime } = useProjects()
 const toast = useToast()
 
 // Read-only mode injected by parent (project page)
@@ -31,7 +31,7 @@ const vueFlowKey = ref(0)
 const skipFitViewOnRefresh = ref(false)
 
 // Viewport to restore after a refresh
-const viewportToRestore = ref<{ x: number; y: number; zoom: number } | null>(null)
+const viewportToRestore = ref<{ x: number, y: number, zoom: number } | null>(null)
 
 // Auto-save with debounce (2 seconds after last modification)
 const debouncedSave = useDebounceFn(async () => {
@@ -147,9 +147,9 @@ const edgeTypes = {
   relation: markRaw(RelationEdge)
 }
 
-// State for relation creation modal
-const showRelationEditor = ref(false)
-const pendingConnection = ref<Connection | null>(null)
+// State for relation creation modal (kept for future use)
+const _showRelationEditor = ref(false)
+const _pendingConnection = ref<Connection | null>(null)
 
 /**
  * Handles a new connection between two columns
@@ -195,7 +195,7 @@ onConnect((connection: Connection) => {
  * Checks if a node is completely within the bounds of a group
  */
 const isCompletelyInsideGroup = (
-  nodePosition: { x: number; y: number },
+  nodePosition: { x: number, y: number },
   nodeWidth: number,
   nodeHeight: number,
   group: GraphNode
@@ -205,10 +205,10 @@ const isCompletelyInsideGroup = (
 
   // Check if all 4 corners of the node are within the group bounds
   return (
-    nodePosition.x >= group.position.x &&
-    nodePosition.y >= group.position.y &&
-    nodePosition.x + nodeWidth <= group.position.x + groupWidth &&
-    nodePosition.y + nodeHeight <= group.position.y + groupHeight
+    nodePosition.x >= group.position.x
+    && nodePosition.y >= group.position.y
+    && nodePosition.x + nodeWidth <= group.position.x + groupWidth
+    && nodePosition.y + nodeHeight <= group.position.y + groupHeight
   )
 }
 
@@ -216,7 +216,7 @@ const isCompletelyInsideGroup = (
  * Checks if a point is within the bounds of a group (center-based)
  */
 const isInsideGroup = (
-  nodePosition: { x: number; y: number },
+  nodePosition: { x: number, y: number },
   nodeWidth: number,
   nodeHeight: number,
   group: GraphNode
@@ -230,10 +230,10 @@ const isInsideGroup = (
 
   // Check if node center is within the group
   return (
-    nodeCenterX >= group.position.x &&
-    nodeCenterX <= group.position.x + groupWidth &&
-    nodeCenterY >= group.position.y &&
-    nodeCenterY <= group.position.y + groupHeight
+    nodeCenterX >= group.position.x
+    && nodeCenterX <= group.position.x + groupWidth
+    && nodeCenterY >= group.position.y
+    && nodeCenterY <= group.position.y + groupHeight
   )
 }
 
@@ -241,7 +241,7 @@ const isInsideGroup = (
  * Finds the group containing a given position
  */
 const findContainingGroup = (
-  nodePosition: { x: number; y: number },
+  nodePosition: { x: number, y: number },
   nodeWidth: number,
   nodeHeight: number,
   excludeNodeId: string
@@ -418,7 +418,7 @@ const handleDeleteSelected = () => {
           } else if (node.type === 'dbGroup') {
             // Unassign children first
             const children = canvasStore.getGroupChildren(node.id)
-            children.forEach(child => {
+            children.forEach((child) => {
               canvasStore.assignToGroup(child.id, null)
             })
             projectStore.deleteGroup(node.id)

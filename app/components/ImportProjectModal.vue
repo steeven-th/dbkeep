@@ -2,7 +2,7 @@
 import { DatabaseEngine } from '~/types/database'
 import type { Project, TableData, Relation } from '~/types/database'
 
-const props = defineProps<{
+defineProps<{
   open: boolean
 }>()
 
@@ -33,7 +33,7 @@ const sqlEngine = ref<DatabaseEngine>(DatabaseEngine.PostgreSQL)
 const sqlParseResult = ref<{
   tables: TableData[]
   relations: Relation[]
-  errors: Array<{ message: string; line: number; column: number }>
+  errors: Array<{ message: string, line: number, column: number }>
 } | null>(null)
 
 // Accepted file types
@@ -122,10 +122,10 @@ const processFile = async (file: File) => {
       parseSqlContent()
       phase.value = 'sql-config'
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast.add({
       title: t('import.error'),
-      description: error.message,
+      description: error instanceof Error ? error.message : String(error),
       color: 'error'
     })
   } finally {
@@ -191,7 +191,7 @@ const importJson = async (content: string, _filename: string) => {
       closeModal()
       router.push(`/app/project/${project.id}`)
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof SyntaxError) {
       throw new Error(t('import.error_invalid_json'))
     }
@@ -235,10 +235,10 @@ const confirmSqlImport = async () => {
       closeModal()
       router.push(`/app/project/${project.id}`)
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast.add({
       title: t('import.error'),
-      description: error.message,
+      description: error instanceof Error ? error.message : String(error),
       color: 'error'
     })
   } finally {
@@ -311,7 +311,10 @@ const closeModal = () => {
             class="absolute inset-0 flex items-center justify-center bg-default/80 rounded-lg"
           >
             <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-loader-2" class="w-5 h-5 animate-spin" />
+              <UIcon
+                name="i-lucide-loader-2"
+                class="w-5 h-5 animate-spin"
+              />
               <span class="text-sm">{{ t('import.importing') }}</span>
             </div>
           </div>
@@ -343,10 +346,16 @@ const closeModal = () => {
       </div>
 
       <!-- Phase 2: SQL Configuration -->
-      <div v-else-if="phase === 'sql-config'" class="space-y-4">
+      <div
+        v-else-if="phase === 'sql-config'"
+        class="space-y-4"
+      >
         <!-- File info -->
         <div class="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-          <UIcon name="i-lucide-file-code" class="w-5 h-5 text-muted" />
+          <UIcon
+            name="i-lucide-file-code"
+            class="w-5 h-5 text-muted"
+          />
           <span class="text-sm font-medium truncate">{{ sqlFilename }}</span>
         </div>
 
@@ -368,38 +377,65 @@ const closeModal = () => {
         </UFormField>
 
         <!-- Parse result preview -->
-        <div v-if="sqlParseResult" class="space-y-2">
+        <div
+          v-if="sqlParseResult"
+          class="space-y-2"
+        >
           <!-- Success: show tables and relations count -->
-          <div v-if="sqlParseResult.tables.length > 0" class="flex items-center gap-4 text-sm">
+          <div
+            v-if="sqlParseResult.tables.length > 0"
+            class="flex items-center gap-4 text-sm"
+          >
             <div class="flex items-center gap-1.5 text-success">
-              <UIcon name="i-lucide-table" class="w-4 h-4" />
+              <UIcon
+                name="i-lucide-table"
+                class="w-4 h-4"
+              />
               <span>{{ t('import.sql_tables_found', { count: sqlParseResult.tables.length }) }}</span>
             </div>
-            <div v-if="sqlParseResult.relations.length > 0" class="flex items-center gap-1.5 text-info">
-              <UIcon name="i-lucide-link" class="w-4 h-4" />
+            <div
+              v-if="sqlParseResult.relations.length > 0"
+              class="flex items-center gap-1.5 text-info"
+            >
+              <UIcon
+                name="i-lucide-link"
+                class="w-4 h-4"
+              />
               <span>{{ t('import.sql_relations_found', { count: sqlParseResult.relations.length }) }}</span>
             </div>
           </div>
 
           <!-- No tables found -->
-          <div v-else-if="sqlParseResult.errors.length === 0" class="text-sm text-warning">
+          <div
+            v-else-if="sqlParseResult.errors.length === 0"
+            class="text-sm text-warning"
+          >
             {{ t('import.sql_no_tables') }}
           </div>
 
           <!-- Parse errors -->
-          <div v-if="sqlParseResult.errors.length > 0" class="space-y-1">
+          <div
+            v-if="sqlParseResult.errors.length > 0"
+            class="space-y-1"
+          >
             <div
               v-for="(error, idx) in sqlParseResult.errors"
               :key="idx"
               class="text-sm text-error flex items-start gap-1.5"
             >
-              <UIcon name="i-lucide-alert-circle" class="w-4 h-4 mt-0.5 shrink-0" />
+              <UIcon
+                name="i-lucide-alert-circle"
+                class="w-4 h-4 mt-0.5 shrink-0"
+              />
               <span>{{ error.message }} ({{ t('import.sql_line') }} {{ error.line }})</span>
             </div>
           </div>
 
           <!-- Tables list preview -->
-          <div v-if="sqlParseResult.tables.length > 0" class="mt-3">
+          <div
+            v-if="sqlParseResult.tables.length > 0"
+            class="mt-3"
+          >
             <div class="flex flex-wrap gap-1.5">
               <UBadge
                 v-for="table in sqlParseResult.tables.slice(0, 10)"
@@ -434,7 +470,10 @@ const closeModal = () => {
             variant="ghost"
             @click="goBackToDropzone"
           >
-            <UIcon name="i-lucide-arrow-left" class="w-4 h-4 mr-1" />
+            <UIcon
+              name="i-lucide-arrow-left"
+              class="w-4 h-4 mr-1"
+            />
             {{ t('import.back') }}
           </UButton>
         </div>

@@ -11,7 +11,7 @@ export const useAuth = () => {
   const sessionQuery = import.meta.client ? useSession() : null
 
   // Shared session state (useState to share between components)
-  const sessionData = useState<any>('auth-session', () => null)
+  const sessionData = useState<{ user?: { id: string, email: string, name?: string } } | null>('auth-session', () => null)
   const isLoading = useState<boolean>('auth-loading', () => false)
   const error = useState<Error | null>('auth-error', () => null)
 
@@ -69,10 +69,10 @@ export const useAuth = () => {
       // Redirect to app after registration
       await router.push('/app')
       return { success: true }
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
-        error: err.message
+        error: err instanceof Error ? err.message : String(err)
       }
     }
   }
@@ -97,10 +97,10 @@ export const useAuth = () => {
       // Redirect to app after login
       await router.push('/app')
       return { success: true }
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
-        error: err.message
+        error: err instanceof Error ? err.message : String(err)
       }
     }
   }
@@ -114,10 +114,10 @@ export const useAuth = () => {
       // Redirect to homepage
       await router.push('/')
       return { success: true }
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
-        error: err.message
+        error: err instanceof Error ? err.message : String(err)
       }
     }
   }

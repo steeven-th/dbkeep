@@ -4,10 +4,9 @@ import type {
   GroupData,
   NoteData,
   Relation,
-  Column
-} from '~/types/database'
+  Column,
+  DatabaseEngine } from '~/types/database'
 import {
-  DatabaseEngine,
   createDefaultProject,
   createDefaultTable,
   createDefaultGroup,

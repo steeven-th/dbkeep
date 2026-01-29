@@ -117,7 +117,10 @@ const previewTextColor = computed(() => {
     side="right"
   >
     <template #body>
-      <div v-if="note" class="space-y-6">
+      <div
+        v-if="note"
+        class="space-y-6"
+      >
         <!-- Section: Note information -->
         <div class="space-y-4">
           <!-- Note name -->
@@ -161,7 +164,10 @@ const previewTextColor = computed(() => {
                 :title="t('note.custom_color')"
                 @click="openColorPicker"
               >
-                <UIcon name="i-lucide-pipette" class="size-3 text-white drop-shadow" />
+                <UIcon
+                  name="i-lucide-pipette"
+                  class="size-3 text-white drop-shadow"
+                />
               </button>
               <!-- Hidden color input -->
               <input
@@ -170,7 +176,7 @@ const previewTextColor = computed(() => {
                 :value="note.color"
                 class="sr-only"
                 @input="updateNoteColor(($event.target as HTMLInputElement).value)"
-              />
+              >
             </div>
           </UFormField>
 
@@ -224,8 +230,12 @@ const previewTextColor = computed(() => {
 
         <!-- Danger zone -->
         <div class="space-y-4">
-          <h3 class="font-semibold text-sm text-error">{{ t('common.danger_zone') }}</h3>
-          <p class="text-sm text-muted">{{ t('note.delete_warning') }}</p>
+          <h3 class="font-semibold text-sm text-error">
+            {{ t('common.danger_zone') }}
+          </h3>
+          <p class="text-sm text-muted">
+            {{ t('note.delete_warning') }}
+          </p>
           <UButton
             color="error"
             variant="soft"

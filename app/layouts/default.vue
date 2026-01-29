@@ -7,7 +7,10 @@ const showProfileModal = ref(false)
 </script>
 
 <template>
-  <UApp class="h-screen" :locale="nuxtUiLocale">
+  <UApp
+    class="h-screen"
+    :locale="nuxtUiLocale"
+  >
     <div class="h-full flex flex-col overflow-hidden">
       <!-- Navbar -->
       <LayoutNavbar

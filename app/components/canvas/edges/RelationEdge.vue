@@ -11,7 +11,6 @@ import { RelationType } from '~/types/database'
 
 const props = defineProps<EdgeProps<Relation>>()
 
-const { t } = useI18n()
 const projectStore = useProjectStore()
 
 // Read-only mode injected by parent (project page)

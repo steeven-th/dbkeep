@@ -145,7 +145,7 @@ const addColumn = () => {
 /**
  * Updates a column property
  */
-const updateColumn = (columnId: string, key: keyof Column, value: any) => {
+const updateColumn = (columnId: string, key: keyof Column, value: Column[keyof Column]) => {
   if (!table.value) return
   projectStore.updateColumn(table.value.id, columnId, { [key]: value })
 
@@ -202,7 +202,7 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
 
   if (isPrimary) {
     // Remove PK from other columns
-    table.value.columns.forEach(col => {
+    table.value.columns.forEach((col) => {
       if (col.id !== columnId && col.primaryKey) {
         updateColumn(col.id, 'primaryKey', false)
       }
@@ -281,7 +281,9 @@ const handlePrimaryKeyChange = (columnId: string, isPrimary: boolean) => {
         <!-- Section: Columns -->
         <div class="space-y-4">
           <div class="flex items-center justify-between">
-            <h3 class="font-semibold text-sm">{{ t('table.columns') }}</h3>
+            <h3 class="font-semibold text-sm">
+              {{ t('table.columns') }}
+            </h3>
             <UButton
               size="xs"
               icon="i-lucide-plus"

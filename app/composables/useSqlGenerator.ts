@@ -246,7 +246,7 @@ export const useSqlGenerator = () => {
   const generateForeignKeySql = (
     relation: Relation,
     tables: TableData[],
-    engine: DatabaseEngine
+    _engine: DatabaseEngine
   ): string | null => {
     const sourceTable = tables.find(t => t.id === relation.sourceTableId)
     const targetTable = tables.find(t => t.id === relation.targetTableId)

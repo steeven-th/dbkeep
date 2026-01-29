@@ -62,7 +62,7 @@ const deleteGroup = () => {
 
       // Remove child tables from group (unassign them)
       const children = canvasStore.getGroupChildren(groupId)
-      children.forEach(child => {
+      children.forEach((child) => {
         canvasStore.assignToGroup(child.id, null)
       })
 
@@ -133,7 +133,7 @@ const deleteGroup = () => {
                 :value="group.color"
                 class="sr-only"
                 @input="updateGroupColor(($event.target as HTMLInputElement).value)"
-              />
+              >
             </div>
           </UFormField>
         </div>
