@@ -4,6 +4,21 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+      day: "monday"
+    open-pull-requests-limit: 5
     labels:
       - "dependencies"
+    groups:
+      # Toutes les mises à jour de prod groupées ensemble
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      # Toutes les mises à jour de dev groupées ensemble
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Les major versions restent en PRs séparées (breaking changes potentiels)
