@@ -106,7 +106,7 @@ const targetTableName = computed(() => {
 /**
  * Updates a relation property
  */
-const updateRelation = (key: string, value: any) => {
+const updateRelation = (key: string, value: unknown) => {
   if (!relation.value) return
 
   projectStore.updateRelation(relation.value.id, { [key]: value })

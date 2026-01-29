@@ -35,7 +35,7 @@ const showDeleteModal = computed({
 })
 
 // Rename modal state
-const projectToRename = ref<{ id: string; name: string } | null>(null)
+const projectToRename = ref<{ id: string, name: string } | null>(null)
 const newProjectName = ref('')
 const isRenaming = ref(false)
 const showRenameModal = computed({
@@ -118,10 +118,10 @@ const handleRenameProject = async () => {
 
     // Close the modal
     showRenameModal.value = false
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast.add({
       title: t('project.error_rename'),
-      description: error.message,
+      description: error instanceof Error ? error.message : String(error),
       color: 'error'
     })
   } finally {

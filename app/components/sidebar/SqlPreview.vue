@@ -476,14 +476,19 @@ const copyToClipboard = async () => {
 
             <div class="flex items-center gap-3 mb-2">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
-                <UIcon :name="format.icon" class="w-5 h-5 text-muted group-hover:text-primary transition-colors" />
+                <UIcon
+                  :name="format.icon"
+                  class="w-5 h-5 text-muted group-hover:text-primary transition-colors"
+                />
               </div>
               <div>
                 <span class="font-medium text-default">{{ format.label }}</span>
                 <span class="text-xs text-muted ml-1">{{ format.extension }}</span>
               </div>
             </div>
-            <p class="text-xs text-muted">{{ format.description }}</p>
+            <p class="text-xs text-muted">
+              {{ format.description }}
+            </p>
           </button>
         </div>
       </template>

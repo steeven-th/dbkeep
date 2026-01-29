@@ -55,7 +55,7 @@ function createTransporter(): Transporter | null {
 
   // Add auth only if user/password are provided
   if (SMTP_USER && SMTP_PASSWORD) {
-    (config as any).auth = {
+    (config as nodemailer.TransportOptions & { auth?: { user: string, pass: string } }).auth = {
       user: SMTP_USER,
       pass: SMTP_PASSWORD
     }
@@ -131,11 +131,11 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
       success: true,
       messageId: result.messageId
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[EmailService] Error sending email:', err)
     return {
       success: false,
-      error: err.message || 'Unknown error'
+      error: err instanceof Error ? err.message : 'Unknown error'
     }
   }
 }

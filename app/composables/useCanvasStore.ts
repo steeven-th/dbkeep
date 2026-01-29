@@ -7,7 +7,7 @@ import type {
   Relation,
   NodePosition
 } from '~/types/database'
-import { DEFAULT_TABLE_COLOR, DEFAULT_GROUP_COLOR, DEFAULT_NOTE_COLOR } from '~/types/database'
+// Colors are used implicitly via the types but not directly in this file
 
 /**
  * Store for managing Vue Flow canvas state
@@ -157,10 +157,10 @@ export const useCanvasStore = () => {
       targetHandle: `${relation.targetColumnId}-target`,
       data: relation,
       zIndex: 1001 // Above tables (1000) and groups (0)
-    })).filter(edge => {
+    })).filter((edge) => {
       // Verify that source and target nodes exist
-      return nodes.value.some(n => n.id === edge.source) &&
-             nodes.value.some(n => n.id === edge.target)
+      return nodes.value.some(n => n.id === edge.source)
+        && nodes.value.some(n => n.id === edge.target)
     })
 
     edges.value = newEdges

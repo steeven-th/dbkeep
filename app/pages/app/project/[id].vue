@@ -10,7 +10,6 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
-const toast = useToast()
 const projectStore = useProjectStore()
 const canvasStore = useCanvasStore()
 const { loadProject, isLoadingProject, saveProject } = useProjects()
@@ -100,7 +99,7 @@ const handleValidationChange = (valid: boolean, errors: SqlParseError[]) => {
 }
 
 // Handle manual SQL changes
-const handleSqlManualChange = (newSql: string) => {
+const handleSqlManualChange = (_newSql: string) => {
   // Save the original SQL on first change
   if (!isSqlManuallyModified.value) {
     originalSqlSnapshot.value = sql.value
@@ -175,7 +174,7 @@ const handleApplySqlChanges = async () => {
       const canvasNode = canvasStore.getNode(existingTable.id)
 
       // Map columns while preserving existing IDs
-      const updatedColumns = newTable.columns.map(newCol => {
+      const updatedColumns = newTable.columns.map((newCol) => {
         const existingCol = existingTable!.columns.find(
           c => c.name.toLowerCase() === newCol.name.toLowerCase()
         )
@@ -220,11 +219,11 @@ const handleApplySqlChanges = async () => {
   }
 
   // Preserve existing relations and update them if necessary
-  const existingRelations = currentProject.relations.map(relation => {
-    let sourceTableId = relation.sourceTableId
-    let targetTableId = relation.targetTableId
-    let sourceColumnId = relation.sourceColumnId
-    let targetColumnId = relation.targetColumnId
+  const existingRelations = currentProject.relations.map((relation) => {
+    const sourceTableId = relation.sourceTableId
+    const targetTableId = relation.targetTableId
+    const sourceColumnId = relation.sourceColumnId
+    const targetColumnId = relation.targetColumnId
 
     // Check if tables still exist
     const sourceTable = updatedTables.find(t => t.id === sourceTableId)
@@ -418,7 +417,10 @@ const handleApplySqlChanges = async () => {
 
       <!-- Canvas -->
       <div class="flex-1 h-full min-w-0 relative">
-        <CanvasDatabaseCanvas ref="canvasRef" class="h-full" />
+        <CanvasDatabaseCanvas
+          ref="canvasRef"
+          class="h-full"
+        />
 
         <!-- Overlay for SQL changes -->
         <CanvasSqlChangesOverlay

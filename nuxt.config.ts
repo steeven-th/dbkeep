@@ -3,6 +3,18 @@ import { fileURLToPath } from 'node:url'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // Favicons and meta tags
+
+  modules: [
+    '@nuxt/eslint',
+    '@nuxt/ui',
+    '@nuxt/scripts',
+    '@nuxt/test-utils',
+    '@nuxtjs/i18n'
+  ],
+
+  devtools: {
+    enabled: true
+  },
   app: {
     head: {
       link: [
@@ -14,13 +26,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/ui',
-    '@nuxt/scripts',
-    '@nuxt/test-utils',
-    '@nuxtjs/i18n'
-  ],
+  css: [fileURLToPath(new URL('./app/assets/css/main.css', import.meta.url))],
 
   // Runtime configuration (environment variables)
   runtimeConfig: {
@@ -32,6 +38,23 @@ export default defineNuxtConfig({
       // Registration: enables/disables user registration
       // Set via NUXT_PUBLIC_ENABLE_REGISTER=false
       enableRegister: true
+    }
+  },
+
+  // Nuxt UI automatically generates the required palettes based on app.config.ts
+
+  routeRules: {
+    '/': { prerender: true }
+  },
+
+  compatibilityDate: '2025-01-15',
+
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: 'never',
+        braceStyle: '1tbs'
+      }
     }
   },
 
@@ -48,29 +71,6 @@ export default defineNuxtConfig({
       useCookie: true,
       cookieKey: 'i18n_redirected',
       redirectOn: 'root'
-    }
-  },
-
-  devtools: {
-    enabled: true
-  },
-
-  css: [fileURLToPath(new URL('./app/assets/css/main.css', import.meta.url))],
-
-  // Nuxt UI automatically generates the required palettes based on app.config.ts
-
-  routeRules: {
-    '/': { prerender: true }
-  },
-
-  compatibilityDate: '2025-01-15',
-
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
     }
   }
 })

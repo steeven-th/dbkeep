@@ -79,12 +79,18 @@ const handleSave = async () => {
 </script>
 
 <template>
-  <Panel position="top-center" class="!m-0 !p-0">
+  <Panel
+    position="top-center"
+    class="!m-0 !p-0"
+  >
     <div
       class="flex items-center gap-1 bg-default border border-default rounded-lg p-1.5 shadow-lg mt-4"
     >
       <!-- Back to project list button -->
-      <UTooltip :text="t('project.back_to_list')" :delay-duration="0">
+      <UTooltip
+        :text="t('project.back_to_list')"
+        :delay-duration="0"
+      >
         <UButton
           icon="i-lucide-arrow-left"
           size="sm"
@@ -100,7 +106,10 @@ const handleSave = async () => {
         <div class="w-px h-6 bg-muted mx-1" />
 
         <!-- Add table button -->
-        <UTooltip :text="t('canvas.add_table')" :delay-duration="0">
+        <UTooltip
+          :text="t('canvas.add_table')"
+          :delay-duration="0"
+        >
           <UButton
             size="sm"
             variant="soft"
@@ -118,18 +127,47 @@ const handleSave = async () => {
               stroke-linejoin="round"
             >
               <!-- Table shape -->
-              <rect x="2" y="4" width="14" height="12" rx="2" />
-              <line x1="2" y1="9" x2="16" y2="9" />
-              <line x1="9" y1="4" x2="9" y2="16" />
+              <rect
+                x="2"
+                y="4"
+                width="14"
+                height="12"
+                rx="2"
+              />
+              <line
+                x1="2"
+                y1="9"
+                x2="16"
+                y2="9"
+              />
+              <line
+                x1="9"
+                y1="4"
+                x2="9"
+                y2="16"
+              />
               <!-- Plus sign -->
-              <line x1="19" y1="15" x2="19" y2="21" />
-              <line x1="16" y1="18" x2="22" y2="18" />
+              <line
+                x1="19"
+                y1="15"
+                x2="19"
+                y2="21"
+              />
+              <line
+                x1="16"
+                y1="18"
+                x2="22"
+                y2="18"
+              />
             </svg>
           </UButton>
         </UTooltip>
 
         <!-- Create group button -->
-        <UTooltip :text="t('group.create')" :delay-duration="0">
+        <UTooltip
+          :text="t('group.create')"
+          :delay-duration="0"
+        >
           <UButton
             size="sm"
             color="neutral"
@@ -148,16 +186,36 @@ const handleSave = async () => {
               stroke-linejoin="round"
             >
               <!-- Group rectangle -->
-              <rect x="2" y="4" width="14" height="12" rx="2" stroke-dasharray="4 2" />
+              <rect
+                x="2"
+                y="4"
+                width="14"
+                height="12"
+                rx="2"
+                stroke-dasharray="4 2"
+              />
               <!-- Plus sign -->
-              <line x1="19" y1="15" x2="19" y2="21" />
-              <line x1="16" y1="18" x2="22" y2="18" />
+              <line
+                x1="19"
+                y1="15"
+                x2="19"
+                y2="21"
+              />
+              <line
+                x1="16"
+                y1="18"
+                x2="22"
+                y2="18"
+              />
             </svg>
           </UButton>
         </UTooltip>
 
         <!-- Create note button -->
-        <UTooltip :text="t('note.create')" :delay-duration="0">
+        <UTooltip
+          :text="t('note.create')"
+          :delay-duration="0"
+        >
           <UButton
             size="sm"
             color="neutral"
@@ -176,13 +234,39 @@ const handleSave = async () => {
               stroke-linejoin="round"
             >
               <!-- Note rectangle (solid) -->
-              <rect x="2" y="4" width="14" height="12" rx="2" />
+              <rect
+                x="2"
+                y="4"
+                width="14"
+                height="12"
+                rx="2"
+              />
               <!-- Text lines -->
-              <line x1="5" y1="8" x2="13" y2="8" />
-              <line x1="5" y1="12" x2="10" y2="12" />
+              <line
+                x1="5"
+                y1="8"
+                x2="13"
+                y2="8"
+              />
+              <line
+                x1="5"
+                y1="12"
+                x2="10"
+                y2="12"
+              />
               <!-- Plus sign -->
-              <line x1="19" y1="15" x2="19" y2="21" />
-              <line x1="16" y1="18" x2="22" y2="18" />
+              <line
+                x1="19"
+                y1="15"
+                x2="19"
+                y2="21"
+              />
+              <line
+                x1="16"
+                y1="18"
+                x2="22"
+                y2="18"
+              />
             </svg>
           </UButton>
         </UTooltip>
@@ -191,7 +275,10 @@ const handleSave = async () => {
         <div class="w-px h-6 bg-muted mx-1" />
 
         <!-- Save button -->
-        <UTooltip :text="t('common.save')" :delay-duration="0">
+        <UTooltip
+          :text="t('common.save')"
+          :delay-duration="0"
+        >
           <UButton
             icon="i-lucide-save"
             size="sm"

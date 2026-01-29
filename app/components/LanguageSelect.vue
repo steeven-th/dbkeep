@@ -3,7 +3,7 @@ const { locale, locales, setLocale } = useI18n()
 
 // Liste des locales disponibles pour le select
 const availableLocales = computed(() => {
-  return (locales.value as { code: string; name: string }[]).map(l => ({
+  return (locales.value as { code: string, name: string }[]).map(l => ({
     label: l.name,
     value: l.code
   }))

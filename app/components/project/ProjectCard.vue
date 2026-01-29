@@ -99,17 +99,6 @@ const formatDate = (date: Date | string) => {
     minute: '2-digit'
   })
 }
-
-/**
- * Handle card click
- */
-const handleCardClick = () => {
-  if (props.restricted) {
-    emit('restrictedAction', props.project.id)
-  } else {
-    emit('open', props.project.id)
-  }
-}
 </script>
 
 <template>

@@ -45,7 +45,7 @@ export function getWorkspaceContext(event: H3Event): WorkspaceContext {
 export function resolveOwner(
   userId: string,
   workspace: WorkspaceContext
-): { ownerId: string; ownerType: 'user' | 'team' } {
+): { ownerId: string, ownerType: 'user' | 'team' } {
   return {
     ownerId: workspace.id || userId,
     ownerType: workspace.type || 'user'
