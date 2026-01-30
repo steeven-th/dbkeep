@@ -11,7 +11,8 @@ export const useAuth = () => {
   const sessionQuery = import.meta.client ? useSession() : null
 
   // Shared session state (useState to share between components)
-  const sessionData = useState<{ user?: { id: string, email: string, name?: string } } | null>('auth-session', () => null)
+  // Note: role field is added by Better Auth admin plugin ('user' | 'admin')
+  const sessionData = useState<{ user?: { id: string, email: string, name?: string, role?: string } } | null>('auth-session', () => null)
   const isLoading = useState<boolean>('auth-loading', () => false)
   const error = useState<Error | null>('auth-error', () => null)
 
