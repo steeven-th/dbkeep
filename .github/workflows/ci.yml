@@ -1,4 +1,4 @@
-name: CI
+name: 🧪 Linter & Tests
 
 on:
   pull_request:

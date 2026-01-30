@@ -2,9 +2,12 @@
 // Note: 'any' types are necessary because node-sql-parser returns a dynamic AST
 // whose structure varies depending on the SQL dialect and query type
 
-import { Parser } from 'node-sql-parser'
+// Import as default export for CommonJS compatibility in ESM context
+import nodeSqlParser from 'node-sql-parser'
 import type { TableData, Column, Relation } from '~/types/database'
 import { ColumnType, RelationType, generateId } from '~/types/database'
+
+const { Parser } = nodeSqlParser
 
 /**
  * SQL parsing error with position for Monaco
