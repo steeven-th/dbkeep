@@ -14,6 +14,9 @@ export const user = pgTable('user', {
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
   role: text('role').default('user'), // 'user' | 'admin' - Better Auth admin plugin
+  banned: boolean('banned').default(false), // Better Auth admin plugin
+  banReason: text('ban_reason'), // Better Auth admin plugin
+  banExpires: timestamptz('ban_expires'), // Better Auth admin plugin
   createdAt: timestamptz('created_at').notNull().defaultNow(),
   updatedAt: timestamptz('updated_at').notNull().defaultNow()
 })
