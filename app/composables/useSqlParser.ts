@@ -4,9 +4,10 @@
 
 // Import as default export for CommonJS compatibility in ESM context
 import nodeSqlParser from 'node-sql-parser'
-const { Parser } = nodeSqlParser
 import type { TableData, Column, Relation } from '~/types/database'
 import { ColumnType, RelationType, generateId } from '~/types/database'
+
+const { Parser } = nodeSqlParser
 
 /**
  * SQL parsing error with position for Monaco
