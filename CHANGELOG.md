@@ -1,3 +1,13 @@
+## [0.1.13](https://github.com/steeven-th/dbkeep/compare/v0.1.12...v0.1.13) (2026-01-30)
+
+
+### Bug Fixes
+
+* add email existence error handling and map Better Auth errors to i18n keys ([ebbe6c2](https://github.com/steeven-th/dbkeep/commit/ebbe6c28a7fbd17ddf337bc1bc8454742237e1f3))
+* extend Better Auth admin plugin support with user ban fields in schema ([61faa33](https://github.com/steeven-th/dbkeep/commit/61faa334cd07998c280cf19d1bd01120fdd90ec6))
+
+
+
 ## [0.1.12](https://github.com/steeven-th/dbkeep/compare/v0.1.11...v0.1.12) (2026-01-30)
 
 
