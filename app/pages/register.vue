@@ -21,6 +21,22 @@ onMounted(() => {
 // Form state
 const formError = ref<string | null>(null)
 
+/**
+ * Maps Better Auth error messages to i18n keys
+ */
+const mapErrorToI18n = (error: string | undefined): string => {
+  if (!error) return t('auth.error_register')
+
+  // Map known Better Auth errors to translations
+  const errorLower = error.toLowerCase()
+  if (errorLower.includes('already exists') || errorLower.includes('already in use')) {
+    return t('auth.error_email_exists')
+  }
+
+  // Default fallback
+  return t('auth.error_register')
+}
+
 // Zod validation schema
 const schema = z.object({
   name: z.string().min(2, t('auth.name_min_length')),
@@ -55,7 +71,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   })
 
   if (!result.success) {
-    formError.value = result.error || t('auth.error_register')
+    formError.value = mapErrorToI18n(result.error)
   }
 }
 </script>
