@@ -1,4 +1,5 @@
 import { createAuthClient } from 'better-auth/vue'
+import { adminClient } from 'better-auth/client/plugins'
 
 /**
  * Better Auth client for Vue/Nuxt frontend
@@ -7,7 +8,10 @@ import { createAuthClient } from 'better-auth/vue'
 export const authClient = createAuthClient({
   baseURL: import.meta.server
     ? (process.env.BETTER_AUTH_URL || 'http://localhost:3000')
-    : window.location.origin
+    : window.location.origin,
+  plugins: [
+    adminClient() // Adds admin role support to client
+  ]
 })
 
 // Export main methods

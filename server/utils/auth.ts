@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { admin } from 'better-auth/plugins'
 import { db } from '../database/drizzle'
 import * as schema from '../database/schema'
 import { sendPasswordResetEmail, sendEmailVerification, isEmailConfigured } from '../services/emailService'
@@ -82,7 +83,12 @@ export const auth = betterAuth({
   // Trusted origins (for development with multiple ports)
   trustedOrigins: process.env.NODE_ENV !== 'production'
     ? ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002']
-    : undefined
+    : undefined,
+
+  // Plugins
+  plugins: [
+    admin() // Adds role field ('user' | 'admin') and admin API routes
+  ]
 })
 
 // Session type

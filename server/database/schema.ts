@@ -5,7 +5,7 @@ const timestamptz = (name: string) => timestamp(name, { withTimezone: true })
 
 /**
  * User table - Application users
- * Compatible with Better Auth
+ * Compatible with Better Auth (with admin plugin)
  */
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -13,6 +13,7 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
+  role: text('role').default('user'), // 'user' | 'admin' - Better Auth admin plugin
   createdAt: timestamptz('created_at').notNull().defaultNow(),
   updatedAt: timestamptz('updated_at').notNull().defaultNow()
 })
