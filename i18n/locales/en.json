@@ -302,6 +302,7 @@
     "passwords_not_match": "Passwords do not match",
     "error_login": "Unable to sign in. Please check your credentials.",
     "error_register": "Unable to create account. Please try again.",
+    "error_email_exists": "This email address is already in use.",
     "error_logout": "Unable to sign out. Please try again."
   },
   "profile": {
