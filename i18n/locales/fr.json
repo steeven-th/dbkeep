@@ -233,7 +233,11 @@
     "no_action": "NO ACTION",
     "confirm_delete": "Êtes-vous sûr de vouloir supprimer cette relation ?",
     "already_exists": "Relation déjà existante",
-    "already_exists_description": "Une relation entre ces deux colonnes existe déjà."
+    "already_exists_description": "Une relation entre ces deux colonnes existe déjà.",
+    "source_anchor": "Ancrage source",
+    "target_anchor": "Ancrage cible",
+    "anchor_left": "Gauche",
+    "anchor_right": "Droite"
   },
   "engines": {
     "postgresql": "PostgreSQL",
