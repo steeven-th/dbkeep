@@ -74,6 +74,7 @@ watch(
 // Vue Flow configuration
 const {
   onConnect,
+  onEdgeUpdate,
   onNodeDragStop,
   onNodesInitialized,
   onNodesChange,
@@ -147,9 +148,17 @@ const edgeTypes = {
   relation: markRaw(RelationEdge)
 }
 
-// State for relation creation modal (kept for future use)
-const _showRelationEditor = ref(false)
-const _pendingConnection = ref<Connection | null>(null)
+/**
+ * Parses a handle ID to extract column ID and side
+ * Handle format: columnId-side-type (e.g. "abc123-left-target", "abc123-right-source")
+ */
+const parseHandle = (handleId: string) => {
+  const parts = handleId.split('-')
+  const _type = parts.pop()! // "source" or "target"
+  const side = parts.pop()! // "left" or "right"
+  const columnId = parts.join('-') // rest is columnId (UUID can contain dashes)
+  return { columnId, side: side as 'left' | 'right' }
+}
 
 /**
  * Handles a new connection between two columns
@@ -158,19 +167,19 @@ onConnect((connection: Connection) => {
   // Block in read-only mode
   if (canvasReadOnly.value) return
 
-  // Extract table and column IDs from handles
-  // Remove -source or -target suffix (regardless of handle type used)
-  const sourceColumnId = connection.sourceHandle?.replace(/-(source|target)$/, '')
-  const targetColumnId = connection.targetHandle?.replace(/-(source|target)$/, '')
+  if (!connection.sourceHandle || !connection.targetHandle) return
 
-  if (!sourceColumnId || !targetColumnId) return
+  const source = parseHandle(connection.sourceHandle)
+  const target = parseHandle(connection.targetHandle)
 
   // Create a new relation
   const relation = projectStore.addRelation({
     sourceTableId: connection.source,
-    sourceColumnId,
+    sourceColumnId: source.columnId,
+    sourceHandlePosition: source.side,
     targetTableId: connection.target,
-    targetColumnId,
+    targetColumnId: target.columnId,
+    targetHandlePosition: target.side,
     type: RelationType.ONE_TO_MANY
   })
 
@@ -189,6 +198,68 @@ onConnect((connection: Connection) => {
       icon: 'i-lucide-alert-triangle'
     })
   }
+})
+
+/**
+ * Handles edge update (user drags an edge endpoint to a different handle)
+ */
+onEdgeUpdate(({ edge, connection }) => {
+  if (canvasReadOnly.value) return
+
+  if (!connection.sourceHandle || !connection.targetHandle) return
+
+  const source = parseHandle(connection.sourceHandle)
+  const target = parseHandle(connection.targetHandle)
+
+  // Validate tables and columns exist
+  const sourceTable = projectStore.getTable(connection.source)
+  const targetTable = projectStore.getTable(connection.target)
+  if (!sourceTable || !targetTable) return
+  if (!sourceTable.columns.find(c => c.id === source.columnId)) return
+  if (!targetTable.columns.find(c => c.id === target.columnId)) return
+
+  const oldRelation = edge.data as import('~/types/database').Relation
+
+  // Check if columns actually changed (not just side)
+  const columnsChanged = (
+    connection.source !== oldRelation.sourceTableId
+    || source.columnId !== oldRelation.sourceColumnId
+    || connection.target !== oldRelation.targetTableId
+    || target.columnId !== oldRelation.targetColumnId
+  )
+
+  // Check for duplicate only if columns changed
+  if (columnsChanged) {
+    const duplicate = projectStore.currentProject.value?.relations.find(r =>
+      r.id !== edge.id
+      && ((r.sourceTableId === connection.source && r.sourceColumnId === source.columnId
+        && r.targetTableId === connection.target && r.targetColumnId === target.columnId)
+      || (r.sourceTableId === connection.target && r.sourceColumnId === target.columnId
+        && r.targetTableId === connection.source && r.targetColumnId === source.columnId))
+    )
+    if (duplicate) {
+      toast.add({
+        title: t('relation.already_exists'),
+        description: t('relation.already_exists_description'),
+        color: 'warning',
+        icon: 'i-lucide-alert-triangle'
+      })
+      return
+    }
+  }
+
+  // Persist: update relation data + edge handles
+  const updates = {
+    sourceTableId: connection.source,
+    sourceColumnId: source.columnId,
+    sourceHandlePosition: source.side as 'left' | 'right',
+    targetTableId: connection.target,
+    targetColumnId: target.columnId,
+    targetHandlePosition: target.side as 'left' | 'right'
+  }
+
+  projectStore.updateRelation(edge.id, updates)
+  canvasStore.updateEdge(edge.id, updates)
 })
 
 /**

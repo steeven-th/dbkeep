@@ -235,6 +235,57 @@ const saveAndClose = () => {
 
         <USeparator />
 
+        <!-- Visual anchoring (purely cosmetic) -->
+        <div class="grid grid-cols-2 gap-4">
+          <UFormField :label="t('relation.source_anchor')">
+            <div class="flex gap-1 w-full">
+              <UButton
+                :color="(relation.sourceHandlePosition || 'right') === 'left' ? 'primary' : 'neutral'"
+                :variant="(relation.sourceHandlePosition || 'right') === 'left' ? 'solid' : 'outline'"
+                icon="i-lucide-panel-left"
+                class="flex-1"
+                @click="updateRelation('sourceHandlePosition', 'left')"
+              >
+                {{ t('relation.anchor_left') }}
+              </UButton>
+              <UButton
+                :color="(relation.sourceHandlePosition || 'right') === 'right' ? 'primary' : 'neutral'"
+                :variant="(relation.sourceHandlePosition || 'right') === 'right' ? 'solid' : 'outline'"
+                icon="i-lucide-panel-right"
+                class="flex-1"
+                @click="updateRelation('sourceHandlePosition', 'right')"
+              >
+                {{ t('relation.anchor_right') }}
+              </UButton>
+            </div>
+          </UFormField>
+
+          <UFormField :label="t('relation.target_anchor')">
+            <div class="flex gap-1 w-full">
+              <UButton
+                :color="(relation.targetHandlePosition || 'left') === 'left' ? 'primary' : 'neutral'"
+                :variant="(relation.targetHandlePosition || 'left') === 'left' ? 'solid' : 'outline'"
+                icon="i-lucide-panel-left"
+                class="flex-1"
+                @click="updateRelation('targetHandlePosition', 'left')"
+              >
+                {{ t('relation.anchor_left') }}
+              </UButton>
+              <UButton
+                :color="(relation.targetHandlePosition || 'left') === 'right' ? 'primary' : 'neutral'"
+                :variant="(relation.targetHandlePosition || 'left') === 'right' ? 'solid' : 'outline'"
+                icon="i-lucide-panel-right"
+                class="flex-1"
+                @click="updateRelation('targetHandlePosition', 'right')"
+              >
+                {{ t('relation.anchor_right') }}
+              </UButton>
+            </div>
+          </UFormField>
+        </div>
+
+        <USeparator />
+
         <!-- Referential actions -->
         <div class="grid grid-cols-2 gap-4">
           <UFormField :label="t('relation.on_delete')">

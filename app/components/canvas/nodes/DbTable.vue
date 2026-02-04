@@ -48,19 +48,29 @@ const getTypeDisplay = (column: Column): string => {
 }
 
 /**
- * Checks if a column is the source of a relation (right side)
+ * Checks if a column has a connection on the left side
  */
-const isSourceConnected = (columnId: string): boolean => {
+const isConnectedLeft = (columnId: string): boolean => {
   const relations = projectStore.currentProject.value?.relations || []
-  return relations.some(r => r.sourceTableId === props.id && r.sourceColumnId === columnId)
+  return relations.some(r =>
+    (r.sourceTableId === props.id && r.sourceColumnId === columnId
+      && (r.sourceHandlePosition || 'right') === 'left')
+    || (r.targetTableId === props.id && r.targetColumnId === columnId
+      && (r.targetHandlePosition || 'left') === 'left')
+  )
 }
 
 /**
- * Checks if a column is the target of a relation (left side)
+ * Checks if a column has a connection on the right side
  */
-const isTargetConnected = (columnId: string): boolean => {
+const isConnectedRight = (columnId: string): boolean => {
   const relations = projectStore.currentProject.value?.relations || []
-  return relations.some(r => r.targetTableId === props.id && r.targetColumnId === columnId)
+  return relations.some(r =>
+    (r.sourceTableId === props.id && r.sourceColumnId === columnId
+      && (r.sourceHandlePosition || 'right') === 'right')
+    || (r.targetTableId === props.id && r.targetColumnId === columnId
+      && (r.targetHandlePosition || 'left') === 'right')
+  )
 }
 </script>
 
@@ -99,13 +109,20 @@ const isTargetConnected = (columnId: string): boolean => {
         :key="column.id"
         class="column-row relative px-3 py-2 flex items-center gap-2 text-sm hover:bg-elevated transition-colors"
       >
-        <!-- Target handle (input - left side) -->
+        <!-- Left side handles (superimposed at the same position) -->
         <Handle
-          :id="`${column.id}-target`"
+          :id="`${column.id}-left-target`"
           type="target"
           :position="Position.Left"
           class="connection-handle target-handle"
-          :class="{ 'is-connected': isTargetConnected(column.id) }"
+          :class="{ 'is-connected': isConnectedLeft(column.id) }"
+        />
+        <Handle
+          :id="`${column.id}-left-source`"
+          type="source"
+          :position="Position.Left"
+          class="connection-handle source-handle"
+          :class="{ 'is-connected': isConnectedLeft(column.id) }"
         />
 
         <!-- Constraint icon -->
@@ -142,13 +159,20 @@ const isTargetConnected = (columnId: string): boolean => {
           </UTooltip>
         </div>
 
-        <!-- Source handle (output - right side) -->
+        <!-- Right side handles (superimposed at the same position) -->
         <Handle
-          :id="`${column.id}-source`"
+          :id="`${column.id}-right-source`"
           type="source"
           :position="Position.Right"
           class="connection-handle source-handle"
-          :class="{ 'is-connected': isSourceConnected(column.id) }"
+          :class="{ 'is-connected': isConnectedRight(column.id) }"
+        />
+        <Handle
+          :id="`${column.id}-right-target`"
+          type="target"
+          :position="Position.Right"
+          class="connection-handle target-handle"
+          :class="{ 'is-connected': isConnectedRight(column.id) }"
         />
       </div>
 

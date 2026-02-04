@@ -159,6 +159,8 @@ export interface Relation {
   type: RelationType
   onDelete?: ReferentialAction
   onUpdate?: ReferentialAction
+  sourceHandlePosition?: 'left' | 'right' // Visual only. Default: 'right'
+  targetHandlePosition?: 'left' | 'right' // Visual only. Default: 'left'
 }
 
 // Interface for complete project

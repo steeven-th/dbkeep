@@ -233,7 +233,11 @@
     "no_action": "NO ACTION",
     "confirm_delete": "Are you sure you want to delete this relation?",
     "already_exists": "Relation already exists",
-    "already_exists_description": "A relation between these two columns already exists."
+    "already_exists_description": "A relation between these two columns already exists.",
+    "source_anchor": "Source anchor",
+    "target_anchor": "Target anchor",
+    "anchor_left": "Left",
+    "anchor_right": "Right"
   },
   "engines": {
     "postgresql": "PostgreSQL",

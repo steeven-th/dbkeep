@@ -26,6 +26,24 @@ export const useCanvasStore = () => {
   // === Helpers ===
 
   /**
+   * Builds source handle ID from a relation
+   * Format: columnId-side-source
+   */
+  const buildSourceHandle = (relation: Relation): string => {
+    const side = relation.sourceHandlePosition || 'right'
+    return `${relation.sourceColumnId}-${side}-source`
+  }
+
+  /**
+   * Builds target handle ID from a relation
+   * Format: columnId-side-target
+   */
+  const buildTargetHandle = (relation: Relation): string => {
+    const side = relation.targetHandlePosition || 'left'
+    return `${relation.targetColumnId}-${side}-target`
+  }
+
+  /**
    * Calculates the next position for a new node
    */
   const getNextNodePosition = (): NodePosition => {
@@ -113,8 +131,8 @@ export const useCanvasStore = () => {
           type: 'relation',
           source: relation.sourceTableId,
           target: relation.targetTableId,
-          sourceHandle: `${relation.sourceColumnId}-source`,
-          targetHandle: `${relation.targetColumnId}-target`,
+          sourceHandle: buildSourceHandle(relation),
+          targetHandle: buildTargetHandle(relation),
           data: relation,
           zIndex: 1001 // Above tables (1000) and groups (0)
         })
@@ -153,8 +171,8 @@ export const useCanvasStore = () => {
       type: 'relation',
       source: relation.sourceTableId,
       target: relation.targetTableId,
-      sourceHandle: `${relation.sourceColumnId}-source`,
-      targetHandle: `${relation.targetColumnId}-target`,
+      sourceHandle: buildSourceHandle(relation),
+      targetHandle: buildTargetHandle(relation),
       data: relation,
       zIndex: 1001 // Above tables (1000) and groups (0)
     })).filter((edge) => {
@@ -363,8 +381,8 @@ export const useCanvasStore = () => {
       type: 'relation',
       source: relation.sourceTableId,
       target: relation.targetTableId,
-      sourceHandle: `${relation.sourceColumnId}-source`,
-      targetHandle: `${relation.targetColumnId}-target`,
+      sourceHandle: buildSourceHandle(relation),
+      targetHandle: buildTargetHandle(relation),
       data: relation,
       zIndex: 1001 // Above tables (1000) and groups (0)
     }
@@ -388,12 +406,16 @@ export const useCanvasStore = () => {
   const updateEdge = (edgeId: string, updates: Partial<Relation>) => {
     edges.value = edges.value.map((edge) => {
       if (edge.id === edgeId) {
+        const newData = { ...edge.data, ...updates } as Relation
+        const sourceSide = newData.sourceHandlePosition || 'right'
+        const targetSide = newData.targetHandlePosition || 'left'
         return {
           ...edge,
-          data: {
-            ...edge.data,
-            ...updates
-          }
+          source: newData.sourceTableId,
+          target: newData.targetTableId,
+          sourceHandle: `${newData.sourceColumnId}-${sourceSide}-source`,
+          targetHandle: `${newData.targetColumnId}-${targetSide}-target`,
+          data: newData
         }
       }
       return edge
