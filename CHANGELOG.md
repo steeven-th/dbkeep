@@ -1,3 +1,12 @@
+## [0.1.14](https://github.com/steeven-th/dbkeep/compare/v0.1.13...v0.1.14) (2026-02-04)
+
+
+### Features
+
+* add support for visual anchor positioning on relation handles (left/right) and enable edge updates via drag ([baf39af](https://github.com/steeven-th/dbkeep/commit/baf39aff18e876143cbda26c1e1f13cb06115747))
+
+
+
 ## [0.1.13](https://github.com/steeven-th/dbkeep/compare/v0.1.12...v0.1.13) (2026-01-30)
 
 
