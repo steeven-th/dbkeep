@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { z } from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import { requestPasswordReset } from '~/utils/auth-client'
 
 definePageMeta({
   layout: 'landing',
@@ -8,40 +9,47 @@ definePageMeta({
 })
 
 const { t } = useI18n()
-const { login, isLoading } = useAuth()
-const { isRegisterEnabled, isGuestModeEnabled } = useAppMode()
-const router = useRouter()
 
 // Form state
 const formError = ref<string | null>(null)
+const isLoading = ref(false)
+const emailSent = ref(false)
+const sentEmail = ref('')
 
 // Zod validation schema
 const schema = z.object({
-  email: z.string().email(t('auth.invalid_email')),
-  password: z.string().min(1, t('auth.password_required'))
+  email: z.string().email(t('auth.invalid_email'))
 })
 
 type Schema = z.output<typeof schema>
 
-// Initial form state
 const state = reactive<Schema>({
-  email: '',
-  password: ''
+  email: ''
 })
 
 /**
- * Login form submission
+ * Submit forgot password request
  */
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+  if (isLoading.value) return
+
   formError.value = null
+  isLoading.value = true
 
-  const result = await login({
-    email: event.data.email,
-    password: event.data.password
-  })
-
-  if (!result.success) {
-    formError.value = result.error || t('auth.error_login')
+  try {
+    await requestPasswordReset({
+      email: event.data.email,
+      redirectTo: '/reset-password'
+    })
+    // Always show success (security: don't reveal if the email exists)
+    sentEmail.value = event.data.email
+    emailSent.value = true
+  } catch {
+    // Still show success for security reasons
+    sentEmail.value = event.data.email
+    emailSent.value = true
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -62,15 +70,36 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           <span class="font-bold text-2xl">{{ t('app_name') }}</span>
         </NuxtLink>
         <h1 class="text-2xl font-bold">
-          {{ t('auth.login_title') }}
+          {{ t('auth.forgot_password_title') }}
         </h1>
         <p class="text-muted mt-2">
-          {{ t('auth.login_subtitle') }}
+          {{ t('auth.forgot_password_subtitle') }}
         </p>
       </div>
 
+      <!-- Success message -->
+      <UCard v-if="emailSent">
+        <div class="space-y-4">
+          <UAlert
+            color="success"
+            icon="i-lucide-mail-check"
+            :title="t('auth.forgot_password_success_title')"
+            :description="t('auth.forgot_password_success_message', { email: sentEmail })"
+          />
+
+          <UButton
+            to="/login"
+            block
+            size="lg"
+            variant="soft"
+          >
+            {{ t('auth.forgot_password_back_login') }}
+          </UButton>
+        </div>
+      </UCard>
+
       <!-- Form -->
-      <UCard>
+      <UCard v-else>
         <UForm
           :schema="schema"
           :state="state"
@@ -102,68 +131,26 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             />
           </UFormField>
 
-          <!-- Password -->
-          <UFormField
-            :label="t('auth.password')"
-            name="password"
-          >
-            <UInput
-              v-model="state.password"
-              type="password"
-              :placeholder="t('auth.password_placeholder')"
-              icon="i-lucide-lock"
-              size="lg"
-              class="w-full"
-            />
-          </UFormField>
-
-          <!-- Forgot password link -->
-          <div class="text-right">
-            <NuxtLink
-              to="/forgot-password"
-              class="text-sm text-primary hover:underline"
-            >
-              {{ t('auth.forgot_password_link') }}
-            </NuxtLink>
-          </div>
-
-          <!-- Login button -->
+          <!-- Submit button -->
           <UButton
             type="submit"
             block
             size="lg"
             :loading="isLoading"
           >
-            {{ t('auth.login_button') }}
+            {{ t('auth.forgot_password_button') }}
           </UButton>
         </UForm>
 
-        <!-- Link to registration (if enabled) -->
+        <!-- Link back to login -->
         <template #footer>
-          <div class="text-center text-sm space-y-3">
-            <!-- Registration link -->
-            <div v-if="isRegisterEnabled">
-              <span class="text-muted">{{ t('auth.no_account') }}</span>
-              {{ ' ' }}
-              <NuxtLink
-                to="/register"
-                class="text-primary hover:underline font-medium"
-              >
-                {{ t('auth.register_link') }}
-              </NuxtLink>
-            </div>
-
-            <!-- Guest mode option -->
-            <div v-if="isGuestModeEnabled">
-              <UButton
-                variant="soft"
-                color="neutral"
-                block
-                @click="router.push('/app')"
-              >
-                {{ t('guest.mode_label') }}
-              </UButton>
-            </div>
+          <div class="text-center text-sm">
+            <NuxtLink
+              to="/login"
+              class="text-primary hover:underline font-medium"
+            >
+              {{ t('auth.forgot_password_back_login') }}
+            </NuxtLink>
           </div>
         </template>
       </UCard>
