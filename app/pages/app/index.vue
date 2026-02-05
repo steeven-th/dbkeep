@@ -48,11 +48,15 @@ const showRenameModal = computed({
   }
 })
 
-// Close any open project and load list on mount
-onMounted(() => {
-  closeProject()
+// Close any open project immediately
+closeProject()
+
+// Start loading projects in setup (not onMounted) to avoid stale data flash.
+// The synchronous part of fetchProjects (clear projects + set loading)
+// runs before the first render, ensuring skeletons show immediately.
+if (import.meta.client) {
   fetchProjects()
-})
+}
 
 /**
  * Opens the new project modal
