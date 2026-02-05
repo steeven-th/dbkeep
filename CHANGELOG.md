@@ -1,3 +1,13 @@
+## [0.1.15](https://github.com/steeven-th/dbkeep/compare/v0.1.14...v0.1.15) (2026-02-05)
+
+
+### Features
+
+* add guest-only middleware and optimize project loading flow ([cd9df73](https://github.com/steeven-th/dbkeep/commit/cd9df73c2de06c1961c8b0fd55a2aab6bb3e80d4))
+* add guest-only middleware and optimize project loading flow ([1ac297a](https://github.com/steeven-th/dbkeep/commit/1ac297af4bb3dc36ab264f2569dc13e47f603455))
+
+
+
 ## [0.1.14](https://github.com/steeven-th/dbkeep/compare/v0.1.13...v0.1.14) (2026-02-04)
 
 
