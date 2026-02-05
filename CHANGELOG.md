@@ -1,3 +1,12 @@
+## [0.1.16](https://github.com/steeven-th/dbkeep/compare/v0.1.15...v0.1.16) (2026-02-05)
+
+
+### Features
+
+* add forgot password and reset password pages ([29d9012](https://github.com/steeven-th/dbkeep/commit/29d901229a882e2d0c8a4dcb9438f2e88b583517))
+
+
+
 ## [0.1.15](https://github.com/steeven-th/dbkeep/compare/v0.1.14...v0.1.15) (2026-02-05)
 
 
