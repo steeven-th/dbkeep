@@ -40,6 +40,7 @@ export const useProjects = () => {
    */
   const fetchProjects = async () => {
     isLoadingList.value = true
+    projects.value = []
     try {
       const data = await $fetch<ProjectListItem[]>('/api/projects')
       projects.value = data
@@ -322,6 +323,7 @@ export const useProjects = () => {
   const resetProjectsList = () => {
     projects.value = []
     hasLoadedOnce.value = false
+    isLoadingList.value = true
   }
 
   // Reset projects when user changes or logs out
