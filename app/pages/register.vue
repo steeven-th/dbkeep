@@ -3,7 +3,8 @@ import { z } from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({
-  layout: 'landing'
+  layout: 'landing',
+  middleware: 'guest',
 })
 
 const { t } = useI18n()
