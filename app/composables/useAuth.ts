@@ -60,7 +60,9 @@ export const useAuth = () => {
       const result = await signUp.email({
         email: data.email,
         password: data.password,
-        name: data.name
+        name: data.name,
+        // Where the verification link redirects once the email is verified
+        callbackURL: '/verify-email'
       })
 
       if (result.error) {

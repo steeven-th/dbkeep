@@ -328,7 +328,14 @@
     "reset_password_no_token": "No reset link found.",
     "reset_password_request_new": "Request a new link",
     "error_forgot_password": "Unable to send the reset email.",
-    "error_reset_password": "Unable to reset password. The link may have expired."
+    "error_reset_password": "Unable to reset password. The link may have expired.",
+    "verify_email_title": "Email verification",
+    "verify_email_success_title": "Email verified!",
+    "verify_email_success_message": "Your email address has been successfully verified. You can now make the most of DBKeep.",
+    "verify_email_error_title": "Invalid or expired link",
+    "verify_email_error_message": "This verification link is invalid or has expired. Log in to receive a new link.",
+    "verify_email_continue": "Continue to the app",
+    "verify_email_back_login": "Back to login"
   },
   "profile": {
     "title": "My profile",

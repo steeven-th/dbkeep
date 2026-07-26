@@ -70,3 +70,48 @@ export function getValidLocale(locale?: string): SupportedLocale {
   }
   return 'en'
 }
+
+/**
+ * Extract the preferred locale from an incoming request.
+ *
+ * Detection order:
+ * 1. The `i18n_redirected` cookie (set by the front-end i18n module,
+ *    reflects the user's chosen/detected language)
+ * 2. The `Accept-Language` header (browser language)
+ * 3. Fallback to the default locale
+ *
+ * Useful for transactional emails sent during flows where the user is not
+ * yet persisted (e.g. sign-up), so their language cannot be read from the DB.
+ *
+ * @param request - The incoming web Request (may be undefined)
+ * @returns A supported locale
+ */
+export function getLocaleFromRequest(request?: Request): SupportedLocale {
+  if (!request) {
+    return getValidLocale()
+  }
+
+  // 1. Try the i18n cookie
+  const cookieHeader = request.headers.get('cookie')
+  if (cookieHeader) {
+    const match = cookieHeader.match(/(?:^|;\s*)i18n_redirected=([^;]+)/)
+    if (match && match[1]) {
+      const cookieLocale = decodeURIComponent(match[1])
+      if (isValidLocale(cookieLocale)) {
+        return cookieLocale
+      }
+    }
+  }
+
+  // 2. Fallback to the Accept-Language header (first language tag)
+  const acceptLanguage = request.headers.get('accept-language')
+  if (acceptLanguage) {
+    const primary = acceptLanguage.split(',')[0]?.trim().slice(0, 2).toLowerCase()
+    if (primary && isValidLocale(primary)) {
+      return primary
+    }
+  }
+
+  // 3. Default locale
+  return getValidLocale()
+}

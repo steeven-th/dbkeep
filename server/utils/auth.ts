@@ -4,6 +4,7 @@ import { admin } from 'better-auth/plugins'
 import { db } from '../database/drizzle'
 import * as schema from '../database/schema'
 import { sendPasswordResetEmail, sendEmailVerification, isEmailConfigured } from '../services/emailService'
+import { getLocaleFromRequest } from './i18n'
 
 /**
  * Better Auth configuration
@@ -34,7 +35,7 @@ export const auth = betterAuth({
     minPasswordLength: 8,
 
     // Password reset email
-    sendResetPassword: async ({ user, url }) => {
+    sendResetPassword: async ({ user, url }, request) => {
       if (!isEmailConfigured()) {
         console.warn('[Auth] Email not configured - reset link:', url)
         return
@@ -43,14 +44,16 @@ export const auth = betterAuth({
       await sendPasswordResetEmail({
         to: user.email,
         resetUrl: url,
-        expiresInMinutes: 60
+        expiresInMinutes: 60,
+        // Detect the language from the request (user may not be persisted yet)
+        locale: getLocaleFromRequest(request)
       })
     }
   },
 
   // Email verification (optional, disabled by default)
   emailVerification: {
-    sendVerificationEmail: async ({ user, url }) => {
+    sendVerificationEmail: async ({ user, url }, request) => {
       if (!isEmailConfigured()) {
         console.warn('[Auth] Email not configured - verification link:', url)
         return
@@ -59,7 +62,9 @@ export const auth = betterAuth({
       await sendEmailVerification({
         to: user.email,
         verifyUrl: url,
-        userName: user.name
+        userName: user.name,
+        // Detect the language from the request (user is not verified yet)
+        locale: getLocaleFromRequest(request)
       })
     },
     // Disabled by default, can be enabled via env

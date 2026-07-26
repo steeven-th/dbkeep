@@ -328,7 +328,14 @@
     "reset_password_no_token": "Aucun lien de réinitialisation trouvé.",
     "reset_password_request_new": "Demander un nouveau lien",
     "error_forgot_password": "Impossible d'envoyer l'email de réinitialisation.",
-    "error_reset_password": "Impossible de réinitialiser le mot de passe. Le lien a peut-être expiré."
+    "error_reset_password": "Impossible de réinitialiser le mot de passe. Le lien a peut-être expiré.",
+    "verify_email_title": "Vérification de l'email",
+    "verify_email_success_title": "Email vérifié !",
+    "verify_email_success_message": "Votre adresse email a bien été vérifiée. Vous pouvez maintenant profiter pleinement de DBKeep.",
+    "verify_email_error_title": "Lien invalide ou expiré",
+    "verify_email_error_message": "Ce lien de vérification est invalide ou a expiré. Connectez-vous pour recevoir un nouveau lien.",
+    "verify_email_continue": "Continuer vers l'application",
+    "verify_email_back_login": "Retour à la connexion"
   },
   "profile": {
     "title": "Mon profil",
